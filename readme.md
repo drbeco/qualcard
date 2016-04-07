@@ -32,17 +32,20 @@ Projeto de Aprendizado de temas diversos via repetição espaçada de cartões (
 ## Licença ##
 
 ### Autor ###
-Prof. Dr. Ruben Carlo Benante
-Email: <rcb@beco.cc>
-Data: 2016-04-07
+
+* Prof. Dr. Ruben Carlo Benante
+    - Email: <rcb@beco.cc>
+    - Data da criação: 2016-04-07
 
 ### Colaboradores ###
-Gerônimo de Sá Barreto Neto
-Email: <geronimoneto1994@gmail.com>
+
+* Gerônimo de Sá Barreto Neto
+    - Email: <geronimoneto1994@gmail.com>
 
 ### Licença pt\_BR ###
 
 qualcosa : um programa para estudar cartões usando repetição espaçada.
+
 Copyright (C) 2016 Ruben Carlo Benante <rcb@beco.cc>
 
 Este programa é software livre; você pode redistribuí-lo e/ou
@@ -64,6 +67,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 ### License en\_US ###
 
 qualcosa : a program to study cards using spaced repetition.
+
 Copyright (C) 2016 Ruben Carlo Benante <rcb@beco.cc>
 
 This program is free software: you can redistribute it and/or modify
