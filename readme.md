@@ -1,10 +1,10 @@
-= qualcard =
+# qualcard #
 
-== Introdução ==
+## Introdução ##
 
 Projeto de Aprendizado de temas diversos via repetição espaçada de cartões (flash cards).
 
-== Regras Implementadas ==
+## Regras Implementadas ##
 
 * A cada execução são apresentadas 10 cartões
 * Pelo menos um desses 10 cartões deve ser novo
@@ -17,7 +17,7 @@ Projeto de Aprendizado de temas diversos via repetição espaçada de cartões (
     - (B) Média < 3.25   -> reagendar para 3 dias
     - (C) Média < 4.50   -> reagendar para 5 dias
     - (D) Caso contrário -> reagendar para 7 dias
-* A nova média M1 é calculada com a fórmula: M1 = (M0 + N) / 2
+* A nova média M1 é calculada com a fórmula: M1 # (M0 + N) / 2
 * Quando todos os cartões estiverem com média (D) o programa parabeniza o estudante e imprime um certificado com:
     - Nome completo
     - Data de início
@@ -29,18 +29,18 @@ Projeto de Aprendizado de temas diversos via repetição espaçada de cartões (
     - Assinatura do Prof. Dr. Ruben Carlo Benante <rcb@beco.cc>
 * As médias usadas para agendamento têm um decaimento suave contínuo pelo período que o programa deixa de ser usado. Para evitar este decaimento, deve-se usar o programa no mínimo uma vez a cada dois dias.
 
-== Licença  ==
+## Licença ##
 
-=== Autor ===
+### Autor ###
 Prof. Dr. Ruben Carlo Benante
 Email: <rcb@beco.cc>
 Data: 2016-04-07
 
-=== Colaboradores ===
+### Colaboradores ###
 Gerônimo de Sá Barreto Neto
 Email: <geronimoneto1994@gmail.com>
 
-=== Licensa ===
+### Licença pt\_BR ###
 
 qualcosa : um programa para estudar cartões usando repetição espaçada.
 Copyright (C) 2016 Ruben Carlo Benante <rcb@beco.cc>
@@ -61,7 +61,7 @@ junto com este programa; se não, escreva para a Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 02111-1307, USA.
 
-=== License ===
+### License en\_US ###
 
 qualcosa : a program to study cards using spaced repetition.
 Copyright (C) 2016 Ruben Carlo Benante <rcb@beco.cc>
