@@ -17,7 +17,7 @@ Projeto de Aprendizado de temas diversos via repetição espaçada de cartões (
     - (B) Média < 3.25   -> reagendar para 3 dias
     - (C) Média < 4.50   -> reagendar para 5 dias
     - (D) Caso contrário -> reagendar para 7 dias
-* A nova média M1 é calculada com a fórmula: M1 # (M0 + N) / 2
+* A nova média M1 é calculada com a fórmula: M1 = (M0 + N) / 2
 * Quando todos os cartões estiverem com média (D) o programa parabeniza o estudante e imprime um certificado com:
     - Nome completo
     - Data de início
