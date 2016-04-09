@@ -1,6 +1,5 @@
 /* ************************************************************************ *
- *    PROGRAM_NAME, VERSION                                                 *
- *    qualcard, v0.1                                                        *
+ *    qualcard, Version 0.1                                                 *
  *    This program helps you learn from a set of cards with questions       *
  *    and answers                                                           *
  *                                                                          *
