@@ -43,7 +43,7 @@
  * @author Ruben Carlo Benante <<rcb@beco.cc>>
  * @par Webpage
  * <<a href="http://www.beco.cc">www.beco.cc</a>>
- * @copyright (c) 2016 GNU GPL v3
+ * @copyright (c) 2016 GNU GPL v2
  * @note This program is free software: you can redistribute it
  * and/or modify it under the terms of the
  * GNU General Public License as published by
