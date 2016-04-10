@@ -145,6 +145,9 @@ void summary(tcfg c); /* how many cards to review */
 int bdsize(FILE *fp); /* database size */
 double rand_minmax(double min, double max); /* drawn a number from [min, max[ */
 int newcard(tcfg c, char *card); /* drawn a new card */
+int ave2day(float ave); /* given an average, return how many days */
+void newdate(char *olddate, int days, char * newdate); /* add days to a date */
+
 int funcexample(int i, int *o, int *z); /* just an example with complete doxygen fields */
 
 /* ---------------------------------------------------------------------- */
@@ -195,6 +198,7 @@ int main(int argc, char *argv[])
     int l; /* line drawn */
     int i; /* index, auxiliary */
     char card[STRSIZE]; /* card drawn */
+    char newd[10];
 
     IFDEBUG("Starting optarg loop...\n");
 
@@ -256,12 +260,10 @@ int main(int argc, char *argv[])
     printf("DB: %s\n", c.bdados);
     printf("CF: %s\n", c.config);
 
-
-
     for(i=0; i<10; i++)
     {
         l=newcard(c, card);
-        printf("Card %4d: %s", l, card);
+        printf("Card %4d: %s", l+1, card);
     }
 
     if(c.fbd)
@@ -303,7 +305,7 @@ int bdsize(FILE *fp)
  */
 void summary(tcfg c)
 {
-    printf("QualCard - Spaced Repetition - %s\n", c.today);
+    printf("QualCard v.%s - Spaced Repetition - %s\n", VERSION, c.today);
     printf("User: %s\n", c.user);
     printf("%s: you have %d cards to review today.\n", "English", 5);
     return;
@@ -338,13 +340,13 @@ int newcard(tcfg c, char *card)
  */
 double rand_minmax(double min, double max)
 {
-    double sorte;
+    double s;
 
-    sorte = rand();
-    sorte /= ((float)RAND_MAX);
-    sorte *= (max-min);
-    sorte += min;
-    return sorte;
+    s = rand();
+    s /= ((float)RAND_MAX);
+    s *= (max-min);
+    s += min;
+    return s;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -387,10 +389,51 @@ void qualcard_init(tcfg *cfg) //(char *td, char *bd, char *cf)
     return;
 }
 
+/* given an average, return how many days */
+int ave2day(float ave)
+{
+    if(ave<0.1)
+        return 0; /* review today */
+    if(ave<2.0)
+        return 1; /* review tomorrow */
+    if(ave<3.25)
+        return 3; /* review in three days */
+    if(ave<4.50)
+        return 5; /* review in five days */
+    return 7; /* review in a week */
+}
 
+/* add days to a date */
+void newdate(char *oldd, int days, char *newd)
+{
+    int tudo, ano, mes, dia;
+    time_t timer; /* epochs */
+    struct tm date={0}; /* campos da data */
 
+    /*char str[LEN];
+    snprintf(str, LEN, "%d", 42);*/
+    /* char sdata[MAXSDATA]; / * data no formato escolhido */
 
+    tudo=(int)strtol(oldd, NULL, 10);
 
+    ano = tudo/10000; /* 20160410/10000=2016.0410 */
+    tudo -= ano*10000;
+    mes = tudo/100; /* 0410/100=04.10 */
+    tudo -= mes*100;
+    dia = tudo;
+
+    date.tm_year = ano-1900;
+    date.tm_mon = mes-1;
+    date.tm_mday = dia + days; /* add the number of days */
+
+    timer = mktime(&date);
+    date = *gmtime(&timer);
+    /*printf(“%s”,asctime(localtime(&timer))); */
+    sprintf(newd, "%04d%02d%02d",date.tm_year+1900,date.tm_mon+1,date.tm_mday);
+    /*printf("%s + %d = %s\n", olddate, days, newd); */
+    /*strftime(sdata, sizeof(sdata), "%F %H:%M", &tmant);
+    printf("Data antiga (SO): %s\n", sdata); */
+}
 
 
 
@@ -411,7 +454,7 @@ void qualcard_init(tcfg *cfg) //(char *td, char *bd, char *cf)
 void help(void)
 {
     IFDEBUG("help()");
-    printf("%s - %s\n", "qualcard", "Learn cards by Spaced Repetition Method");
+    printf("%s v.%s - %s\n", "qualcard", VERSION, "Learn cards by Spaced Repetition Method");
     printf("\nUsage: %s [-h|-v]\n", "qualcard");
     printf("\nOptions:\n");
     printf("\t-h,  --help\n\t\tShow this help.\n");
