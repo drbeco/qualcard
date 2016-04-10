@@ -147,6 +147,7 @@ double rand_minmax(double min, double max); /* drawn a number from [min, max[ */
 int newcard(tcfg c, char *card); /* drawn a new card */
 int ave2day(float ave); /* given an average, return how many days */
 void newdate(char *olddate, int days, char * newdate); /* add days to a date */
+char *readdate(char *oldd); /* return date in a readable format */
 
 int funcexample(int i, int *o, int *z); /* just an example with complete doxygen fields */
 
@@ -254,7 +255,7 @@ int main(int argc, char *argv[])
     }
     c.QTDCARD=bdsize(c.fbd);
 
-    printf("Today: %s\n", c.today);
+    printf("Today: %s\n", readdate(c.today));
     printf("Number of cards: %d\n", c.QTDCARD);
     printf("User: %s\n", c.user);
     printf("DB: %s\n", c.bdados);
@@ -427,18 +428,32 @@ void newdate(char *oldd, int days, char *newd)
     date.tm_mday = dia + days; /* add the number of days */
 
     timer = mktime(&date);
-    date = *gmtime(&timer);
-    /*printf(“%s”,asctime(localtime(&timer))); */
+    date = *gmtime(&timer); /* atribuir valor, nao o ponteiro */
+    /*printf("Local is %s\n",asctime(localtime(&timer))); */
+    /*printf("UTC is %s\n",asctime(gmtime(&timer))); */
+    /*strftime(sdata, sizeof(sdata), "%F %H:%M", &date);*/
     sprintf(newd, "%04d%02d%02d",date.tm_year+1900,date.tm_mon+1,date.tm_mday);
     /*printf("%s + %d = %s\n", olddate, days, newd); */
-    /*strftime(sdata, sizeof(sdata), "%F %H:%M", &tmant);
-    printf("Data antiga (SO): %s\n", sdata); */
 }
 
+/* return date in a readable format */
+char *readdate(char *oldd)
+{
+    static char* months[] = {"Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dec" };
+    static char dd[12];
+    int tudo, ano, mes, dia;
 
+    tudo=(int)strtol(oldd, NULL, 10);
 
+    ano = tudo/10000; /* 20160410/10000=2016.0410 */
+    tudo -= ano*10000;
+    mes = tudo/100; /* 0410/100=04.10 */
+    tudo -= mes*100;
+    dia = tudo;
 
-
+    sprintf(dd, "%02d-%s-%04d", dia, months[mes-1], ano);
+    return dd;
+}
 
 /* ---------------------------------------------------------------------- */
 /**
