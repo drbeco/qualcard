@@ -287,7 +287,7 @@ int bdsize(FILE *fp)
     fseek(fp, 0, 0 ); /* linha 0 */
     do
     {
-        fgets(line, TAMLINE-1, fp);
+        fgets(line, TAMLINE, fp);
         qtdl++;
     }while(!feof(fp));
     return --qtdl;
@@ -325,7 +325,7 @@ int newcard(tcfg c, char *card)
     l=(int)rand_minmax(0.0, c.QTDCARD); /* [= 0, QTDPAD-1 =] */
     fseek(c.fbd, 0, 0);
     for(i=0; i<=l; i++)
-        fgets(line, TAMLINE-1, c.fbd);
+        fgets(line, TAMLINE, c.fbd);
     strcpy(card, line);
     return l; /* linha do arquivo, de 0 a QTDPAD-1 */
 }
