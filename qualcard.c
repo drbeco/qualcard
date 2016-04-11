@@ -118,6 +118,7 @@
 /* limits */
 #define TAMLINE 1500
 #define STRSIZE 256 /**< String buffer size */
+#define DTSIZE 9 /**< String with yyyymmdd */
 #define PEREXEC 10 /**< How many cards presented per round (execution) */
 #define NEWEXEC 1 /**< Minimum number of new cards presented per round */
 
@@ -129,11 +130,11 @@ static int verb=0; /**< verbose level, global within the file */
 typedef struct scfg /* configuration data struct */
 {
     int QTDCARD; /* database size */
-    char today[14]; /* yyyymmdd */
+    int today; /* yyyymmdd */
     char user[STRSIZE]; /* user name */
     char dbasef[STRSIZE], config[STRSIZE]; /* filenames: database and configuration */
-    FILE *fdb; /* database file pointer */
-    FILE *fcf; /* config file pointer */
+//     FILE *fdb; /* database file pointer */
+//     FILE *fcf; /* config file pointer */
     int *cfcard, *cfdate; /* card num, last date */
     float *cfave; /* card average */
     int cfsize; /* size of config file */
@@ -149,16 +150,20 @@ void help(void); /* print some help */
 void copyr(void); /* print version and copyright information */
 void qualcard_init(tcfg *cfg); /* global initialization function */
 void summary(tcfg c); /* how many cards to review */
-int dbsize(FILE *fp); /* database size */
+int dbsize(char *dbname); /* database size */
 double randmm(double min, double max); /* drawn a number from [min, max[ */
-int newcard(tcfg c, char *card); /* drawn a new card */
+int newcard(tcfg c); //, char *card); /* drawn a new card */
 int ave2day(float ave); /* given an average, return how many days */
-void newdate(char *olddate, int days, char * newdate); /* add days to a date */
-char *prettydate(char *oldd); /* return date in a pretty format */
+int newdate(int oldd, int days); /* add days to a date */
+char *prettydate(int somedate); /* return date in a pretty format */
 void readcfg(tcfg *c); /* read config file */
 void *reallocordie(void *ptr, size_t sz); /* resize the memory block of a pointer or die */
 void readdbfiles(tcfg *c); /* read files from directory and create a dynamic vector of strings */
 char *theme(char *file); /* take the theme from a database file name */
+void select10cards(tcfg *c, int tencards[10][2]); /* select 10 cards (old or new) to be presented */
+void sortmemo(tcfg *c); /* prioritary (old) comes first (selection sort) */
+
+void getcard(tcfg c, int cardnum, char *card); /* given a card number, get it from file */
 
 
 
@@ -213,7 +218,11 @@ int main(int argc, char *argv[])
     int l; /* line drawn */
     int i; /* index, auxiliary */
     char card[STRSIZE]; /* card drawn */
-    char newd[10];
+//     char newd[DTSIZE]; /* 20140608'\0' */
+    int newd;
+//     int ntoday; /* today as an integer yyyymmdd */
+    int tencards[10][2]; /* ten cards, index in memory (-1 if new), line in file */
+
 
     IFDEBUG("Starting optarg loop...\n");
 
@@ -265,13 +274,6 @@ int main(int argc, char *argv[])
         exit(EXIT_SUCCESS);
     }
 
-    c.fdb=fopen(c.dbasef,"r");
-    if(!c.fdb)
-    {
-        printf("Fail to open database %s.\n", c.dbasef);
-        exit(EXIT_FAILURE);
-    }
-    c.QTDCARD=dbsize(c.fdb);
 
     printf("Number of cards: %d\n", c.QTDCARD);
     printf("DB: %s\n", c.dbasef);
@@ -283,39 +285,137 @@ int main(int argc, char *argv[])
 //         printf("Card %4d: %s", l+1, card);
 //     }
 
-    if(c.fdb)
-        fclose(c.fdb); /* database file */
+//     if(c.fdb)
+//         fclose(c.fdb); / * database file * /
 
 
 //     printf("readcfg()...\n");
     readcfg(&c);
 //     printf("c.cfsize=%d\n", c.cfsize);
-    for(i=0; i<c.cfsize; i++)
-        printf("card: %d, date: %d, ave: %f\n", c.cfcard[i], c.cfdate[i], c.cfave[i]);
+//     for(i=0; i<c.cfsize; i++)
+//         printf("card: %d, date: %d, ave: %f\n", c.cfcard[i], c.cfdate[i], c.cfave[i]);
 
+    /*ntoday=newdate(c.today, 0, newd);*/
 
+//     ntoday=(int)strtol(c.today, NULL, 10);
 
-    if(c.fcf)
-        fclose(c.fcf); /* config file */
+    select10cards(&c, tencards);
+
+    for(i=0; i<10; i++)
+    {
+        getcard(c, tencards[i][1], card);
+        if(tencards[i][0]==-1) /* new card? */
+            printf("Card %d (new card)\n", tencards[i][1]);
+        else
+        {
+            newd=newdate(c.cfdate[tencards[i][0]], ave2day(c.cfave[tencards[i][0]]));
+            printf("Card %d (revision date %s)\n", tencards[i][1], prettydate(newd));
+        }
+        printf("%s\n", card);
+    }
+
+//     if(c.fcf)
+//         fclose(c.fcf); /* config file */
 
     return EXIT_SUCCESS;
 }
 
+/* prioritary (old) comes first (selection sort) */
+void sortmemo(tcfg *c)
+{
+//     int *cfcard, *cfdate; / * card num, last date * /
+//     float *cfave; / * card average * /
+//     int cfsize; / * size of config file * /
+    int i, j, iux;
+    int ki, kj;
+    float fux;
+    if(c->cfsize<2)
+        return;
+
+//     printf("before sort\n");
+//     for(i=0; i<c->cfsize; i++)
+//     {
+//         ki=newdate(c->cfdate[i], ave2day(c->cfave[i]));
+//         printf("%d %d %f - (+%d) %d\n", c->cfcard[i], c->cfdate[i], c->cfave[i], ave2day(c->cfave[i]), ki);
+//     }
+
+    for(i=0; i<c->cfsize-1; i++)
+        for(j=i+1; j<c->cfsize; j++)
+        {
+            ki=newdate(c->cfdate[i], ave2day(c->cfave[i]));
+            kj=newdate(c->cfdate[j], ave2day(c->cfave[j]));
+            if(ki>kj) /* ki is after, invert */
+            {
+                /* swap cards number */
+                iux=c->cfcard[i];
+                c->cfcard[i]=c->cfcard[j];
+                c->cfcard[j]=iux;
+                /* swap cards presented date */
+                iux=c->cfdate[i];
+                c->cfdate[i]=c->cfdate[j];
+                c->cfdate[j]=iux;
+                /* swap cards average */
+                fux=c->cfave[i];
+                c->cfave[i]=c->cfave[j];
+                c->cfave[j]=fux;
+            }
+        }
+//     printf("\nafter sort\n");
+//     for(i=0; i<c->cfsize; i++)
+//     {
+//         ki=newdate(c->cfdate[i], ave2day(c->cfave[i]));
+//         printf("%d %d %f - (+%d) %d\n", c->cfcard[i], c->cfdate[i], c->cfave[i], ave2day(c->cfave[i]), ki);
+//     }
+//     printf("\n");
+}
+
+
+// int ave2day(float ave)
+// tudo newdate(char *oldd, int days, char *newd)
+
+
+/* select 10 cards (old or new) to be presented */
+void select10cards(tcfg *c, int tencards[10][2])
+{
+    int i;
+
+    sortmemo(c);
+    for(i=0; i<9 && i<c->cfsize; i++) /* nine olds if possible */
+    {
+        if(newdate(c->cfdate[i], ave2day(c->cfave[i]))>c->today) /* just until today */
+            break;
+        tencards[i][0]=i; /* take the first nine or less */
+        tencards[i][1]=c->cfcard[i]; /* file line */
+    }
+    for(; i<10; i++)
+    {
+        tencards[i][0]=-1; /* not in memory */
+        tencards[i][1]=newcard(*c); /* new not in memory */
+    }
+}
 
 /* database size */
-int dbsize(FILE *fp)
+int dbsize(char *dbname)
 {
     char line[TAMLINE];
     int qtdl=0;
+    FILE *fp;
 
-    if(!fp)
-        return 0;
+
+    if(!(fp=fopen(dbname,"r")))
+    {
+        printf("Fail to open database %s.\n", dbname);
+        exit(EXIT_FAILURE);
+        /* return 0; */
+    }
+
     fseek(fp, 0, 0 ); /* linha 0 */
     do
     {
         fgets(line, TAMLINE, fp);
         qtdl++;
     }while(!feof(fp));
+    fclose(fp);
     return --qtdl;
 }
 
@@ -362,17 +462,65 @@ char *theme(char *file)
  * retorna o numero da linha lida (de 0 a FIM-1)
  * e a string lida
  */
-int newcard(tcfg c, char *card)
+int newcard(tcfg c) //, char *card)
 {
-    int l, i;
+    int l, i, total, novo;
     char line[TAMLINE];
+//     FILE *fp;
 
-    l=(int)randmm(0.0, c.QTDCARD); /* [= 0, QTDPAD-1 =] */
-    fseek(c.fdb, 0, 0);
-    for(i=0; i<=l; i++)
-        fgets(line, TAMLINE, c.fdb);
+
+//     if(!(fp=fopen(c.dbasef,"r")))
+//     {
+//         printf("Fail to open database %s.\n", c.dbasef);
+//         exit(EXIT_FAILURE);
+        /* return 0; */
+//     }
+
+    total=c.QTDCARD-c.cfsize;
+    novo=1;
+
+    l=(int)randmm(0.0, total); /* [= 0, QTDPAD-1 =] */
+
+    while(novo)
+    {
+        novo=0;
+        for(i=0; i<c.cfsize; i++) /* talvez ordenar por card num? */
+            if(l==c.cfcard[i])
+            {
+                l = (l+1)%c.QTDCARD; /* advance l to the next avaiable */
+                novo=1;
+            }
+    }
+
+//     fseek(fp, 0, 0);
+//     for(i=0; i<=l; i++)
+//         fgets(line, TAMLINE, fp);
+//     strcpy(card, line);
+
+//     fclose(fp);
+    return l; /* card line number */
+}
+
+/* given a card number, get it from file */
+void getcard(tcfg c, int cardnum, char *card)
+{
+    char line[TAMLINE];
+    FILE *fp;
+    int i;
+
+    if(!(fp=fopen(c.dbasef,"r")))
+    {
+        printf("Fail to open database %s.\n", c.dbasef);
+        exit(EXIT_FAILURE);
+        /* return 0; */
+    }
+    fseek(fp, 0, 0);
+    for(i=0; i<=cardnum; i++)
+        fgets(line, TAMLINE, fp);
     strcpy(card, line);
-    return l; /* linha do arquivo, de 0 a QTDPAD-1 */
+
+    fclose(fp);
+    return;
 }
 
 /**
@@ -419,10 +567,13 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
 //     const char *dbcore="english-word-definition-test";
     char dbcore[STRSIZE];
     char *dot;
+    FILE *fdb;
+    char stoday[DTSIZE];
 
     lt=time(NULL);
     timeptr=localtime(&lt);
-    sprintf(cfg->today, "%04d%02d%02d", 1900 + timeptr->tm_year, 1 + timeptr->tm_mon, timeptr->tm_mday);
+    sprintf(stoday, "%04d%02d%02d", 1900 + timeptr->tm_year, 1 + timeptr->tm_mon, timeptr->tm_mday);
+    cfg->today=(int)strtol(stoday, NULL, 10);
 
     srand((unsigned)time(&lt));
 
@@ -466,6 +617,9 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
     sprintf(cfg->config, "%s-%s%s", cfg->user, dbcore, EXTCF);
     // strcpy(cf, "beco-english-word-definition-test.cf4");
 
+
+    cfg->QTDCARD=dbsize(cfg->dbasef);
+
     return;
 }
 
@@ -484,23 +638,24 @@ int ave2day(float ave)
 }
 
 /* add days to a date */
-void newdate(char *oldd, int days, char *newd)
+int newdate(int oldd, int days)
 {
-    int tudo, ano, mes, dia;
+    int ano, mes, dia;
     time_t timer; /* epochs */
     struct tm date={0}; /* campos da data */
+    char snewd[DTSIZE];
 
     /*char str[LEN];
     snprintf(str, LEN, "%d", 42);*/
     /* char sdata[MAXSDATA]; / * data no formato escolhido */
 
-    tudo=(int)strtol(oldd, NULL, 10);
+//     tudo=(int)strtol(oldd, NULL, 10);
 
-    ano = tudo/10000; /* 20160410/10000=2016.0410 */
-    tudo -= ano*10000;
-    mes = tudo/100; /* 0410/100=04.10 */
-    tudo -= mes*100;
-    dia = tudo;
+    ano = oldd/10000; /* 20160410/10000=2016.0410 */
+    oldd -= ano*10000;
+    mes = oldd/100; /* 0410/100=04.10 */
+    oldd -= mes*100;
+    dia = oldd;
 
     date.tm_year = ano-1900;
     date.tm_mon = mes-1;
@@ -511,24 +666,26 @@ void newdate(char *oldd, int days, char *newd)
     /*printf("Local is %s\n",asctime(localtime(&timer))); */
     /*printf("UTC is %s\n",asctime(gmtime(&timer))); */
     /*strftime(sdata, sizeof(sdata), "%F %H:%M", &date);*/
-    sprintf(newd, "%04d%02d%02d",date.tm_year+1900,date.tm_mon+1,date.tm_mday);
+    sprintf(snewd, "%04d%02d%02d",date.tm_year+1900,date.tm_mon+1,date.tm_mday);
+    oldd=(int)strtol(snewd, NULL, 10);
     /*printf("%s + %d = %s\n", olddate, days, newd); */
+    return oldd;
 }
 
 /* return date in a pretty format */
-char *prettydate(char *oldd)
+char *prettydate(int oldd)
 {
     static char* months[] = {"Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dec" };
     static char dd[12];
-    int tudo, ano, mes, dia;
+    int ano, mes, dia;
 
-    tudo=(int)strtol(oldd, NULL, 10);
+//     tudo=(int)strtol(oldd, NULL, 10);
 
-    ano = tudo/10000; /* 20160410/10000=2016.0410 */
-    tudo -= ano*10000;
-    mes = tudo/100; /* 0410/100=04.10 */
-    tudo -= mes*100;
-    dia = tudo;
+    ano = oldd/10000; /* 20160410/10000=2016.0410 */
+    oldd -= ano*10000;
+    mes = oldd/100; /* 0410/100=04.10 */
+    oldd -= mes*100;
+    dia = oldd;
 
     sprintf(dd, "%02d-%s-%04d", dia, months[mes-1], ano);
     return dd;
