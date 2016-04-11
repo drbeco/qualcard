@@ -74,9 +74,9 @@
 #include <time.h> /* Time and date functions */
 #include <string.h> /* Strings functions definitions */
 #include <dirent.h> /* Defines directory entries */
+#include <assert.h> /* Verify assumptions with assert */
 
 /* #include <math.h> */ /* Mathematics functions */
-/* #include <assert.h> */ /* Verify assumptions with assert */
 /* #include <dlfcn.h> */ /* Dynamic library */
 /* #include <malloc.h> */ /* Dynamic memory allocation */
 /* #include <unistd.h> */ /* UNIX standard function */
@@ -162,10 +162,11 @@ void readdbfiles(tcfg *c); /* read files from directory and create a dynamic vec
 char *theme(char *file); /* take the theme from a database file name */
 void select10cards(tcfg *c, int tencards[10][2]); /* select 10 cards (old or new) to be presented */
 void sortmemo(tcfg *c); /* prioritary (old) comes first (selection sort) */
-
 void getcard(tcfg c, int cardnum, char *card); /* given a card number, get it from file */
-
-
+char *cardfront(char *card); /* get the front of the card */
+char *cardback(char *card); /* get the back of the card */
+void save2memo(tcfg *c, int i, int card, int score); /* save new or update old card */
+void save2file(tcfg c); /* save updated cards in memory to config file */
 
 int funcexample(int i, int *o, int *z); /* just an example with complete doxygen fields */
 
@@ -205,24 +206,18 @@ int funcexample(int i, int *o, int *z); /* just an example with complete doxygen
  */
 int main(int argc, char *argv[])
 {
-    int opt; /* return from getopt() */
-    int dbnum; /* database number chosen */
+    int opt; /* return from getopt() and user options */
+    char sopt[3]; /* self evaluation score */
     int SUMMA=0; /* summary only */
     time_t lt;
     struct tm *timeptr;
-    /*int QTDCARD; / * database size * /
-    char today[14]; / * yyyymmdd * /
-    char dbasef[STRSIZE], config[STRSIZE], user[STRSIZE]; */
     tcfg c={0};
-    /* FILE *fdb=NULL, *fcf=NULL; */
     int l; /* line drawn */
     int i; /* index, auxiliary */
     char card[STRSIZE]; /* card drawn */
-//     char newd[DTSIZE]; /* 20140608'\0' */
     int newd;
-//     int ntoday; /* today as an integer yyyymmdd */
     int tencards[10][2]; /* ten cards, index in memory (-1 if new), line in file */
-
+    int again=1; /* while some card score presented is still zero */
 
     IFDEBUG("Starting optarg loop...\n");
 
@@ -279,46 +274,124 @@ int main(int argc, char *argv[])
     printf("DB: %s\n", c.dbasef);
     printf("CF: %s\n", c.config);
 
-//     for(i=0; i<10; i++)
-//     {
-//         l=newcard(c, card);
-//         printf("Card %4d: %s", l+1, card);
-//     }
-
-//     if(c.fdb)
-//         fclose(c.fdb); / * database file * /
-
-
-//     printf("readcfg()...\n");
     readcfg(&c);
 //     printf("c.cfsize=%d\n", c.cfsize);
 //     for(i=0; i<c.cfsize; i++)
 //         printf("card: %d, date: %d, ave: %f\n", c.cfcard[i], c.cfdate[i], c.cfave[i]);
 
-    /*ntoday=newdate(c.today, 0, newd);*/
-
-//     ntoday=(int)strtol(c.today, NULL, 10);
-
     select10cards(&c, tencards);
 
-    for(i=0; i<10; i++)
+    while(again)
     {
-        getcard(c, tencards[i][1], card);
-        if(tencards[i][0]==-1) /* new card? */
-            printf("Card %d (new card)\n", tencards[i][1]);
-        else
+        again=0;
+        for(i=0; i<10; i++)
         {
-            newd=newdate(c.cfdate[tencards[i][0]], ave2day(c.cfave[tencards[i][0]]));
-            printf("Card %d (revision date %s)\n", tencards[i][1], prettydate(newd));
+            if(tencards[i][0]==-2) /* already presented and ok */
+                continue;
+            getcard(c, tencards[i][1], card); /* tencards[i][1]=line number in file */
+            printf("----------------------------------------\n");
+            if(tencards[i][0]==-1) /* new card? */
+                printf("Card %d (new card)\n", tencards[i][1]);
+            else
+            {
+                newd=newdate(c.cfdate[tencards[i][0]], ave2day(c.cfave[tencards[i][0]]));
+                printf("Card %d (revision date %s)\n", tencards[i][1], prettydate(newd));
+            }
+
+            printf("%s\n\n", cardfront(card));
+
+            printf("Press <ENTER> to see the back of the card\n");
+            do opt=getchar(); while(opt!='\n');
+            printf("%s\n", cardback(card));
+
+            do
+            {
+                printf("Your self-evaluation (from 0 to 5) is: ");
+                scanf("%d%*c", &opt); /* discard the '\n'. Better use fgets() */
+            } while(opt<0 || opt>5);
+            if(opt==0)
+                again=1;
+            else
+            {
+                save2memo(&c, tencards[i][0], tencards[i][1], opt); /* tencards[i][0]=index in memory */
+                tencards[i][0]=-2; /* presented and ok */
+            }
         }
-        printf("%s\n", card);
     }
+    printf("----------------------------------------\n");
+
+    save2file(c);
 
 //     if(c.fcf)
 //         fclose(c.fcf); /* config file */
 
     return EXIT_SUCCESS;
 }
+
+/* save new or update old card */
+void save2memo(tcfg *c, int i, int card, int score)
+{
+    if(i==-1) /* new memory block */
+    {
+        c->cfsize++;
+        c->cfcard=(int *)reallocordie(c->cfcard, sizeof(int)*c->cfsize);
+        c->cfdate=(int *)reallocordie(c->cfdate, sizeof(int)*c->cfsize);
+        c->cfave=(float *)reallocordie(c->cfave, sizeof(float)*c->cfsize);
+        c->cfcard[c->cfsize-1]=card;
+        c->cfdate[c->cfsize-1]=c->today;
+        c->cfave[c->cfsize-1]=(float)score; /* first score */
+        return;
+    }
+
+    assert(c->cfcard[i] == card); /* if c->cfcard[i] != card; then error; */
+    c->cfdate[i] = c->today;
+    c->cfave[i] = (c->cfave[i] + (float)score)/2.0;
+    return;
+}
+
+/* save updated cards in memory to config file */
+void save2file(tcfg c)
+{
+    int i;
+    FILE *fp;
+
+    if((fp=fopen(c.config, "w"))!=NULL) /* create from scratch */
+    {
+        for(i=0; i<c.cfsize; i++)
+            fprintf(fp, "%d %d %f\n", c.cfcard[i], c.cfdate[i], c.cfave[i]);
+
+        fclose(fp);
+    }
+    else
+        fprintf(stderr, "save2file(): can't open config file for writing.\n");
+    return; /* leu do arquivo para os vetores */
+}
+
+
+char *cardfront(char *card)
+{
+    static char front[STRSIZE];
+    char *colon;
+
+    strcpy(front, card);
+    if((colon=strchr(front, ':'))) /* find the colon */
+        *colon='\0'; /* delete from : on */
+    return front;
+}
+
+char *cardback(char *card)
+{
+    static char back[STRSIZE];
+    char *colon;
+
+    if((colon=strchr(back, ':'))) /* find the colon */
+        colon++; /* next char starts the back */
+    else
+        colon=card; /* no colon? copy all */
+    strcpy(back, colon);
+    return back;
+}
+
 
 /* prioritary (old) comes first (selection sort) */
 void sortmemo(tcfg *c)
