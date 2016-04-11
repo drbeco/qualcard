@@ -73,6 +73,7 @@
 #include <getopt.h> /* get options from system argc/argv */
 #include <time.h> /* Time and date functions */
 #include <string.h> /* Strings functions definitions */
+#include <dirent.h> /* Defines directory entries */
 
 /* #include <math.h> */ /* Mathematics functions */
 /* #include <assert.h> */ /* Verify assumptions with assert */
@@ -130,9 +131,15 @@ typedef struct scfg /* configuration data struct */
     int QTDCARD; /* database size */
     char today[14]; /* yyyymmdd */
     char user[STRSIZE]; /* user name */
-    char bdados[STRSIZE], config[STRSIZE]; /* filenames: database and configuration */
-    FILE *fbd; /* database file pointer */
+    char dbados[STRSIZE], config[STRSIZE]; /* filenames: database and configuration */
+    FILE *fdb; /* database file pointer */
     FILE *fcf; /* config file pointer */
+    int *cfcard, *cfdate; /* card num, last date */
+    float *cfave; /* card average */
+    int cfsize; /* size of config file */
+    char **dbfiles; /* char dbfiles[100][256];*/
+    //char *dbfiles[0]; / * char dbfiles[100][256];*/
+    int dbfsize; /* first dimension / lines */
 } tcfg; /* configuration data type */
 
 /* ---------------------------------------------------------------------- */
@@ -142,12 +149,17 @@ void help(void); /* print some help */
 void copyr(void); /* print version and copyright information */
 void qualcard_init(tcfg *cfg); /* global initialization function */
 void summary(tcfg c); /* how many cards to review */
-int bdsize(FILE *fp); /* database size */
-double rand_minmax(double min, double max); /* drawn a number from [min, max[ */
+int dbsize(FILE *fp); /* database size */
+double randmm(double min, double max); /* drawn a number from [min, max[ */
 int newcard(tcfg c, char *card); /* drawn a new card */
 int ave2day(float ave); /* given an average, return how many days */
 void newdate(char *olddate, int days, char * newdate); /* add days to a date */
-char *readdate(char *oldd); /* return date in a readable format */
+char *prettydate(char *oldd); /* return date in a pretty format */
+void readcfg(tcfg *c); /* read config file */
+void *reallocordie(void *ptr, size_t sz); /* resize the memory block of a pointer or die */
+void readdbfiles(tcfg *c); /* read files from directory and create a dynamic vector of strings */
+
+
 
 int funcexample(int i, int *o, int *z); /* just an example with complete doxygen fields */
 
@@ -193,9 +205,9 @@ int main(int argc, char *argv[])
     struct tm *timeptr;
     /*int QTDCARD; / * database size * /
     char today[14]; / * yyyymmdd * /
-    char bdados[STRSIZE], config[STRSIZE], user[STRSIZE]; */
+    char dbados[STRSIZE], config[STRSIZE], user[STRSIZE]; */
     tcfg c={0};
-    /* FILE *fbd=NULL, *fcf=NULL; */
+    /* FILE *fdb=NULL, *fcf=NULL; */
     int l; /* line drawn */
     int i; /* index, auxiliary */
     char card[STRSIZE]; /* card drawn */
@@ -247,18 +259,18 @@ int main(int argc, char *argv[])
     }
 
 
-    c.fbd=fopen(c.bdados,"r");
-    if(!c.fbd)
+    c.fdb=fopen(c.dbados,"r");
+    if(!c.fdb)
     {
-        printf("Fail to open database %s.\n", c.bdados);
+        printf("Fail to open database %s.\n", c.dbados);
         exit(EXIT_FAILURE);
     }
-    c.QTDCARD=bdsize(c.fbd);
+    c.QTDCARD=dbsize(c.fdb);
 
-    printf("Today: %s\n", readdate(c.today));
+    printf("Today: %s\n", prettydate(c.today));
     printf("Number of cards: %d\n", c.QTDCARD);
     printf("User: %s\n", c.user);
-    printf("DB: %s\n", c.bdados);
+    printf("DB: %s\n", c.dbados);
     printf("CF: %s\n", c.config);
 
     for(i=0; i<10; i++)
@@ -267,8 +279,23 @@ int main(int argc, char *argv[])
         printf("Card %4d: %s", l+1, card);
     }
 
-    if(c.fbd)
-        fclose(c.fbd); /* database file */
+    if(c.fdb)
+        fclose(c.fdb); /* database file */
+
+    printf("readcfg()...\n");
+    readcfg(&c);
+    printf("c.cfsize=%d\n", c.cfsize);
+    for(i=0; i<c.cfsize; i++)
+        printf("card: %d, date: %d, ave: %f\n", c.cfcard[i], c.cfdate[i], c.cfave[i]);
+
+    printf("readdbfiles()...\n");
+    readdbfiles(&c);
+    printf("c.dbfsize=%d\n", c.dbfsize);
+    for(i=0; i<c.dbfsize; i++)
+        printf("file: %s (len %zu, last %d)\n", c.dbfiles[i], strlen(c.dbfiles[i]), c.dbfiles[i][strlen(c.dbfiles[i])]);
+
+
+
     if(c.fcf)
         fclose(c.fcf); /* config file */
 
@@ -277,7 +304,7 @@ int main(int argc, char *argv[])
 
 
 /* database size */
-int bdsize(FILE *fp)
+int dbsize(FILE *fp)
 {
     char line[TAMLINE];
     int qtdl=0;
@@ -322,10 +349,10 @@ int newcard(tcfg c, char *card)
     int l, i;
     char line[TAMLINE];
 
-    l=(int)rand_minmax(0.0, c.QTDCARD); /* [= 0, QTDPAD-1 =] */
-    fseek(c.fbd, 0, 0);
+    l=(int)randmm(0.0, c.QTDCARD); /* [= 0, QTDPAD-1 =] */
+    fseek(c.fdb, 0, 0);
     for(i=0; i<=l; i++)
-        fgets(line, TAMLINE, c.fbd);
+        fgets(line, TAMLINE, c.fdb);
     strcpy(card, line);
     return l; /* linha do arquivo, de 0 a QTDPAD-1 */
 }
@@ -339,7 +366,7 @@ int newcard(tcfg c, char *card)
  * @version 20160409.000957
  * @date 2016-04-09
  */
-double rand_minmax(double min, double max)
+double randmm(double min, double max)
 {
     double s;
 
@@ -362,7 +389,7 @@ double rand_minmax(double min, double max)
  * @date 2016-04-09
  *
  */
-void qualcard_init(tcfg *cfg) //(char *td, char *bd, char *cf)
+void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
 {
     IFDEBUG("qualcard_init()");
     /* initialization */
@@ -370,8 +397,8 @@ void qualcard_init(tcfg *cfg) //(char *td, char *bd, char *cf)
     time_t lt;
     struct tm *timeptr;
     /* const char *user=getenv("USER"); */
-//     const char *bdcore="english-word-definition-test";
-    const char *bdcore="english-word-definition";
+//     const char *dbcore="english-word-definition-test";
+    const char *dbcore="english-word-definition";
 
     lt=time(NULL);
     timeptr=localtime(&lt);
@@ -382,9 +409,9 @@ void qualcard_init(tcfg *cfg) //(char *td, char *bd, char *cf)
     if(cfg->user[0]=='\0')
         strcpy(cfg->user, getenv("USER"));
 
-    sprintf(cfg->bdados, "%s%s", bdcore, EXTDB);
-    // strcpy(bd, "english-word-definition.ex4");
-    sprintf(cfg->config, "%s-%s%s", cfg->user, bdcore, EXTCF);
+    sprintf(cfg->dbados, "%s%s", dbcore, EXTDB);
+    // strcpy(db, "english-word-definition.ex4");
+    sprintf(cfg->config, "%s-%s%s", cfg->user, dbcore, EXTCF);
     // strcpy(cf, "beco-english-word-definition-test.cf4");
 
     return;
@@ -436,8 +463,8 @@ void newdate(char *oldd, int days, char *newd)
     /*printf("%s + %d = %s\n", olddate, days, newd); */
 }
 
-/* return date in a readable format */
-char *readdate(char *oldd)
+/* return date in a pretty format */
+char *prettydate(char *oldd)
 {
     static char* months[] = {"Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dec" };
     static char dd[12];
@@ -454,6 +481,114 @@ char *readdate(char *oldd)
     sprintf(dd, "%02d-%s-%04d", dia, months[mes-1], ano);
     return dd;
 }
+
+/* resize the memory block of a pointer or die */
+void *reallocordie(void *ptr, size_t sz)
+{
+    void *tmp;
+    if((tmp=realloc(ptr, sz))==NULL)
+    {
+        printf("out of memory\n");
+        exit(EXIT_FAILURE);
+    }
+    return tmp;
+}
+
+/* read config file to memory */
+void readcfg(tcfg *c)
+{
+    int i;
+    int card, date;
+    float ave;
+    FILE *fp;
+
+    /* if(access(c->config, F_OK)!=-1) / * config file exists */
+    c->cfcard=c->cfdate=NULL;
+    c->cfave=NULL;
+    c->cfsize=0;
+    if((fp=fopen(c->config, "r"))!=NULL) /* we've got a file! */
+    {
+        for(i=0; 3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave); i++)
+        {
+            c->cfcard=(int *)reallocordie(c->cfcard, sizeof(int)*(i+1));
+            c->cfdate=(int *)reallocordie(c->cfdate, sizeof(int)*(i+1));
+            c->cfave=(float *)reallocordie(c->cfave, sizeof(float)*(i+1));
+            c->cfcard[i]=card;
+            c->cfdate[i]=date;
+            c->cfave[i]=ave;
+            c->cfsize++;
+        }
+        fclose(fp);
+    }
+    else
+        fprintf(stderr, "readcfg(): can't open config file.\n");
+    return; /* leu do arquivo para os vetores */
+}
+
+
+/* todo:
+ * writecfg
+ * choosedb
+ */
+
+
+void readdbfiles(tcfg *c)
+{
+    DIR *dp;
+    struct dirent *ep;
+    char *dot=NULL;
+    int len;
+
+    c->dbfiles=NULL; /* risk of memory leak here: this line isn't needed */
+    c->dbfsize=0;
+    dp = opendir("./");
+    if(dp != NULL)
+    {
+        while((ep=readdir(dp))) /* while there is a file, get it */
+        {
+//             puts(ep->d_name);
+            dot=strrchr(ep->d_name, '.'); /* grab extension */
+            if(dot==NULL)
+                continue;
+            len=strlen(ep->d_name);
+            if(len>(STRSIZE-1))
+            {
+                perror("Ignoring file with too big name");
+                continue;
+            }
+            if(!strcmp(dot, ".ex4")) /* achou db */
+            {
+                c->dbfsize++;
+//                 printf("c->dbfsize:%d\n", c->dbfsize);
+                c->dbfiles=(char **)reallocordie(c->dbfiles, sizeof(char *)*(c->dbfsize));
+//                 printf("vai %s\n", ep->d_name);
+//                 printf("c->dbfiles=%p, c->dbfiles[0]=%p [1]=%p\n", c->dbfiles, c->dbfiles[0], c->dbfiles[1]);
+//                c->dbfiles=(char **)malloc(sizeof(char *)*c->dbfsize);
+//                *(c->dbfiles+i)=(char *)malloc(10);
+
+                c->dbfiles[c->dbfsize-1] = NULL;
+                c->dbfiles[c->dbfsize-1] = (char *)reallocordie(c->dbfiles[c->dbfsize-1], sizeof(char)*(len+1));
+
+//                 c->dbfiles[c->dbfsize-1] = (char *)reallocordie(*(c->dbfiles + c->dbfsize - 1), sizeof(char)*(len+1));
+                strncpy(c->dbfiles[c->dbfsize-1], ep->d_name, len+1);
+//                 printf("c->dbfiles[%d]=%p '%s'\n", c->dbfsize-1, c->dbfiles[c->dbfsize-1], c->dbfiles[c->dbfsize-1]);
+            }
+        }
+        closedir(dp);
+    }
+    else
+        perror ("Couldn't open the directory");
+
+    return;
+}
+
+
+
+
+
+
+
+
 
 /* ---------------------------------------------------------------------- */
 /**
