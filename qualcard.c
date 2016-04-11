@@ -131,7 +131,7 @@ typedef struct scfg /* configuration data struct */
     int QTDCARD; /* database size */
     char today[14]; /* yyyymmdd */
     char user[STRSIZE]; /* user name */
-    char dbados[STRSIZE], config[STRSIZE]; /* filenames: database and configuration */
+    char dbasef[STRSIZE], config[STRSIZE]; /* filenames: database and configuration */
     FILE *fdb; /* database file pointer */
     FILE *fcf; /* config file pointer */
     int *cfcard, *cfdate; /* card num, last date */
@@ -200,12 +200,13 @@ int funcexample(int i, int *o, int *z); /* just an example with complete doxygen
 int main(int argc, char *argv[])
 {
     int opt; /* return from getopt() */
+    int dbnum; /* database number chosen */
     int SUMMA=0; /* summary only */
     time_t lt;
     struct tm *timeptr;
     /*int QTDCARD; / * database size * /
     char today[14]; / * yyyymmdd * /
-    char dbados[STRSIZE], config[STRSIZE], user[STRSIZE]; */
+    char dbasef[STRSIZE], config[STRSIZE], user[STRSIZE]; */
     tcfg c={0};
     /* FILE *fdb=NULL, *fcf=NULL; */
     int l; /* line drawn */
@@ -216,13 +217,15 @@ int main(int argc, char *argv[])
     IFDEBUG("Starting optarg loop...\n");
 
     /* getopt() configured options:
-     *        -h  help
-     *        -c  copyright & version
-     *        -v  verbose
-     *        -s  status of reviews
+     *        -h            help
+     *        -c            copyright & version
+     *        -v            verbose
+     *        -s            status of reviews
+     *        -u username   set the username (default: whoami)
+     *        -d database   set the database to use (default: ask)
      */
     opterr = 0;
-    while((opt = getopt(argc, argv, "vhcsu:")) != EOF)
+    while((opt = getopt(argc, argv, "vhcsu:d:")) != EOF)
         switch(opt)
         {
             case 'h': /* exit */
@@ -239,6 +242,9 @@ int main(int argc, char *argv[])
                 break;
             case 'u':
                 strcpy(c.user, optarg);
+                break;
+            case 'd':
+                strcpy(c.dbasef, optarg);
                 break;
             case '?':  /* exit */
             default:
@@ -258,11 +264,10 @@ int main(int argc, char *argv[])
         exit(EXIT_SUCCESS);
     }
 
-
-    c.fdb=fopen(c.dbados,"r");
+    c.fdb=fopen(c.dbasef,"r");
     if(!c.fdb)
     {
-        printf("Fail to open database %s.\n", c.dbados);
+        printf("Fail to open database %s.\n", c.dbasef);
         exit(EXIT_FAILURE);
     }
     c.QTDCARD=dbsize(c.fdb);
@@ -270,29 +275,24 @@ int main(int argc, char *argv[])
     printf("Today: %s\n", prettydate(c.today));
     printf("Number of cards: %d\n", c.QTDCARD);
     printf("User: %s\n", c.user);
-    printf("DB: %s\n", c.dbados);
+    printf("DB: %s\n", c.dbasef);
     printf("CF: %s\n", c.config);
 
-    for(i=0; i<10; i++)
-    {
-        l=newcard(c, card);
-        printf("Card %4d: %s", l+1, card);
-    }
+//     for(i=0; i<10; i++)
+//     {
+//         l=newcard(c, card);
+//         printf("Card %4d: %s", l+1, card);
+//     }
 
     if(c.fdb)
         fclose(c.fdb); /* database file */
 
-    printf("readcfg()...\n");
+
+//     printf("readcfg()...\n");
     readcfg(&c);
-    printf("c.cfsize=%d\n", c.cfsize);
+//     printf("c.cfsize=%d\n", c.cfsize);
     for(i=0; i<c.cfsize; i++)
         printf("card: %d, date: %d, ave: %f\n", c.cfcard[i], c.cfdate[i], c.cfave[i]);
-
-    printf("readdbfiles()...\n");
-    readdbfiles(&c);
-    printf("c.dbfsize=%d\n", c.dbfsize);
-    for(i=0; i<c.dbfsize; i++)
-        printf("file: %s (len %zu, last %d)\n", c.dbfiles[i], strlen(c.dbfiles[i]), c.dbfiles[i][strlen(c.dbfiles[i])]);
 
 
 
@@ -396,9 +396,11 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
 
     time_t lt;
     struct tm *timeptr;
+    int i, dbnum;
     /* const char *user=getenv("USER"); */
 //     const char *dbcore="english-word-definition-test";
-    const char *dbcore="english-word-definition";
+    char dbcore[STRSIZE];
+    char *dot;
 
     lt=time(NULL);
     timeptr=localtime(&lt);
@@ -409,8 +411,37 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
     if(cfg->user[0]=='\0')
         strcpy(cfg->user, getenv("USER"));
 
-    sprintf(cfg->dbados, "%s%s", dbcore, EXTDB);
+
+    readdbfiles(cfg);
+    if(!cfg->dbfsize)
+    {
+        printf("No databases found.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if(cfg->dbasef[0]=='\0')
+    {
+        do
+        {
+            printf("Databases found:\n");
+            for(i=0; i<cfg->dbfsize; i++)
+                printf("(%d) %s\n", i+1, cfg->dbfiles[i]);
+
+            printf("Choose a database: ");
+            scanf("%d", &dbnum);
+        } while(dbnum<1 || dbnum>cfg->dbfsize);
+        dbnum--;
+        strcpy(cfg->dbasef, cfg->dbfiles[dbnum]);
+    }
+
+    // sprintf(cfg->dbasef, "%s%s", dbcore, EXTDB);
     // strcpy(db, "english-word-definition.ex4");
+    strcpy(dbcore, cfg->dbasef);
+    if((dot=strrchr(dbcore, '.'))) /* find the dot */
+        *dot='\0'; /* delete from dot on */
+
+//     printf("core: %s\n", dbcore);
+
     sprintf(cfg->config, "%s-%s%s", cfg->user, dbcore, EXTCF);
     // strcpy(cf, "beco-english-word-definition-test.cf4");
 
@@ -547,8 +578,7 @@ void readdbfiles(tcfg *c)
         while((ep=readdir(dp))) /* while there is a file, get it */
         {
 //             puts(ep->d_name);
-            dot=strrchr(ep->d_name, '.'); /* grab extension */
-            if(dot==NULL)
+            if(!(dot=strrchr(ep->d_name, '.'))) /* grab extension */
                 continue;
             len=strlen(ep->d_name);
             if(len>(STRSIZE-1))
@@ -612,9 +642,10 @@ void help(void)
     printf("\t-v,  --verbose\n\t\tSet verbose level (cumulative).\n");
     printf("\t-s,  --status\n\t\tShow how many cards needs review in each database.\n");
     printf("\t-u username,  --user username\n\t\tUse the username's profile.\n");
+    printf("\t-d file.ex4,  --database file.ex4\n\t\tUse the given database to practice.\n\t\tThe file must have a '.ex4' extension\n\t\tand its name is in the form 'theme-question-answer.ex4', where:\n\t\t\t* theme: the theme of the study.\n\t\t\t* question: the first side of the card.\n\t\t\t* answer: the back side of the card.\n");
     /* add more options here */
     printf("\nExit status:\n\t0 if ok.\n\t1 some error occurred.\n");
-    printf("\nTodo:\n\tLong options not implemented yet.\n\t-u username not implemented yet.\n");
+    printf("\nTodo:\n\tLong options not implemented yet.\n");
     printf("\nAuthor:\n\tWritten by %s <%s>\n\n", "Ruben Carlo Benante", "rcb@beco.cc");
     exit(EXIT_FAILURE);
 }
