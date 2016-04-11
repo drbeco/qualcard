@@ -158,6 +158,7 @@ char *prettydate(char *oldd); /* return date in a pretty format */
 void readcfg(tcfg *c); /* read config file */
 void *reallocordie(void *ptr, size_t sz); /* resize the memory block of a pointer or die */
 void readdbfiles(tcfg *c); /* read files from directory and create a dynamic vector of strings */
+char *theme(char *file); /* take the theme from a database file name */
 
 
 
@@ -272,9 +273,7 @@ int main(int argc, char *argv[])
     }
     c.QTDCARD=dbsize(c.fdb);
 
-    printf("Today: %s\n", prettydate(c.today));
     printf("Number of cards: %d\n", c.QTDCARD);
-    printf("User: %s\n", c.user);
     printf("DB: %s\n", c.dbasef);
     printf("CF: %s\n", c.config);
 
@@ -333,11 +332,30 @@ int dbsize(FILE *fp)
  */
 void summary(tcfg c)
 {
-    printf("QualCard v.%s - Spaced Repetition - %s\n", VERSION, c.today);
-    printf("User: %s\n", c.user);
-    printf("%s: you have %d cards to review today.\n", "English", 5);
+    int i;
+
+    for(i=0; i<c.dbfsize; i++)
+    {
+        printf("%s: you have ", theme(c.dbfiles[i]));
+        printf("%d cards to review today.\n", rand()%21);
+    }
     return;
 }
+
+/* take the theme out of a file name */
+char *theme(char *file)
+{
+    char *dash;
+    static char theme[STRSIZE];
+
+    strcpy(theme, file);
+    if((dash=strchr(theme, '-')))
+        *dash='\0';
+
+    return theme;
+}
+
+
 
 /*
  * le um novo cartao aleatorio do arquivo
@@ -358,10 +376,10 @@ int newcard(tcfg c, char *card)
 }
 
 /**
- * \brief Drawn a float number in the given interval [min, max[
- * \param[in] min Lower number of the interval (closed, inclusive)
- * \param[in] max Maximum number of the interval (open, exclusive)
- * \param[out] sorteio The number drawn and returned
+ * @brief Drawn a float number in the given interval [min, max[
+ * @param[in] min Lower number of the interval (closed, inclusive)
+ * @param[in] max Maximum number of the interval (open, exclusive)
+ * @param[out] sorteio The number drawn and returned
  * @author Ruben Carlo Benante
  * @version 20160409.000957
  * @date 2016-04-09
@@ -411,6 +429,9 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
     if(cfg->user[0]=='\0')
         strcpy(cfg->user, getenv("USER"));
 
+    printf("QualCard v.%s - Spaced Repetition\n", VERSION);
+    printf("%s, ", cfg->user);
+    printf("today is %s\n", prettydate(cfg->today));
 
     readdbfiles(cfg);
     if(!cfg->dbfsize)
