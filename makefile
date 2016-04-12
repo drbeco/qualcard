@@ -23,11 +23,12 @@ LIBECO_VERSION = 1.0
 LIBECO_CFLAGS = -Ofast -c -Wno-unused-variable -Wno-unused-function
 LIBECO_CPPFLAGS = -DDEBUG=0 -DVERSION=$(LIBECO_VERSION) -DBUILD=$(LIBECO_BUILD)
 LIBECO_LDLIBS = -lm
+APP = qualcard
 
 %.o : %.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $^ -o $@ |& tee errors.err
 
-%.x : %.o $(OBJ)
+$(APP) : % : %.o $(OBJ)
 	$(CC) $(LDLIBS) $^ -o $@ |& tee errors.err
 
 libeco-ux64.o : libeco.c
