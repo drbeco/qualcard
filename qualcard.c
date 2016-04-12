@@ -651,7 +651,7 @@ void createcfgdir(tcfg *c)
             }
     }
 
-    sprintf(c->cfgpath, "%s/%s/", path1, "qualcard");
+    sprintf(c->cfgpath, "%s/%s", path1, "qualcard");
     if(0 != access(c->cfgpath, F_OK))
     {
         if(ENOENT == errno) /* does not exist */
@@ -684,7 +684,7 @@ void createcfgdir(tcfg *c)
  * @date 2016-04-09
  *
  */
-void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
+void qualcard_init(tcfg *cfg)
 {
     IFDEBUG("qualcard_init()");
 
@@ -720,14 +720,14 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
         printf("I can't find the binary path\n");
         exit(EXIT_FAILURE);
     }
-    sprintf(cfg->dbpath, "%sdb/", binpath); /* /usr/local/bin/qualcarddb/ */
+    sprintf(cfg->dbpath, "%sdb", binpath); /* /usr/local/bin/qualcarddb/ */
 
     createcfgdir(cfg); /* /home/user/.config/qualcard/ */
 
     if(verb>1)
     {
-        printf("database path: %s\n", cfg->dbpath);
-        printf("config path: %s\n", cfg->cfgpath);
+        printf("database path: %s/\n", cfg->dbpath);
+        printf("config path: %s/\n", cfg->cfgpath);
     }
 
     readdbfiles(cfg);
