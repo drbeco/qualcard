@@ -1,5 +1,5 @@
 /***************************************************************************
- *   qualcard.c                               Version 1.3.20160412.101200  *
+ *   qualcard.c                               Version 1.3.20160412.203737  *
  *                                                                         *
  *   Learn cards by Spaced Repetition Method.                              *
  *   This program helps you learn from a set of cards with questions       *
@@ -766,7 +766,7 @@ void qualcard_init(tcfg *cfg)
 
     if(cfg->QTDCARD<10)
     {
-        printf("Error in database %s. Must have at least 10 questions.\n", cfg->dbasef);
+        printf("Error in database %s.\nMust have at least 10 questions:answers (lines).\n", cfg->dbasef);
         exit(EXIT_FAILURE);
     }
 
