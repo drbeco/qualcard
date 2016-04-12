@@ -150,6 +150,7 @@ void save2file(tcfg c); /* save updated cards in memory to config file */
 int dbsize(tcfg *c); /* database size */
 void cfanalyses(tcfg *c, int *view, int *learn); /* analyses a history file */
 void createcfgdir(tcfg *c); /* creates /home/user/.config/qualcard/ */
+char *filenopath(char *filepath); /* get filename with no path */
 
 /* ---------------------------------------------------------------------- */
 /* @ingroup GroupUnique */
@@ -248,12 +249,16 @@ int main(int argc, char *argv[])
         exit(EXIT_SUCCESS);
     }
 
-    printf("\nDataBase file: %s (%d cards)\n", c.dbasef, c.QTDCARD);
-    printf("History  file: %s\n\n", c.configf);
+    if(verb>0)
+    {
+        printf("\nDataBase file: %s (%d cards) %s\n", filenopath(c.dbasef), c.QTDCARD, c.dbasef);  /* BUG */
+        printf("History  file: %s %s\n", filenopath(c.configf), c.configf); /* BUG */
+    }
 
     readcfg(&c);
     select10cards(&c, tencards);
 
+    printf("\n");
     while(again)
     {
         again=0;
@@ -264,7 +269,7 @@ int main(int argc, char *argv[])
             getcard(c, tencards[i][1], card); /* tencards[i][1]=line number in file */
             printf("----------------------------------------\n");
             if(tencards[i][0]==-1) /* new card? */
-                printf("Card %d (new card)\n", tencards[i][1]+1);
+                printf("Card %d (new card for today)\n", tencards[i][1]+1);
             else
             {
                 newd=newdate(c.cfdate[tencards[i][0]], ave2day(c.cfave[tencards[i][0]]));
@@ -326,11 +331,11 @@ void save2file(tcfg c)
 {
     int i;
     FILE *fp;
-    char fullname[PATHSIZE];
+//     char fullname[PATHSIZE];
 
-    sprintf(fullname, "/%s/%s", c.cfgpath, c.configf);
+//     sprintf(fullname, "/%s/%s", c.cfgpath, c.configf);
 
-    if((fp=fopen(fullname, "w"))!=NULL) /* create from scratch */
+    if((fp=fopen(c.configf, "w"))!=NULL) /* create from scratch */
     {
         for(i=0; i<c.cfsize; i++)
             fprintf(fp, "%d %d %f\n", c.cfcard[i], c.cfdate[i], c.cfave[i]);
@@ -338,7 +343,7 @@ void save2file(tcfg c)
         fclose(fp);
     }
     else
-        fprintf(stderr, "save2file(): can't open config file for writing.\n");
+        fprintf(stderr, "save2file(): can't open config file %s for writing.\n", c.configf);
     return; /* leu do arquivo para os vetores */
 }
 
@@ -367,6 +372,23 @@ char *cardback(char *card)
         colon=card; /* no colon? copy all */
     strcpy(back, colon);
     return back;
+}
+
+/* get filename with no path */
+char *filenopath(char *filepath)
+{
+    static char filename[STRSIZE];
+    char *bar;
+
+    if((bar=strrchr(filepath, '/'))) /* find the last / */
+        bar++; /* next char starts the filename */
+    else /* no bar? that's odd... */
+    {
+        printf("Filename %s must be an absolute path.\n", filepath);
+        exit(EXIT_FAILURE);
+    }
+    strcpy(filename, bar);
+    return filename;
 }
 
 /* prioritary (old) comes first (selection sort) */
@@ -427,10 +449,10 @@ int dbsize(tcfg *c)//, char *dbname)
     char line[TAMLINE];
     int qtdl=0;
     FILE *fp;
-    char fullname[PATHSIZE];
+//     char fullname[PATHSIZE];
 
-    sprintf(fullname, "/%sdb/%s", c->binpath, c->dbasef);
-    if(!(fp=fopen(fullname,"r")))
+//     sprintf(fullname, "/%sdb/%s", c->binpath, c->dbasef);
+    if(!(fp=fopen(c->dbasef,"r")))
     {
         printf("Fail to open database %s.\n", c->dbasef);
         exit(EXIT_FAILURE);
@@ -452,13 +474,13 @@ void cfanalyses(tcfg *c, int *view, int *learn)
     int card, date;
     float ave;
     FILE *fp;
-    char fullname[PATHSIZE];
+//     char fullname[PATHSIZE];
 
     *view=0;
     *learn=0;
 
-    sprintf(fullname, "/%s/%s", c->cfgpath, c->configf);
-    if(!(fp=fopen(fullname,"r")))
+//     sprintf(fullname, "/%s/%s", c->cfgpath, c->configf);
+    if(!(fp=fopen(c->configf,"r")))
         return;
 
     while(3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave))
@@ -492,16 +514,15 @@ void summary(tcfg *cfg)
 
     for(i=0; i<cfg->dbfsize; i++)
     {
-
         strcpy(cfg->dbasef, cfg->dbfiles[i]);
-        strcpy(dbcore, cfg->dbasef);
+        strcpy(dbcore, filenopath(cfg->dbasef));
         if((dot=strrchr(dbcore, '.'))) /* find the dot */
             *dot='\0'; /* delete from dot on */
-        sprintf(cfg->configf, "%s-%s%s", cfg->user, dbcore, EXTCF);
+        sprintf(cfg->configf, "%s/%s-%s%s", cfg->cfgpath, cfg->user, dbcore, EXTCF);
         cfg->QTDCARD=dbsize(cfg);
 
         cfanalyses(cfg, &view, &learn);
-        printf("%s: total %d, viewed %d, learned %d\n", theme(cfg->dbfiles[i]), cfg->QTDCARD, view, learn);
+        printf("%s: total %d, viewed %d, learned %d\n", theme(filenopath(cfg->dbfiles[i])), cfg->QTDCARD, view, learn);
     }
     return;
 }
@@ -547,10 +568,10 @@ void getcard(tcfg c, int cardnum, char *card)
     char line[TAMLINE];
     FILE *fp;
     int i;
-    char fullname[PATHSIZE];
+//     char fullname[PATHSIZE];
 
-    sprintf(fullname, "/%sdb/%s", c.binpath, c.dbasef);
-    if(!(fp=fopen(fullname,"r")))
+//     sprintf(fullname, "/%sdb/%s", c.binpath, c.dbasef);
+    if(!(fp=fopen(c.dbasef,"r")))
     {
         printf("Fail to open database %s.\n", c.dbasef);
         exit(EXIT_FAILURE);
@@ -651,6 +672,7 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
     char dbcore[STRSIZE];
     char *dot;
     char stoday[DTSIZE];
+    char binpath[PATHSIZE];
 
     lt=time(NULL);
     timeptr=localtime(&lt);
@@ -670,18 +692,19 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
         printf("today is %s\n", prettydate(cfg->today));
     }
 
-    if(readlink("/proc/self/exe", cfg->binpath, PATHSIZE) == -1)
+    if(readlink("/proc/self/exe", binpath, PATHSIZE) == -1)
     {
         perror("readlink");
         printf("I can't find the binary path\n");
         exit(EXIT_FAILURE);
     }
+    sprintf(cfg->dbpath, "/%sdb/", binpath); /* /usr/local/bin/qualcarddb/ */
 
-    createcfgdir(cfg);
+    createcfgdir(cfg); /* /home/user/.config/qualcard/ */
 
     if(verb>1)
     {
-        printf("binary path: %s\n", cfg->binpath);
+        printf("database path: %s\n", cfg->dbpath);
         printf("config path: %s\n", cfg->cfgpath);
     }
 
@@ -700,7 +723,7 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
         {
             printf("Databases found:\n");
             for(i=0; i<cfg->dbfsize; i++)
-                printf("(%d) %s\n", i+1, cfg->dbfiles[i]);
+                printf("(%d) %s %s\n", i+1, filenopath(cfg->dbfiles[i]), cfg->dbfiles[i]); /* BUG */
 
             dbnum=1; /* default */
             if(cfg->dbfsize>1)
@@ -713,10 +736,10 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
         strcpy(cfg->dbasef, cfg->dbfiles[dbnum]);
     }
 
-    strcpy(dbcore, cfg->dbasef);
+    strcpy(dbcore, filenopath(cfg->dbasef));
     if((dot=strrchr(dbcore, '.'))) /* find the dot */
         *dot='\0'; /* delete from dot on */
-    sprintf(cfg->configf, "%s-%s%s", cfg->user, dbcore, EXTCF);
+    sprintf(cfg->configf, "%s/%s-%s%s", cfg->cfgpath, cfg->user, dbcore, EXTCF);
     cfg->QTDCARD=dbsize(cfg);
 
     return;
@@ -797,14 +820,14 @@ void readcfg(tcfg *c)
     int card, date;
     float ave;
     FILE *fp;
-    char fullname[PATHSIZE];
+//     char fullname[PATHSIZE];
 
-    sprintf(fullname, "/%s/%s", c->cfgpath, c->configf);
+//     sprintf(fullname, "/%s/%s", c->cfgpath, c->configf);
 
     c->cfcard=c->cfdate=NULL;
     c->cfave=NULL;
     c->cfsize=0;
-    if((fp=fopen(fullname, "r"))!=NULL) /* we've got a file! */
+    if((fp=fopen(c->configf, "r"))!=NULL) /* we've got a file! */
     {
         for(i=0; 3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave); i++)
         {
@@ -865,38 +888,46 @@ void readdbfiles(tcfg *c)
     struct dirent *ep;
     char *dot=NULL;
     int len;
+    int dois=1;
     char fullname[PATHSIZE];
-
-    sprintf(fullname, "/%sdb/", c->binpath);
 
     c->dbfiles=NULL; /* risk of memory leak here: this line isn't needed */
     c->dbfsize=0;
-    dp = opendir(fullname);
-    if(dp != NULL)
+
+    do
     {
-        while((ep=readdir(dp))) /* while there is a file, get it */
+        dp = opendir(dois?c->dbpath:c->cfgpath);
+        if(dp != NULL)
         {
-            if(!(dot=strrchr(ep->d_name, '.'))) /* grab extension */
-                continue;
-            len=strlen(ep->d_name);
-            if(len>(STRSIZE-1))
+            while((ep=readdir(dp))) /* while there is a file, get it */
             {
-                perror("Ignoring file with too big name");
-                continue;
+                if(!(dot=strrchr(ep->d_name, '.'))) /* grab extension */
+                    continue;
+                sprintf(fullname, "%s/%s", (dois?c->dbpath:c->cfgpath), ep->d_name);
+                len=strlen(fullname);
+                if(len>(STRSIZE-1))
+                {
+                    fprintf(stderr, "Ignoring file with too big name: %s\n", fullname);
+                    continue;
+                }
+                if(!strcmp(dot, ".ex4")) /* achou db */
+                {
+                    c->dbfsize++;
+                    c->dbfiles=(char **)reallocordie(c->dbfiles, sizeof(char *)*(c->dbfsize));
+                    c->dbfiles[c->dbfsize-1] = NULL;
+                    c->dbfiles[c->dbfsize-1] = (char *)reallocordie(c->dbfiles[c->dbfsize-1], sizeof(char)*(len+1));
+                    strncpy(c->dbfiles[c->dbfsize-1], fullname, len+1);
+                }
             }
-            if(!strcmp(dot, ".ex4")) /* achou db */
-            {
-                c->dbfsize++;
-                c->dbfiles=(char **)reallocordie(c->dbfiles, sizeof(char *)*(c->dbfsize));
-                c->dbfiles[c->dbfsize-1] = NULL;
-                c->dbfiles[c->dbfsize-1] = (char *)reallocordie(c->dbfiles[c->dbfsize-1], sizeof(char)*(len+1));
-                strncpy(c->dbfiles[c->dbfsize-1], ep->d_name, len+1);
-            }
+            closedir(dp);
         }
-        closedir(dp);
-    }
-    else
-        perror ("Couldn't open the directory");
+        else
+        {
+            fprintf(stderr, "Error: %s\n", (dois?c->dbpath:c->cfgpath));
+            perror ("Couldn't open the directory");
+        }
+        dois--;
+    }while(dois);
 
     return;
 }
