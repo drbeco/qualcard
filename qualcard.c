@@ -1,5 +1,5 @@
 /***************************************************************************
- *   qualcard.c                               Version 1.0.20160411.205959  *
+ *   qualcard.c                               Version 1.1.20160411.205959  *
  *                                                                         *
  *   Learn cards by Spaced Repetition Method.                              *
  *   This program helps you learn from a set of cards with questions       *
@@ -102,6 +102,7 @@
 /* globals */
 
 static int verb=0; /**< verbose level, global within the file */
+static int SUMMA=0; /* summary only */
 
 typedef struct scfg /* configuration data struct */
 {
@@ -122,7 +123,7 @@ typedef struct scfg /* configuration data struct */
 void help(void); /* print some help */
 void copyr(void); /* print version and copyright information */
 void qualcard_init(tcfg *cfg); /* global initialization function */
-void summary(tcfg c); /* how many cards to review */
+void summary(tcfg *c); /* how many cards to review */
 int dbsize(char *dbname); /* database size */
 double randmm(double min, double max); /* drawn a number from [min, max[ */
 int newcard(tcfg c); //, char *card); /* drawn a new card */
@@ -140,6 +141,7 @@ char *cardfront(char *card); /* get the front of the card */
 char *cardback(char *card); /* get the back of the card */
 void save2memo(tcfg *c, int i, int card, int score); /* save new or update old card */
 void save2file(tcfg c); /* save updated cards in memory to config file */
+void cfanalyses(char *cfname, int *view, int *learn); /* analyses a history file */
 
 /* ---------------------------------------------------------------------- */
 /* @ingroup GroupUnique */
@@ -178,7 +180,6 @@ void save2file(tcfg c); /* save updated cards in memory to config file */
 int main(int argc, char *argv[])
 {
     int opt; /* return from getopt() and user options */
-    int SUMMA=0; /* summary only */
     tcfg c={0};
     int i; /* index, auxiliary */
     char card[STRSIZE]; /* card drawn */
@@ -191,13 +192,14 @@ int main(int argc, char *argv[])
     /* getopt() configured options:
      *        -h            help
      *        -c            copyright & version
-     *        -v            verbose
+     *        -v            verbose++
+     *        -q            quiet (verbose--)
      *        -s            status of reviews
      *        -u username   set the username (default: whoami)
      *        -d database   set the database to use (default: ask)
      */
     opterr = 0;
-    while((opt = getopt(argc, argv, "hcvsu:d:")) != EOF)
+    while((opt = getopt(argc, argv, "hcvqsu:d:")) != EOF)
         switch(opt)
         {
             case 'h': /* exit */
@@ -208,6 +210,9 @@ int main(int argc, char *argv[])
                 break;
             case 'v':
                 verb++;
+                break;
+            case 'q':
+                verb--;
                 break;
             case 's':
                 SUMMA=1;
@@ -224,14 +229,14 @@ int main(int argc, char *argv[])
                 return EXIT_FAILURE;
         }
 
-    if(verb)
+    if(verb>1)
         printf("Verbose level set at: %d\n", verb);
 
     qualcard_init(&c); /* initialization function */
 
     if(SUMMA)
     {
-        summary(c); /* how many cards to review */
+        summary(&c); /* how many cards to review */
         exit(EXIT_SUCCESS);
     }
 
@@ -251,11 +256,11 @@ int main(int argc, char *argv[])
             getcard(c, tencards[i][1], card); /* tencards[i][1]=line number in file */
             printf("----------------------------------------\n");
             if(tencards[i][0]==-1) /* new card? */
-                printf("Card %d (new card)\n", tencards[i][1]);
+                printf("Card %d (new card)\n", tencards[i][1]+1);
             else
             {
                 newd=newdate(c.cfdate[tencards[i][0]], ave2day(c.cfave[tencards[i][0]]));
-                printf("Card %d (revision date %s)\n", tencards[i][1], prettydate(newd));
+                printf("Card %d (revision date %s)\n", tencards[i][1]+1, prettydate(newd));
             }
 
             printf("%s\n\n", cardfront(card));
@@ -428,6 +433,28 @@ int dbsize(char *dbname)
     return --qtdl;
 }
 
+/* history analises */
+void cfanalyses(char *cfname, int *view, int *learn)
+{
+    int card, date;
+    float ave;
+    FILE *fp;
+
+    *view=0;
+    *learn=0;
+    if(!(fp=fopen(cfname,"r")))
+        return;
+
+    while(3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave))
+    {
+        (*view)++;
+        if(ave>=4.5)
+            (*learn)++;
+    }
+    fclose(fp);
+    return;
+}
+
 /* ---------------------------------------------------------------------- */
 /**
  * @ingroup GroupUnique
@@ -440,14 +467,25 @@ int dbsize(char *dbname)
  * @todo This function is not ready
  *
  */
-void summary(tcfg c)
+void summary(tcfg *cfg)
 {
-    int i;
+    int i, view=0, learn=0;
+    char *dot, dbcore[STRSIZE];
 
-    for(i=0; i<c.dbfsize; i++)
+    /* English: total 1500, viewed 300, learned 12 */
+
+    for(i=0; i<cfg->dbfsize; i++)
     {
-        printf("%s: you have ", theme(c.dbfiles[i]));
-        printf("%d cards to review today.\n", rand()%21);
+
+        strcpy(cfg->dbasef, cfg->dbfiles[i]);
+        strcpy(dbcore, cfg->dbasef);
+        if((dot=strrchr(dbcore, '.'))) /* find the dot */
+            *dot='\0'; /* delete from dot on */
+        sprintf(cfg->config, "%s-%s%s", cfg->user, dbcore, EXTCF);
+        cfg->QTDCARD=dbsize(cfg->dbasef);
+
+        cfanalyses(cfg->config, &view, &learn);
+        printf("%s: total %d, viewed %d, learned %d\n", theme(cfg->dbfiles[i]), cfg->QTDCARD, view, learn);
     }
     return;
 }
@@ -562,8 +600,11 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
         strcpy(cfg->user, getenv("USER"));
 
     printf("QualCard v.%s - Spaced Repetition\n", VERSION);
-    printf("%s, ", cfg->user);
-    printf("today is %s\n", prettydate(cfg->today));
+    if(verb>0)
+    {
+        printf("%s, ", cfg->user);
+        printf("today is %s\n", prettydate(cfg->today));
+    }
 
     readdbfiles(cfg);
     if(!cfg->dbfsize)
@@ -572,6 +613,8 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
         exit(EXIT_FAILURE);
     }
 
+    if(SUMMA)
+        return;
     if(cfg->dbasef[0]=='\0')
     {
         do
@@ -718,7 +761,7 @@ void readcfg(tcfg *c)
  * @endcode
  *
  * @warning   Be carefull with blu
- * @deprecated This function will be deactivated in version +33
+ * @deprecated This function will be deactivated
  * @see help()
  * @see copyr()
  * @bug There is a bug with x greater than y
@@ -789,6 +832,7 @@ void help(void)
     printf("\t-h,  --help\n\t\tShow this help.\n");
     printf("\t-c,  --version\n\t\tShow version and copyright information.\n");
     printf("\t-v,  --verbose\n\t\tSet verbose level (cumulative).\n");
+    printf("\t-q,  --quiet\n\t\tReduces verbose level (also cumulative).\n");
     printf("\t-s,  --status\n\t\tShow how many cards needs review in each database.\n");
     printf("\t-u username,  --user username\n\t\tUse the username's profile.\n");
     printf("\t-d file.ex4,  --database file.ex4\n\t\tUse the given database to practice.\n\t\tThe file must have a '.ex4' extension\n\t\tand its name is in the form 'theme-question-answer.ex4', where:\n\t\t\t* theme: the theme of the study.\n\t\t\t* question: the first side of the card.\n\t\t\t* answer: the back side of the card.\n");
@@ -813,7 +857,7 @@ void help(void)
 void copyr(void)
 {
     IFDEBUG("copyr()");
-    printf("%s - Version %s\n", "qualcard", VERSION);
+    printf("%s - Version %s\n", "QualCard", VERSION);
     printf("\nCopyright (C) %d %s <%s>, GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>. This  is  free  software:  you are free to change and redistribute it. There is NO WARRANTY, to the extent permitted by law. USE IT AS IT IS. The author takes no responsability to any damage this software may inflige in your data.\n\n", 2016, "Ruben Carlo Benante", "rcb@beco.cc");
     if(verb>3) printf("copyr(): Verbose: %d\n", verb); /* -vvvv */
         exit(EXIT_FAILURE);

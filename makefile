@@ -6,7 +6,7 @@
 SHELL=/bin/bash -o pipefail
 
 MAJOR = 1
-MINOR = 0
+MINOR = 1
 BUILD = $(shell date +"%g%m%d.%H%M%S")
 DEFSYM = $(subst .,_,$(BUILD))
 VERSION = "\"$(MAJOR).$(MINOR).$(BUILD)\""
