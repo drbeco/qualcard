@@ -269,15 +269,12 @@ int main(int argc, char *argv[])
 
     if(verb>0)
     {
-        printf("\nDataBase file: %s (%d cards) %s\n", filenopath(c.dbasef), c.QTDCARD, c.dbasef);  /* BUG */
-        printf("History  file: %s %s\n", filenopath(c.configf), c.configf); /* BUG */
+        printf("\nDataBase file: %s (%d cards)\n", filenopath(c.dbasef), c.QTDCARD);
+        printf("History  file: %s %s\n", filenopath(c.configf));
     }
 
     readcfg(&c);
     select10cards(&c, tencards);
-
-    for(i=0; i<10; i++)
-        printf("tencards[%d][TFIL]=%d\n", i, tencards[i][TFIL]);
 
     printf("\n");
     while(again)
@@ -287,14 +284,14 @@ int main(int argc, char *argv[])
         {
             if(tencards[i][TMEM]==-2) /* already presented and ok */
                 continue;
-            getcard(c, tencards[i][TFIL], card); /* tencards[i][1]=line number in file */
+            getcard(c, tencards[i][TFIL], card);
             printf("------------------------------------------\n");
             if(tencards[i][TMEM]==-1) /* new card? */
-                printf("Card %d (new card for today)\n", tencards[i][TFIL]); /* BUG +1 */
+                printf("Card %d (new card for today)\n", tencards[i][TFIL]+1);
             else
             {
                 newd=newdate(c.cfdate[tencards[i][TMEM]], ave2day(c.cfave[tencards[i][TMEM]]));
-                printf("Card %d (revision date %s)\n", tencards[i][TFIL], prettydate(newd)); /* BUG +1 */
+                printf("Card %d (revision date %s)\n", tencards[i][TFIL]+1, prettydate(newd));
             }
 
             printf("%s\n\n", cardfront(card));
@@ -312,12 +309,12 @@ int main(int argc, char *argv[])
                 again=1;
             else
             {
-                save2memo(&c, tencards[i][TMEM], tencards[i][TFIL], opt); /* tencards[i][0]=index in memory */
+                save2memo(&c, tencards[i][TMEM], tencards[i][TFIL], opt);
                 tencards[i][TMEM]=-2; /* presented and ok */
             }
         }
     }
-    printf("----------------------------------------\n");
+    printf("------------------------------------------\n");
 
     save2file(c);
 
@@ -352,9 +349,6 @@ void save2file(tcfg c)
 {
     int i;
     FILE *fp;
-//     char fullname[PATHSIZE];
-
-//     sprintf(fullname, "/%s/%s", c.cfgpath, c.configf);
 
     if((fp=fopen(c.configf, "w"))!=NULL) /* create from scratch */
     {
@@ -367,7 +361,6 @@ void save2file(tcfg c)
         fprintf(stderr, "save2file(): can't open config file %s for writing.\n", c.configf);
     return; /* leu do arquivo para os vetores */
 }
-
 
 /* get the front of the card */
 char *cardfront(char *card)
@@ -445,7 +438,6 @@ void sortmemo(tcfg *c)
 }
 
 /* select 10 cards (old or new) to be presented */
-/* nao pode sortear repetido mesmo sem estar na memoria */
 void select10cards(tcfg *c, int tencards[10][2])
 {
     int i, j;
@@ -485,9 +477,7 @@ int dbsize(tcfg *c)//, char *dbname)
     char line[TAMLINE];
     int qtdl=0;
     FILE *fp;
-//     char fullname[PATHSIZE];
 
-//     sprintf(fullname, "/%sdb/%s", c->binpath, c->dbasef);
     if(!(fp=fopen(c->dbasef,"r")))
     {
         printf("Fail to open database %s.\n", c->dbasef);
@@ -510,12 +500,10 @@ void cfanalyses(tcfg *c, int *view, int *learn)
     int card, date;
     float ave;
     FILE *fp;
-//     char fullname[PATHSIZE];
 
     *view=0;
     *learn=0;
 
-//     sprintf(fullname, "/%s/%s", c->cfgpath, c->configf);
     if(!(fp=fopen(c->configf,"r")))
         return;
 
@@ -576,19 +564,10 @@ char *theme(char *file)
     return theme;
 }
 
-void listab(void)
-{
-    int j;
-    while(randnorep(LISTBASKET, &j)==BASKETOK)
-        printf("%d->", j);
-    printf("NULL\n");
-}
-
 /* Sorteia um cartao novo que esta no arquivo e nunca foi visto */
 int newcard(tcfg c, int tencards[10][2])
 {
     int l, i;
-    //int qtd10=10, total, novo;
 
     randnorep(FILLBASKET, &c.QTDCARD); /* fill */
 
@@ -596,16 +575,13 @@ int newcard(tcfg c, int tencards[10][2])
         if(tencards[i][TFIL]!=-2)
             if(randnorep(REMOVEBASKET, &tencards[i][TFIL])!=BASKETOK)
                 printf("erro ten randnorep() = %d\n", tencards[i][TFIL]);
-//     listab();
 
     for(i=0; i<c.cfsize; i++) /* remove from history */
         if(randnorep(REMOVEBASKET, &c.cfcard[i])!=BASKETOK)
             printf("erro his randnorep() = %d\n", tencards[i][TFIL]);
-    //     listab();
 
     if(randnorep(DRAWBASKET, &l)!=BASKETOK)
         l=-2;
-    listab();
 
     return l;
 }
@@ -616,9 +592,7 @@ void getcard(tcfg c, int cardnum, char *card)
     char line[TAMLINE];
     FILE *fp;
     int i;
-//     char fullname[PATHSIZE];
 
-//     sprintf(fullname, "/%sdb/%s", c.binpath, c.dbasef);
     if(!(fp=fopen(c.dbasef,"r")))
     {
         printf("Fail to open database %s.\n", c.dbasef);
@@ -771,7 +745,7 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
         {
             printf("Databases found:\n");
             for(i=0; i<cfg->dbfsize; i++)
-                printf("(%d) %s %s\n", i+1, filenopath(cfg->dbfiles[i]), cfg->dbfiles[i]); /* BUG */
+                printf("(%d) %s\n", i+1, filenopath(cfg->dbfiles[i]));
 
             dbnum=1; /* default */
             if(cfg->dbfsize>1)
@@ -789,6 +763,12 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
         *dot='\0'; /* delete from dot on */
     sprintf(cfg->configf, "%s/%s-%s%s", cfg->cfgpath, cfg->user, dbcore, EXTCF);
     cfg->QTDCARD=dbsize(cfg);
+
+    if(cfg->QTDCARD<10)
+    {
+        printf("Error in database %s. Must have at least 10 questions.\n", cfg->dbasef);
+        exit(EXIT_FAILURE);
+    }
 
     return;
 }
@@ -866,9 +846,6 @@ void readcfg(tcfg *c)
     int card, date;
     float ave;
     FILE *fp;
-//     char fullname[PATHSIZE];
-
-//     sprintf(fullname, "/%s/%s", c->cfgpath, c->configf);
 
     c->cfcard=c->cfdate=NULL;
     c->cfave=NULL;
