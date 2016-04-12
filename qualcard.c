@@ -270,7 +270,7 @@ int main(int argc, char *argv[])
     if(verb>0)
     {
         printf("\nDataBase file: %s (%d cards)\n", filenopath(c.dbasef), c.QTDCARD);
-        printf("History  file: %s %s\n", filenopath(c.configf));
+        printf("History  file: %s\n", filenopath(c.configf));
     }
 
     readcfg(&c);
