@@ -5,13 +5,14 @@
 .PRECIOUS: %.o
 SHELL=/bin/bash -o pipefail
 
-MAJOR = 0
-MINOR = 1
+MAJOR = 1
+MINOR = 0
 BUILD = $(shell date +"%g%m%d.%H%M%S")
 DEFSYM = $(subst .,_,$(BUILD))
 VERSION = "\"$(MAJOR).$(MINOR).$(BUILD)\""
 CC = gcc
-CFLAGS = -Wall -Wextra -g -O0 -c -std=gnu99 -Wno-unused-variable -Wno-unused-function
+CFLAGS = -Wall -Wextra -g -O0 -c -std=gnu99 
+# -Wno-unused-variable -Wno-unused-function
 #CFLAGS = -Wall -Wextra -Ofast -c -std=gnu99
 #-ansi -pedantic-errors -c -Ofast
 CPPFLAGS = -DVERSION=$(VERSION) -DBUILD="\"$(BUILD)\""

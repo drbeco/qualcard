@@ -1,5 +1,5 @@
 /***************************************************************************
- *   qualcard.c                               Version 20160409.000957      *
+ *   qualcard.c                               Version 1.0.20160411.205959  *
  *                                                                         *
  *   Learn cards by Spaced Repetition Method.                              *
  *   This program helps you learn from a set of cards with questions       *
@@ -76,30 +76,6 @@
 #include <dirent.h> /* Defines directory entries */
 #include <assert.h> /* Verify assumptions with assert */
 
-/* #include <math.h> */ /* Mathematics functions */
-/* #include <dlfcn.h> */ /* Dynamic library */
-/* #include <malloc.h> */ /* Dynamic memory allocation */
-/* #include <unistd.h> */ /* UNIX standard function */
-/* #include <limits.h> */ /* Various C limits */
-/* #include <ctype.h> */ /* Character functions */
-/* #include <errno.h> */ /* Error number codes errno */
-/* #include <signal.h> */ /* Signal processing */
-/* #include <stdarg.h> */ /* Functions with variable arguments */
-/* #include <pthread.h> */ /* Parallel programming with threads */
-/* #include <fcntl.h> */ /* File control definitions */
-/* #include <termios.h> */ /* Terminal I/O definitions POSIX */
-/* #include <sys/stat.h> */ /* File status and information */
-/* #include <float.h> */ /* Float constants to help portability */
-/* #include <setjmp.h> */ /* Bypass standard function calls and return */
-/* #include <stddef.h> */ /* Various types and MACROS */
-/* #include <SWI-Prolog.h> */ /* Prolog integration with C */
-/* #include <ncurses.h> */ /* Screen handling and optimisation functions */
-/* #include <allegro.h> */ /* A game library for graphics, sounds, etc. */
-/* #include <libintl.h> */ /* Internationalization / translation */
-/* #include <locale.h> */ /* MACROS LC_ for location specific settings */
-/* #include "libeco.h" */ /* I/O, Math, Sound, Color, Portable Linux/Windows */
-/* #include "qualcard.h" */ /* To be created for this template if needed */
-
 /* ---------------------------------------------------------------------- */
 /* definitions */
 
@@ -133,13 +109,10 @@ typedef struct scfg /* configuration data struct */
     int today; /* yyyymmdd */
     char user[STRSIZE]; /* user name */
     char dbasef[STRSIZE], config[STRSIZE]; /* filenames: database and configuration */
-//     FILE *fdb; /* database file pointer */
-//     FILE *fcf; /* config file pointer */
     int *cfcard, *cfdate; /* card num, last date */
     float *cfave; /* card average */
     int cfsize; /* size of config file */
     char **dbfiles; /* char dbfiles[100][256];*/
-    //char *dbfiles[0]; / * char dbfiles[100][256];*/
     int dbfsize; /* first dimension / lines */
 } tcfg; /* configuration data type */
 
@@ -167,8 +140,6 @@ char *cardfront(char *card); /* get the front of the card */
 char *cardback(char *card); /* get the back of the card */
 void save2memo(tcfg *c, int i, int card, int score); /* save new or update old card */
 void save2file(tcfg c); /* save updated cards in memory to config file */
-
-int funcexample(int i, int *o, int *z); /* just an example with complete doxygen fields */
 
 /* ---------------------------------------------------------------------- */
 /* @ingroup GroupUnique */
@@ -207,12 +178,8 @@ int funcexample(int i, int *o, int *z); /* just an example with complete doxygen
 int main(int argc, char *argv[])
 {
     int opt; /* return from getopt() and user options */
-    char sopt[3]; /* self evaluation score */
     int SUMMA=0; /* summary only */
-    time_t lt;
-    struct tm *timeptr;
     tcfg c={0};
-    int l; /* line drawn */
     int i; /* index, auxiliary */
     char card[STRSIZE]; /* card drawn */
     int newd;
@@ -230,7 +197,7 @@ int main(int argc, char *argv[])
      *        -d database   set the database to use (default: ask)
      */
     opterr = 0;
-    while((opt = getopt(argc, argv, "vhcsu:d:")) != EOF)
+    while((opt = getopt(argc, argv, "hcvsu:d:")) != EOF)
         switch(opt)
         {
             case 'h': /* exit */
@@ -259,7 +226,6 @@ int main(int argc, char *argv[])
 
     if(verb)
         printf("Verbose level set at: %d\n", verb);
-    /* ...and we are done */
 
     qualcard_init(&c); /* initialization function */
 
@@ -269,16 +235,10 @@ int main(int argc, char *argv[])
         exit(EXIT_SUCCESS);
     }
 
-
-    printf("Number of cards: %d\n", c.QTDCARD);
-    printf("DB: %s\n", c.dbasef);
-    printf("CF: %s\n", c.config);
+    printf("\nDataBase file: %s (%d cards)\n", c.dbasef, c.QTDCARD);
+    printf("History  file: %s\n\n", c.config);
 
     readcfg(&c);
-//     printf("c.cfsize=%d\n", c.cfsize);
-//     for(i=0; i<c.cfsize; i++)
-//         printf("card: %d, date: %d, ave: %f\n", c.cfcard[i], c.cfdate[i], c.cfave[i]);
-
     select10cards(&c, tencards);
 
     while(again)
@@ -322,9 +282,8 @@ int main(int argc, char *argv[])
 
     save2file(c);
 
-//     if(c.fcf)
-//         fclose(c.fcf); /* config file */
-
+    printf("\nLive as if you were to die tomorrow. Learn as if you were to live forever. (Mahatma Gandhi)\n");
+    printf("Thank you for using QualCard version %s.\n\n", VERSION);
     return EXIT_SUCCESS;
 }
 
@@ -368,6 +327,7 @@ void save2file(tcfg c)
 }
 
 
+/* get the front of the card */
 char *cardfront(char *card)
 {
     static char front[STRSIZE];
@@ -379,6 +339,7 @@ char *cardfront(char *card)
     return front;
 }
 
+/* get the back of the card */
 char *cardback(char *card)
 {
     static char back[STRSIZE];
@@ -392,25 +353,14 @@ char *cardback(char *card)
     return back;
 }
 
-
 /* prioritary (old) comes first (selection sort) */
 void sortmemo(tcfg *c)
 {
-//     int *cfcard, *cfdate; / * card num, last date * /
-//     float *cfave; / * card average * /
-//     int cfsize; / * size of config file * /
     int i, j, iux;
     int ki, kj;
     float fux;
     if(c->cfsize<2)
         return;
-
-//     printf("before sort\n");
-//     for(i=0; i<c->cfsize; i++)
-//     {
-//         ki=newdate(c->cfdate[i], ave2day(c->cfave[i]));
-//         printf("%d %d %f - (+%d) %d\n", c->cfcard[i], c->cfdate[i], c->cfave[i], ave2day(c->cfave[i]), ki);
-//     }
 
     for(i=0; i<c->cfsize-1; i++)
         for(j=i+1; j<c->cfsize; j++)
@@ -433,19 +383,7 @@ void sortmemo(tcfg *c)
                 c->cfave[j]=fux;
             }
         }
-//     printf("\nafter sort\n");
-//     for(i=0; i<c->cfsize; i++)
-//     {
-//         ki=newdate(c->cfdate[i], ave2day(c->cfave[i]));
-//         printf("%d %d %f - (+%d) %d\n", c->cfcard[i], c->cfdate[i], c->cfave[i], ave2day(c->cfave[i]), ki);
-//     }
-//     printf("\n");
 }
-
-
-// int ave2day(float ave)
-// tudo newdate(char *oldd, int days, char *newd)
-
 
 /* select 10 cards (old or new) to be presented */
 void select10cards(tcfg *c, int tencards[10][2])
@@ -474,12 +412,10 @@ int dbsize(char *dbname)
     int qtdl=0;
     FILE *fp;
 
-
     if(!(fp=fopen(dbname,"r")))
     {
         printf("Fail to open database %s.\n", dbname);
         exit(EXIT_FAILURE);
-        /* return 0; */
     }
 
     fseek(fp, 0, 0 ); /* linha 0 */
@@ -501,6 +437,7 @@ int dbsize(char *dbname)
  * @author Ruben Carlo Benante
  * @version 20160409.000957
  * @date 2016-04-09
+ * @todo This function is not ready
  *
  */
 void summary(tcfg c)
@@ -528,31 +465,14 @@ char *theme(char *file)
     return theme;
 }
 
-
-
-/*
- * le um novo cartao aleatorio do arquivo
- * retorna o numero da linha lida (de 0 a FIM-1)
- * e a string lida
- */
+/* Sorteia um cartao novo que esta no arquivo e nunca foi visto */
 int newcard(tcfg c) //, char *card)
 {
     int l, i, total, novo;
-    char line[TAMLINE];
-//     FILE *fp;
-
-
-//     if(!(fp=fopen(c.dbasef,"r")))
-//     {
-//         printf("Fail to open database %s.\n", c.dbasef);
-//         exit(EXIT_FAILURE);
-        /* return 0; */
-//     }
 
     total=c.QTDCARD-c.cfsize;
     novo=1;
-
-    l=(int)randmm(0.0, total); /* [= 0, QTDPAD-1 =] */
+    l=(int)randmm(0.0, total); /* [= 0, total-1 =] */
 
     while(novo)
     {
@@ -564,13 +484,6 @@ int newcard(tcfg c) //, char *card)
                 novo=1;
             }
     }
-
-//     fseek(fp, 0, 0);
-//     for(i=0; i<=l; i++)
-//         fgets(line, TAMLINE, fp);
-//     strcpy(card, line);
-
-//     fclose(fp);
     return l; /* card line number */
 }
 
@@ -585,7 +498,6 @@ void getcard(tcfg c, int cardnum, char *card)
     {
         printf("Fail to open database %s.\n", c.dbasef);
         exit(EXIT_FAILURE);
-        /* return 0; */
     }
     fseek(fp, 0, 0);
     for(i=0; i<=cardnum; i++)
@@ -631,16 +543,12 @@ double randmm(double min, double max)
 void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
 {
     IFDEBUG("qualcard_init()");
-    /* initialization */
 
     time_t lt;
     struct tm *timeptr;
     int i, dbnum;
-    /* const char *user=getenv("USER"); */
-//     const char *dbcore="english-word-definition-test";
     char dbcore[STRSIZE];
     char *dot;
-    FILE *fdb;
     char stoday[DTSIZE];
 
     lt=time(NULL);
@@ -648,7 +556,7 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
     sprintf(stoday, "%04d%02d%02d", 1900 + timeptr->tm_year, 1 + timeptr->tm_mon, timeptr->tm_mday);
     cfg->today=(int)strtol(stoday, NULL, 10);
 
-    srand((unsigned)time(&lt));
+    srand((unsigned)time(&lt)); /* new unknow seed */
 
     if(cfg->user[0]=='\0')
         strcpy(cfg->user, getenv("USER"));
@@ -679,18 +587,10 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
         strcpy(cfg->dbasef, cfg->dbfiles[dbnum]);
     }
 
-    // sprintf(cfg->dbasef, "%s%s", dbcore, EXTDB);
-    // strcpy(db, "english-word-definition.ex4");
     strcpy(dbcore, cfg->dbasef);
     if((dot=strrchr(dbcore, '.'))) /* find the dot */
         *dot='\0'; /* delete from dot on */
-
-//     printf("core: %s\n", dbcore);
-
     sprintf(cfg->config, "%s-%s%s", cfg->user, dbcore, EXTCF);
-    // strcpy(cf, "beco-english-word-definition-test.cf4");
-
-
     cfg->QTDCARD=dbsize(cfg->dbasef);
 
     return;
@@ -700,7 +600,7 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
 int ave2day(float ave)
 {
     if(ave<0.1)
-        return 0; /* review today */
+        return 0; /* review today BUG */
     if(ave<2.0)
         return 1; /* review tomorrow */
     if(ave<3.25)
@@ -718,12 +618,6 @@ int newdate(int oldd, int days)
     struct tm date={0}; /* campos da data */
     char snewd[DTSIZE];
 
-    /*char str[LEN];
-    snprintf(str, LEN, "%d", 42);*/
-    /* char sdata[MAXSDATA]; / * data no formato escolhido */
-
-//     tudo=(int)strtol(oldd, NULL, 10);
-
     ano = oldd/10000; /* 20160410/10000=2016.0410 */
     oldd -= ano*10000;
     mes = oldd/100; /* 0410/100=04.10 */
@@ -736,12 +630,8 @@ int newdate(int oldd, int days)
 
     timer = mktime(&date);
     date = *gmtime(&timer); /* atribuir valor, nao o ponteiro */
-    /*printf("Local is %s\n",asctime(localtime(&timer))); */
-    /*printf("UTC is %s\n",asctime(gmtime(&timer))); */
-    /*strftime(sdata, sizeof(sdata), "%F %H:%M", &date);*/
     sprintf(snewd, "%04d%02d%02d",date.tm_year+1900,date.tm_mon+1,date.tm_mday);
     oldd=(int)strtol(snewd, NULL, 10);
-    /*printf("%s + %d = %s\n", olddate, days, newd); */
     return oldd;
 }
 
@@ -751,8 +641,6 @@ char *prettydate(int oldd)
     static char* months[] = {"Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dec" };
     static char dd[12];
     int ano, mes, dia;
-
-//     tudo=(int)strtol(oldd, NULL, 10);
 
     ano = oldd/10000; /* 20160410/10000=2016.0410 */
     oldd -= ano*10000;
@@ -784,7 +672,6 @@ void readcfg(tcfg *c)
     float ave;
     FILE *fp;
 
-    /* if(access(c->config, F_OK)!=-1) / * config file exists */
     c->cfcard=c->cfdate=NULL;
     c->cfave=NULL;
     c->cfsize=0;
@@ -803,122 +690,8 @@ void readcfg(tcfg *c)
         fclose(fp);
     }
     else
-        fprintf(stderr, "readcfg(): can't open config file.\n");
+        printf("No previous history. Starting new study.\n");
     return; /* leu do arquivo para os vetores */
-}
-
-
-/* todo:
- * writecfg
- * choosedb
- */
-
-
-void readdbfiles(tcfg *c)
-{
-    DIR *dp;
-    struct dirent *ep;
-    char *dot=NULL;
-    int len;
-
-    c->dbfiles=NULL; /* risk of memory leak here: this line isn't needed */
-    c->dbfsize=0;
-    dp = opendir("./");
-    if(dp != NULL)
-    {
-        while((ep=readdir(dp))) /* while there is a file, get it */
-        {
-//             puts(ep->d_name);
-            if(!(dot=strrchr(ep->d_name, '.'))) /* grab extension */
-                continue;
-            len=strlen(ep->d_name);
-            if(len>(STRSIZE-1))
-            {
-                perror("Ignoring file with too big name");
-                continue;
-            }
-            if(!strcmp(dot, ".ex4")) /* achou db */
-            {
-                c->dbfsize++;
-//                 printf("c->dbfsize:%d\n", c->dbfsize);
-                c->dbfiles=(char **)reallocordie(c->dbfiles, sizeof(char *)*(c->dbfsize));
-//                 printf("vai %s\n", ep->d_name);
-//                 printf("c->dbfiles=%p, c->dbfiles[0]=%p [1]=%p\n", c->dbfiles, c->dbfiles[0], c->dbfiles[1]);
-//                c->dbfiles=(char **)malloc(sizeof(char *)*c->dbfsize);
-//                *(c->dbfiles+i)=(char *)malloc(10);
-
-                c->dbfiles[c->dbfsize-1] = NULL;
-                c->dbfiles[c->dbfsize-1] = (char *)reallocordie(c->dbfiles[c->dbfsize-1], sizeof(char)*(len+1));
-
-//                 c->dbfiles[c->dbfsize-1] = (char *)reallocordie(*(c->dbfiles + c->dbfsize - 1), sizeof(char)*(len+1));
-                strncpy(c->dbfiles[c->dbfsize-1], ep->d_name, len+1);
-//                 printf("c->dbfiles[%d]=%p '%s'\n", c->dbfsize-1, c->dbfiles[c->dbfsize-1], c->dbfiles[c->dbfsize-1]);
-            }
-        }
-        closedir(dp);
-    }
-    else
-        perror ("Couldn't open the directory");
-
-    return;
-}
-
-
-
-
-
-
-
-
-
-/* ---------------------------------------------------------------------- */
-/**
- * @ingroup GroupUnique
- * @brief Prints help information and exit
- * @details Prints help information (usually called by opt -h)
- * @return Void
- * @author Ruben Carlo Benante
- * @version 20160409.000957
- * @date 2016-04-09
- *
- */
-void help(void)
-{
-    IFDEBUG("help()");
-    printf("%s v.%s - %s\n", "qualcard", VERSION, "Learn cards by Spaced Repetition Method");
-    printf("\nUsage: %s [-h|-v]\n", "qualcard");
-    printf("\nOptions:\n");
-    printf("\t-h,  --help\n\t\tShow this help.\n");
-    printf("\t-c,  --version\n\t\tShow version and copyright information.\n");
-    printf("\t-v,  --verbose\n\t\tSet verbose level (cumulative).\n");
-    printf("\t-s,  --status\n\t\tShow how many cards needs review in each database.\n");
-    printf("\t-u username,  --user username\n\t\tUse the username's profile.\n");
-    printf("\t-d file.ex4,  --database file.ex4\n\t\tUse the given database to practice.\n\t\tThe file must have a '.ex4' extension\n\t\tand its name is in the form 'theme-question-answer.ex4', where:\n\t\t\t* theme: the theme of the study.\n\t\t\t* question: the first side of the card.\n\t\t\t* answer: the back side of the card.\n");
-    /* add more options here */
-    printf("\nExit status:\n\t0 if ok.\n\t1 some error occurred.\n");
-    printf("\nTodo:\n\tLong options not implemented yet.\n");
-    printf("\nAuthor:\n\tWritten by %s <%s>\n\n", "Ruben Carlo Benante", "rcb@beco.cc");
-    exit(EXIT_FAILURE);
-}
-
-/* ---------------------------------------------------------------------- */
-/**
- * @ingroup GroupUnique
- * @brief Prints version and copyright information and exit
- * @details Prints version and copyright information (usually called by opt -V)
- * @return Void
- * @author Ruben Carlo Benante
- * @version 20160409.000957
- * @date 2016-04-09
- *
- */
-void copyr(void)
-{
-    IFDEBUG("copyr()");
-    printf("%s - Version %s\n", "qualcard", VERSION);
-    printf("\nCopyright (C) %d %s <%s>, GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>. This  is  free  software:  you are free to change and redistribute it. There is NO WARRANTY, to the extent permitted by law. USE IT AS IT IS. The author takes no responsability to any damage this software may inflige in your data.\n\n", 2016, "Ruben Carlo Benante", "rcb@beco.cc");
-    if(verb>3) printf("copyr(): Verbose: %d\n", verb); /* -vvvv */
-        exit(EXIT_FAILURE);
 }
 
 /* ---------------------------------------------------------------------- */
@@ -957,12 +730,93 @@ void copyr(void)
  * @copyright Only if not the same as the whole file
  *
  */
-int funcexample(int i, int *o, int *z)
+void readdbfiles(tcfg *c)
 {
-    IFDEBUG("funcexample()");
-    i += *z;
-    *o = (*z)++;
-    return i-4;
+    DIR *dp;
+    struct dirent *ep;
+    char *dot=NULL;
+    int len;
+
+    c->dbfiles=NULL; /* risk of memory leak here: this line isn't needed */
+    c->dbfsize=0;
+    dp = opendir("./");
+    if(dp != NULL)
+    {
+        while((ep=readdir(dp))) /* while there is a file, get it */
+        {
+            if(!(dot=strrchr(ep->d_name, '.'))) /* grab extension */
+                continue;
+            len=strlen(ep->d_name);
+            if(len>(STRSIZE-1))
+            {
+                perror("Ignoring file with too big name");
+                continue;
+            }
+            if(!strcmp(dot, ".ex4")) /* achou db */
+            {
+                c->dbfsize++;
+                c->dbfiles=(char **)reallocordie(c->dbfiles, sizeof(char *)*(c->dbfsize));
+                c->dbfiles[c->dbfsize-1] = NULL;
+                c->dbfiles[c->dbfsize-1] = (char *)reallocordie(c->dbfiles[c->dbfsize-1], sizeof(char)*(len+1));
+                strncpy(c->dbfiles[c->dbfsize-1], ep->d_name, len+1);
+            }
+        }
+        closedir(dp);
+    }
+    else
+        perror ("Couldn't open the directory");
+
+    return;
+}
+
+/* ---------------------------------------------------------------------- */
+/**
+ * @ingroup GroupUnique
+ * @brief Prints help information and exit
+ * @details Prints help information (usually called by opt -h)
+ * @return Void
+ * @author Ruben Carlo Benante
+ * @version 20160409.000957
+ * @date 2016-04-09
+ *
+ */
+void help(void)
+{
+    IFDEBUG("help()");
+    printf("%s v.%s - %s\n", "qualcard", VERSION, "Learn cards by Spaced Repetition Method");
+    printf("\nUsage: %s [options]\n", "qualcard");
+    printf("\nOptions:\n");
+    printf("\t-h,  --help\n\t\tShow this help.\n");
+    printf("\t-c,  --version\n\t\tShow version and copyright information.\n");
+    printf("\t-v,  --verbose\n\t\tSet verbose level (cumulative).\n");
+    printf("\t-s,  --status\n\t\tShow how many cards needs review in each database.\n");
+    printf("\t-u username,  --user username\n\t\tUse the username's profile.\n");
+    printf("\t-d file.ex4,  --database file.ex4\n\t\tUse the given database to practice.\n\t\tThe file must have a '.ex4' extension\n\t\tand its name is in the form 'theme-question-answer.ex4', where:\n\t\t\t* theme: the theme of the study.\n\t\t\t* question: the first side of the card.\n\t\t\t* answer: the back side of the card.\n");
+    /* add more options here */
+    printf("\nExit status:\n\t0 if ok.\n\t1 some error occurred.\n");
+    printf("\nTodo:\n\tLong options not implemented yet.\n");
+    printf("\nAuthor:\n\tWritten by %s <%s>\n\n", "Ruben Carlo Benante", "rcb@beco.cc");
+    exit(EXIT_FAILURE);
+}
+
+/* ---------------------------------------------------------------------- */
+/**
+ * @ingroup GroupUnique
+ * @brief Prints version and copyright information and exit
+ * @details Prints version and copyright information (usually called by opt -V)
+ * @return Void
+ * @author Ruben Carlo Benante
+ * @version 20160409.000957
+ * @date 2016-04-09
+ *
+ */
+void copyr(void)
+{
+    IFDEBUG("copyr()");
+    printf("%s - Version %s\n", "qualcard", VERSION);
+    printf("\nCopyright (C) %d %s <%s>, GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>. This  is  free  software:  you are free to change and redistribute it. There is NO WARRANTY, to the extent permitted by law. USE IT AS IT IS. The author takes no responsability to any damage this software may inflige in your data.\n\n", 2016, "Ruben Carlo Benante", "rcb@beco.cc");
+    if(verb>3) printf("copyr(): Verbose: %d\n", verb); /* -vvvv */
+        exit(EXIT_FAILURE);
 }
 
 /**  @} */
