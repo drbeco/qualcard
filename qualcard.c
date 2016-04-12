@@ -88,6 +88,20 @@
 #define SCOREA 4.25
 #define SCOREB 3.25
 #define SCOREC 2.25
+#define TMEM 0 /**< tencards memory index */
+#define TFIL 1 /**< tencards file index (card number) */
+
+/* randnorep() input: mode */
+#define DRAWBASKET   -1 /**< MODE set randnorep() to draw */
+#define LISTBASKET   -2 /**< MODE set randnorep() to list */
+#define REMOVEBASKET -3 /**< MODE set randnorep() to remove */
+#define FILLBASKET   -4 /**< MODE set randnorep() to fill basket */
+/* randnorep() output: error codes returned */
+#define BASKETOK      0 /**< randnorep() return code for no error */
+#define BASKETEMPTY  -1 /**< randnorep() return code for empty list */
+#define BASKETLISTED -2 /**< randnorep() return code for all listed */
+#define BASKETERROR  -3 /**< randnorep() return code for other error */
+#define BASKETFULL   -4 /**< randnorep() return code for full basket */
 
 /* Debug */
 #ifndef DEBUG /* gcc -DDEBUG=1 */
@@ -109,7 +123,7 @@
 /* globals */
 
 static int verb=0; /**< verbose level, global within the file */
-static int SUMMA=0; /* summary only */
+static int SUMMA=0; /**< print summary only and exit */
 
 typedef struct scfg /* configuration data struct */
 {
@@ -135,7 +149,6 @@ void copyr(void); /* print version and copyright information */
 void qualcard_init(tcfg *cfg); /* global initialization function */
 void summary(tcfg *c); /* how many cards to review */
 double randmm(double min, double max); /* drawn a number from [min, max[ */
-int newcard(tcfg c); //, char *card); /* drawn a new card */
 int ave2day(float ave); /* given an average, return how many days */
 int newdate(int oldd, int days); /* add days to a date */
 char *prettydate(int somedate); /* return date in a pretty format */
@@ -143,6 +156,7 @@ void readcfg(tcfg *c); /* read config file */
 void *reallocordie(void *ptr, size_t sz); /* resize the memory block of a pointer or die */
 void readdbfiles(tcfg *c); /* read files from directory and create a dynamic vector of strings */
 char *theme(char *file); /* take the theme from a database file name */
+int newcard(tcfg c, int tencards[10][2]); /* drawn a new card */
 void select10cards(tcfg *c, int tencards[10][2]); /* select 10 cards (old or new) to be presented */
 void sortmemo(tcfg *c); /* prioritary (old) comes first (selection sort) */
 void getcard(tcfg c, int cardnum, char *card); /* given a card number, get it from file */
@@ -154,6 +168,7 @@ int dbsize(tcfg *c); /* database size */
 void cfanalyses(tcfg *c, int *view, int *learn); /* analyses a history file */
 void createcfgdir(tcfg *c); /* creates /home/user/.config/qualcard/ */
 char *filenopath(char *filepath); /* get filename with no path */
+int randnorep(int mode, int *n); /* drawn numbers from a list with no repetition */
 
 /* ---------------------------------------------------------------------- */
 /* @ingroup GroupUnique */
@@ -261,22 +276,25 @@ int main(int argc, char *argv[])
     readcfg(&c);
     select10cards(&c, tencards);
 
+    for(i=0; i<10; i++)
+        printf("tencards[%d][TFIL]=%d\n", i, tencards[i][TFIL]);
+
     printf("\n");
     while(again)
     {
         again=0;
         for(i=0; i<10; i++)
         {
-            if(tencards[i][0]==-2) /* already presented and ok */
+            if(tencards[i][TMEM]==-2) /* already presented and ok */
                 continue;
-            getcard(c, tencards[i][1], card); /* tencards[i][1]=line number in file */
-            printf("----------------------------------------\n");
-            if(tencards[i][0]==-1) /* new card? */
-                printf("Card %d (new card for today)\n", tencards[i][1]+1);
+            getcard(c, tencards[i][TFIL], card); /* tencards[i][1]=line number in file */
+            printf("------------------------------------------\n");
+            if(tencards[i][TMEM]==-1) /* new card? */
+                printf("Card %d (new card for today)\n", tencards[i][TFIL]); /* BUG +1 */
             else
             {
-                newd=newdate(c.cfdate[tencards[i][0]], ave2day(c.cfave[tencards[i][0]]));
-                printf("Card %d (revision date %s)\n", tencards[i][1]+1, prettydate(newd));
+                newd=newdate(c.cfdate[tencards[i][TMEM]], ave2day(c.cfave[tencards[i][TMEM]]));
+                printf("Card %d (revision date %s)\n", tencards[i][TFIL], prettydate(newd)); /* BUG +1 */
             }
 
             printf("%s\n\n", cardfront(card));
@@ -294,8 +312,8 @@ int main(int argc, char *argv[])
                 again=1;
             else
             {
-                save2memo(&c, tencards[i][0], tencards[i][1], opt); /* tencards[i][0]=index in memory */
-                tencards[i][0]=-2; /* presented and ok */
+                save2memo(&c, tencards[i][TMEM], tencards[i][TFIL], opt); /* tencards[i][0]=index in memory */
+                tencards[i][TMEM]=-2; /* presented and ok */
             }
         }
     }
@@ -427,26 +445,38 @@ void sortmemo(tcfg *c)
 }
 
 /* select 10 cards (old or new) to be presented */
-/* BUG
- * nao pode sortear repetido mesmo sem estar na memoria */
+/* nao pode sortear repetido mesmo sem estar na memoria */
 void select10cards(tcfg *c, int tencards[10][2])
 {
-    int i;
+    int i, j;
 
-    sortmemo(c);
+    for(i=0; i<10; i++) /* zeroing */
+        tencards[i][TMEM]=tencards[i][TFIL]=-2; /* end of cards */
+
+    sortmemo(c); /* sort cfcard, cfdate and cfave, by date+days(ave) */
     for(i=0; i<9 && i<c->cfsize; i++) /* nine olds if possible */
     {
-        if(newdate(c->cfdate[i], ave2day(c->cfave[i]))>c->today) /* just until today */
+        if(newdate(c->cfdate[i], ave2day(c->cfave[i])) > c->today) /* just until today */
             break;
-        tencards[i][0]=i; /* take the first nine or less */
-        tencards[i][1]=c->cfcard[i]; /* file line */
+        tencards[i][TMEM]=i; /* take the first nine or less */
+        tencards[i][TFIL]=c->cfcard[i]; /* file line */
     }
-    for(; i<10; i++)
+    for(j=i; j<10; j++)
     {
-        tencards[i][0]=-1; /* not in memory */
-        tencards[i][1]=newcard(*c); /* new not in memory BUG nor in tencards already */
+        /* new not in memory nor in tencards already */
+        if((tencards[j][TFIL]=newcard(*c, tencards))==-2)
+            break; /* there is not enough */
+        tencards[j][TMEM]=-1; /* not in memory, but valid new card from file */
     }
-    /* BUG not always will we have al
+    if(j<10) /* still need, lets see cards for tomorrow */
+    {
+        while(i<c->cfsize && j<10)
+        {
+            tencards[j][TMEM]=i; /* take the next waiting in history */
+            tencards[j][TFIL]=c->cfcard[i]; /* file line */
+            i++; j++;
+        }
+    }
 }
 
 /* database size */
@@ -546,26 +576,38 @@ char *theme(char *file)
     return theme;
 }
 
-/* Sorteia um cartao novo que esta no arquivo e nunca foi visto */
-int newcard(tcfg c) //, char *card)
+void listab(void)
 {
-    int l, i, total, novo;
+    int j;
+    while(randnorep(LISTBASKET, &j)==BASKETOK)
+        printf("%d->", j);
+    printf("NULL\n");
+}
 
-    total=c.QTDCARD-c.cfsize;
-    novo=1;
-    l=(int)randmm(0.0, total); /* [= 0, total-1 =] */
+/* Sorteia um cartao novo que esta no arquivo e nunca foi visto */
+int newcard(tcfg c, int tencards[10][2])
+{
+    int l, i;
+    //int qtd10=10, total, novo;
 
-    while(novo)
-    {
-        novo=0;
-        for(i=0; i<c.cfsize; i++) /* talvez ordenar por card num? */
-            if(l==c.cfcard[i])
-            {
-                l = (l+1)%c.QTDCARD; /* advance l to the next avaiable */
-                novo=1;
-            }
-    }
-    return l; /* card line number */
+    randnorep(FILLBASKET, &c.QTDCARD); /* fill */
+
+    for(i=0; i<10; i++) /* remove from tencards */
+        if(tencards[i][TFIL]!=-2)
+            if(randnorep(REMOVEBASKET, &tencards[i][TFIL])!=BASKETOK)
+                printf("erro ten randnorep() = %d\n", tencards[i][TFIL]);
+//     listab();
+
+    for(i=0; i<c.cfsize; i++) /* remove from history */
+        if(randnorep(REMOVEBASKET, &c.cfcard[i])!=BASKETOK)
+            printf("erro his randnorep() = %d\n", tencards[i][TFIL]);
+    //     listab();
+
+    if(randnorep(DRAWBASKET, &l)!=BASKETOK)
+        l=-2;
+    listab();
+
+    return l;
 }
 
 /* given a card number, get it from file */
@@ -934,6 +976,141 @@ void readdbfiles(tcfg *c)
     }while(dois>=0);
 
     return;
+}
+
+/* drawn numbers from a list with no repetition */
+int randnorep(int mode, int *n)
+{
+    struct listnum
+    {
+        int num;              /* the number */
+        struct listnum *prox; /* next number */
+    };
+    static int listqtd = 0; /* how much numbers in the basket */
+    static struct listnum *lcab = NULL; /* head of the list */
+    struct listnum *ln = NULL, *lant = NULL; /* ln: list point to number. lant: the node before. */
+    static struct listnum *lista = NULL;
+
+    int j;
+    int sort;
+
+    if(lcab == NULL)
+    {
+        lcab = (struct listnum *) malloc(sizeof(struct listnum));
+        lcab->prox = NULL;
+        lista = lcab;
+    }
+
+    if(mode == FILLBASKET) /* fills the basket */
+    {
+        if(*n<1)
+            return BASKETERROR;
+        /* deleting the old basket */
+        lant = lcab->prox;
+        while(lant != NULL)     /* delete previous experiment */
+        {
+            ln = lant->prox;
+            free(lant);
+            lant = ln;
+        }
+        lcab->prox = NULL;
+
+        /* filling the new basket */
+        listqtd = *n;
+        ln = lcab;
+        for(j = 0; j < listqtd; j++)
+        {
+            ln->num = j;
+            ln->prox = (struct listnum *) malloc(sizeof(struct listnum));
+            lant = ln;
+            ln = ln->prox;
+            ln->prox = NULL;
+        }
+        free(ln);
+        lant->prox = NULL;
+
+        return BASKETOK;
+    }
+    else if(mode == DRAWBASKET) /* Draw a number */
+    {
+        if(listqtd == 0)
+            return BASKETEMPTY; /* empty basket */
+        sort = randmm(0, listqtd);
+        ln = lcab;
+        lant = NULL;
+        for(j = 0; j < sort; j++)
+        {
+            lant = ln;
+            ln = ln->prox;
+        }
+        *n = ln->num;         /* number drawn */
+        listqtd--;
+
+        if(listqtd <= 0)        /* if no more, dont need to delete head */
+            return BASKETOK;
+
+        if(lant != NULL)        /* not the head */
+            lant->prox = ln->prox;
+        else                    /* it is the head */
+        {
+            lcab = lcab->prox;
+            lista = lcab;
+        }
+        free(ln);
+
+        return BASKETOK;
+    }
+    else if(mode == LISTBASKET)    /* LISTBASKET  */
+    {
+        /* for(a=randnorep(LISTBASKET); a!=BASKETLISTED; a=randnorep(LISTBASKET)) ( */
+        if(listqtd == 0)
+            return BASKETLISTED;    /* listed because empty basket */
+        if(lista == NULL)
+        {
+            lista = lcab;
+            return BASKETLISTED;    /* basket listed */
+        }
+        while(lista != NULL)
+        {
+            *n = lista->num;
+            lista = lista->prox;
+            return BASKETOK;
+        }
+    }
+    else if(mode == REMOVEBASKET) /* Remove a specific item */
+    {
+        if(listqtd == 0)
+            return BASKETEMPTY; /* empty basket */
+        sort = *n;
+        ln = lcab;
+        lant = NULL;
+        while(ln!=NULL)
+        {
+            if(ln->num==sort) /* number remove */
+                break;
+            lant = ln;
+            ln = ln->prox;
+        }
+        if(ln==NULL) /* number not found */
+            return BASKETERROR;
+
+        listqtd--;
+
+        if(listqtd <= 0)        /* if no more, dont need to delete head */
+            return BASKETOK;
+
+        if(lant != NULL)        /* not the head */
+            lant->prox = ln->prox;
+        else                    /* it is the head */
+        {
+            lcab = lcab->prox;
+            lista = lcab;
+        }
+        free(ln);
+
+        return BASKETOK;
+    }
+    return BASKETERROR; /* unknow mode */
 }
 
 /* ---------------------------------------------------------------------- */
