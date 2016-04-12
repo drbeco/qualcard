@@ -384,7 +384,7 @@ char *cardback(char *card)
     static char back[STRSIZE];
     char *colon;
 
-    if((colon=strchr(back, ':'))) /* find the colon */
+    if((colon=strchr(card, ':'))) /* find the colon */
         colon++; /* next char starts the back */
     else
         colon=card; /* no colon? copy all */
@@ -673,7 +673,7 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
                 printf("(%d) %s\n", i+1, cfg->dbfiles[i]);
 
             printf("Choose a database: ");
-            scanf("%d", &dbnum);
+            scanf("%d%*c", &dbnum); /* ignore '\n' */
         } while(dbnum<1 || dbnum>cfg->dbfsize);
         dbnum--;
         strcpy(cfg->dbasef, cfg->dbfiles[dbnum]);
