@@ -1,5 +1,5 @@
 /***************************************************************************
- *   qualcard.c                               Version 1.1.20160411.205959  *
+ *   qualcard.c                               Version 1.3.20160412.101200  *
  *                                                                         *
  *   Learn cards by Spaced Repetition Method.                              *
  *   This program helps you learn from a set of cards with questions       *
@@ -112,15 +112,15 @@ typedef struct scfg /* configuration data struct */
 {
     int QTDCARD; /* database size */
     int today; /* yyyymmdd */
-    char binpath[PATHSIZE]; /* path to the binary */
-    char cfgpath[PATHSIZE]; /* path to the config directory */
+    char dbpath[PATHSIZE]; /* path to commom database path */
+    char cfgpath[PATHSIZE]; /* path to config directory (history and databases) */
     char user[STRSIZE]; /* user name of the program */
     char realuser[STRSIZE]; /* user name of the account */
-    char dbasef[STRSIZE], config[STRSIZE]; /* filenames: database and configuration */
+    char dbasef[STRSIZE], configf[STRSIZE]; /* current filenames: database and configuration */
     int *cfcard, *cfdate; /* card num, last date */
     float *cfave; /* card average */
     int cfsize; /* size of config file */
-    char **dbfiles; /* char dbfiles[100][256];*/
+    char **dbfiles; /* char dbfiles[number of files][string lenght];*/
     int dbfsize; /* first dimension / lines */
 } tcfg; /* configuration data type */
 
@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
     }
 
     printf("\nDataBase file: %s (%d cards)\n", c.dbasef, c.QTDCARD);
-    printf("History  file: %s\n\n", c.config);
+    printf("History  file: %s\n\n", c.configf);
 
     readcfg(&c);
     select10cards(&c, tencards);
@@ -328,7 +328,7 @@ void save2file(tcfg c)
     FILE *fp;
     char fullname[PATHSIZE];
 
-    sprintf(fullname, "/%s/%s", c.cfgpath, c.config);
+    sprintf(fullname, "/%s/%s", c.cfgpath, c.configf);
 
     if((fp=fopen(fullname, "w"))!=NULL) /* create from scratch */
     {
@@ -457,7 +457,7 @@ void cfanalyses(tcfg *c, int *view, int *learn)
     *view=0;
     *learn=0;
 
-    sprintf(fullname, "/%s/%s", c->cfgpath, c->config);
+    sprintf(fullname, "/%s/%s", c->cfgpath, c->configf);
     if(!(fp=fopen(fullname,"r")))
         return;
 
@@ -497,7 +497,7 @@ void summary(tcfg *cfg)
         strcpy(dbcore, cfg->dbasef);
         if((dot=strrchr(dbcore, '.'))) /* find the dot */
             *dot='\0'; /* delete from dot on */
-        sprintf(cfg->config, "%s-%s%s", cfg->user, dbcore, EXTCF);
+        sprintf(cfg->configf, "%s-%s%s", cfg->user, dbcore, EXTCF);
         cfg->QTDCARD=dbsize(cfg);
 
         cfanalyses(cfg, &view, &learn);
@@ -716,7 +716,7 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
     strcpy(dbcore, cfg->dbasef);
     if((dot=strrchr(dbcore, '.'))) /* find the dot */
         *dot='\0'; /* delete from dot on */
-    sprintf(cfg->config, "%s-%s%s", cfg->user, dbcore, EXTCF);
+    sprintf(cfg->configf, "%s-%s%s", cfg->user, dbcore, EXTCF);
     cfg->QTDCARD=dbsize(cfg);
 
     return;
@@ -799,7 +799,7 @@ void readcfg(tcfg *c)
     FILE *fp;
     char fullname[PATHSIZE];
 
-    sprintf(fullname, "/%s/%s", c->cfgpath, c->config);
+    sprintf(fullname, "/%s/%s", c->cfgpath, c->configf);
 
     c->cfcard=c->cfdate=NULL;
     c->cfave=NULL;
