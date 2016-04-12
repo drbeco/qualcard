@@ -672,7 +672,7 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
     char dbcore[STRSIZE];
     char *dot;
     char stoday[DTSIZE];
-    char binpath[PATHSIZE];
+    char binpath[PATHSIZE]={0};
 
     lt=time(NULL);
     timeptr=localtime(&lt);
@@ -698,7 +698,7 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
         printf("I can't find the binary path\n");
         exit(EXIT_FAILURE);
     }
-    sprintf(cfg->dbpath, "/%sdb/", binpath); /* /usr/local/bin/qualcarddb/ */
+    sprintf(cfg->dbpath, "%sdb/", binpath); /* /usr/local/bin/qualcarddb/ */
 
     createcfgdir(cfg); /* /home/user/.config/qualcard/ */
 
@@ -927,7 +927,7 @@ void readdbfiles(tcfg *c)
             perror ("Couldn't open the directory");
         }
         dois--;
-    }while(dois);
+    }while(dois>=0);
 
     return;
 }
