@@ -85,6 +85,9 @@
 /* #define BUILD (20160409.000957) / * * < Build Version Number */
 #define EXTDB ".ex4" /**< Database extension: theme-question-answer.ex4 (example: english-word-definition.ex4) */
 #define EXTCF ".cf4" /**< Configuration file extension: user-qualcard.cf4 */
+#define SCOREA 4.25
+#define SCOREB 3.25
+#define SCOREC 2.25
 
 /* Debug */
 #ifndef DEBUG /* gcc -DDEBUG=1 */
@@ -424,6 +427,8 @@ void sortmemo(tcfg *c)
 }
 
 /* select 10 cards (old or new) to be presented */
+/* BUG
+ * nao pode sortear repetido mesmo sem estar na memoria */
 void select10cards(tcfg *c, int tencards[10][2])
 {
     int i;
@@ -439,8 +444,9 @@ void select10cards(tcfg *c, int tencards[10][2])
     for(; i<10; i++)
     {
         tencards[i][0]=-1; /* not in memory */
-        tencards[i][1]=newcard(*c); /* new not in memory */
+        tencards[i][1]=newcard(*c); /* new not in memory BUG nor in tencards already */
     }
+    /* BUG not always will we have al
 }
 
 /* database size */
@@ -486,7 +492,7 @@ void cfanalyses(tcfg *c, int *view, int *learn)
     while(3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave))
     {
         (*view)++;
-        if(ave>=4.5)
+        if(ave>=SCOREA)
             (*learn)++;
     }
     fclose(fp);
@@ -748,15 +754,13 @@ void qualcard_init(tcfg *cfg) //(char *td, char *db, char *cf)
 /* given an average, return how many days */
 int ave2day(float ave)
 {
-    if(ave<0.1)
-        return 0; /* review today BUG */
-    if(ave<2.0)
-        return 1; /* review tomorrow */
-    if(ave<3.25)
-        return 3; /* review in three days */
-    if(ave<4.50)
-        return 5; /* review in five days */
-    return 7; /* review in a week */
+    if(ave<SCOREC)
+        return 1; /* D: review tomorrow */
+    if(ave<SCOREB)
+        return 3; /* C: review in three days */
+    if(ave<SCOREA)
+        return 5; /* B: review in five days */
+    return 7; /* A: review in a week */
 }
 
 /* add days to a date */
