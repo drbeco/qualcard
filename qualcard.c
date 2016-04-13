@@ -573,12 +573,14 @@ int newcard(tcfg c, int tencards[10][2])
 
     for(i=0; i<10; i++) /* remove from tencards */
         if(tencards[i][TFIL]!=-2)
-            if(randnorep(REMOVEBASKET, &tencards[i][TFIL])!=BASKETOK)
-                printf("erro ten randnorep() = %d\n", tencards[i][TFIL]);
+            randnorep(REMOVEBASKET, &tencards[i][TFIL]);
+//                 if(randnorep(REMOVEBASKET, &tencards[i][TFIL])!=BASKETOK)
+//                 printf("erro ten randnorep() = %d\n", tencards[i][TFIL]);
 
     for(i=0; i<c.cfsize; i++) /* remove from history */
-        if(randnorep(REMOVEBASKET, &c.cfcard[i])!=BASKETOK)
-            printf("erro his randnorep() = %d\n", tencards[i][TFIL]);
+        randnorep(REMOVEBASKET, &c.cfcard[i]);
+//             if(randnorep(REMOVEBASKET, &c.cfcard[i])!=BASKETOK)
+//             printf("erro his randnorep() = %d\n", tencards[i][TFIL]);
 
     if(randnorep(DRAWBASKET, &l)!=BASKETOK)
         l=-2;
