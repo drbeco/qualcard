@@ -12,19 +12,20 @@ Projeto de Aprendizado de temas diversos via repetição espaçada de cartões (
 * No máximo nove cartões que precisam de reforço por repetição são apresentados
 * Se não houver cartões que precisam de repetição por reforço, todos os 10 cartões serão novos
 * Os cartões apresentados são auto-avaliados pelo estudante com uma nota N de 0 a 5 (sendo 0 para não conhecer/lembrar, e 5 para acerto com facilidade e confiança)
-* Uma vez apresentados os cartões são agendados para reapresentação com a seguintes escala:
-    - (A) Média < 2.00   -> reagendar para o dia seguinte
-    - (B) Média < 3.25   -> reagendar para 3 dias
-    - (C) Média < 4.50   -> reagendar para 5 dias
-    - (D) Caso contrário -> reagendar para 7 dias
-* A nova média M1 é calculada com a fórmula: M1 = (M0 + N) / 2
-* Quando todos os cartões estiverem com média (D) o programa parabeniza o estudante e imprime um certificado com:
-    - Nome completo
+* Cartões que recebem a nota zero são repetidos ao final, quantas vezes forem necessárias, até que receba nota maior.
+* De posse da nota (N), uma nova média (M1) é calculada com a fórmula: M1 = (M0 + N) / 2, onde M0 é a média anterior. No primeiro ciclo, M1 = M0 = N.
+* Uma vez apresentados, os cartões são agendados para reapresentação com a seguinte escala:
+    - (D) Média < 2.25   -> reagendar para o dia seguinte
+    - (C) Média < 3.25   -> reagendar para 3 dias
+    - (B) Média < 4.25   -> reagendar para 5 dias
+    - (A) Caso contrário -> reagendar para 7 dias
+* Quando todos os cartões estiverem com média (A) o programa parabeniza o estudante e imprime um certificado com:
+    - Nome completo e usuário
     - Data de início
     - Data de conclusão
     - Carga horária
     - Número de cartões aprendidos
-    - Tema
+    - Tema do estudo
     - Número de série de certificação
     - Assinatura do Prof. Dr. Ruben Carlo Benante <rcb@beco.cc>
 * As médias usadas para agendamento têm um decaimento suave contínuo pelo período que o programa deixa de ser usado. Para evitar este decaimento, deve-se usar o programa no mínimo uma vez a cada dois dias.
@@ -82,7 +83,5 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
 
 

@@ -369,7 +369,7 @@ char *cardfront(char *card)
     char *colon;
 
     strcpy(front, card);
-    if((colon=strchr(front, ':'))) /* find the colon */
+    if((colon=strchr(front, ':'))) /* find first the colon */
         *colon='\0'; /* delete from : on */
     return front;
 }
@@ -380,7 +380,7 @@ char *cardback(char *card)
     static char back[STRSIZE];
     char *colon;
 
-    if((colon=strchr(card, ':'))) /* find the colon */
+    if((colon=strchr(card, ':'))) /* find first the colon */
         colon++; /* next char starts the back */
     else
         colon=card; /* no colon? copy all */
