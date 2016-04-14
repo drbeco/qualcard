@@ -169,6 +169,7 @@ void cfanalyses(tcfg *c, int *view, int *learn); /* analyses a history file */
 void createcfgdir(tcfg *c); /* creates /home/user/.config/qualcard/ */
 char *filenopath(char *filepath); /* get filename with no path */
 int randnorep(int mode, int *n); /* drawn numbers from a list with no repetition */
+void changebarnet(char *s); /* change \n and \t to the real thing */
 
 /* ---------------------------------------------------------------------- */
 /* @ingroup GroupUnique */
@@ -371,6 +372,7 @@ char *cardfront(char *card)
     strcpy(front, card);
     if((colon=strchr(front, ':'))) /* find first the colon */
         *colon='\0'; /* delete from : on */
+    changebarnet(front);
     return front;
 }
 
@@ -385,7 +387,27 @@ char *cardback(char *card)
     else
         colon=card; /* no colon? copy all */
     strcpy(back, colon);
+    changebarnet(back);
     return back;
+}
+
+/* change \n and \t to the real thing */
+void changebarnet(char *nt)
+{
+    do
+        if((nt=strchr(nt,'\\')))
+        {
+            nt++;
+            if(*nt=='n'||*nt=='t')
+            {
+                if(*nt=='n')
+                    *nt='\n';
+                else
+                    *nt='\t';
+                *(nt-1)=' ';
+            }
+        }
+    while(nt!=NULL);
 }
 
 /* get filename with no path */
