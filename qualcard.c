@@ -160,8 +160,6 @@ int newcard(tcfg c, int tencards[10][2]); /* drawn a new card */
 void select10cards(tcfg *c, int tencards[10][2]); /* select 10 cards (old or new) to be presented */
 void sortmemo(tcfg *c); /* prioritary (old) comes first (selection sort) */
 void getcard(tcfg c, int cardnum, char *cardfr, char *cardbk); /* given a card number, get it from file */
-char *cardfront(char *card); /* get the front of the card */
-char *cardback(char *card); /* get the back of the card */
 void cardfaces(char *card, char *fr, char *bk); /* get card faces front/back */
 void save2memo(tcfg *c, int i, int card, int score); /* save new or update old card */
 void save2file(tcfg c); /* save updated cards in memory to config file */
@@ -366,34 +364,6 @@ void save2file(tcfg c)
     return; /* leu do arquivo para os vetores */
 }
 
-/* get the front of the card */
-char *cardfront(char *card)
-{
-    static char front[STRSIZE];
-    char *colon;
-
-    strcpy(front, card);
-    if((colon=strchr(front, ':'))) /* find first the colon */
-        *colon='\0'; /* delete from : on */
-    changebarnet(front);
-    return front;
-}
-
-/* get the back of the card */
-char *cardback(char *card)
-{
-    static char back[STRSIZE];
-    char *colon;
-
-    if((colon=strchr(card, ':'))) /* find first the colon */
-        colon++; /* next char starts the back */
-    else
-        colon=card; /* no colon? copy all */
-    strcpy(back, colon);
-    changebarnet(back);
-    return back;
-}
-
 /* get card faces */
 void cardfaces(char *card, char *fr, char *bk)
 {
@@ -589,7 +559,7 @@ void summary(tcfg *cfg)
     int i, view=0, learn=0;
     char *dot, dbcore[STRSIZE];
 
-    /* English: total 1500, viewed 300, learned 12 */
+    /* Example: English: total 1500, viewed 300 (20%), learned 45 (3%). Score: E */
 
     for(i=0; i<cfg->dbfsize; i++)
     {
@@ -629,13 +599,11 @@ int newcard(tcfg c, int tencards[10][2])
     for(i=0; i<10; i++) /* remove from tencards */
         if(tencards[i][TFIL]!=-2)
             randnorep(REMOVEBASKET, &tencards[i][TFIL]);
-//                 if(randnorep(REMOVEBASKET, &tencards[i][TFIL])!=BASKETOK)
-//                 printf("erro ten randnorep() = %d\n", tencards[i][TFIL]);
+//          if(randnorep(REMOVEBASKET, &tencards[i][TFIL])!=BASKETOK)
+//              printf("erro randnorep() = %d\n", tencards[i][TFIL]);
 
     for(i=0; i<c.cfsize; i++) /* remove from history */
         randnorep(REMOVEBASKET, &c.cfcard[i]);
-//             if(randnorep(REMOVEBASKET, &c.cfcard[i])!=BASKETOK)
-//             printf("erro his randnorep() = %d\n", tencards[i][TFIL]);
 
     if(randnorep(DRAWBASKET, &l)!=BASKETOK)
         l=-2;
@@ -661,7 +629,6 @@ void getcard(tcfg c, int cardnum, char *cardfr, char *cardbk)
     fclose(fp);
 
     cardfaces(card, cardfr, cardbk);
-//     strcpy(cardfr, card);
 
     return;
 }
@@ -1098,7 +1065,7 @@ int randnorep(int mode, int *n)
     }
     else if(mode == LISTBASKET)    /* LISTBASKET  */
     {
-        /* for(a=randnorep(LISTBASKET); a!=BASKETLISTED; a=randnorep(LISTBASKET)) ( */
+        /* Example: for(a=randnorep(LISTBASKET); a!=BASKETLISTED; a=randnorep(LISTBASKET)) ( */
         if(listqtd == 0)
             return BASKETLISTED;    /* listed because empty basket */
         if(lista == NULL)
@@ -1172,7 +1139,7 @@ void help(void)
     printf("\t-q,  --quiet\n\t\tReduces verbose level (also cumulative).\n");
     printf("\t-s,  --status\n\t\tShow how many cards needs review in each database.\n");
     printf("\t-u username,  --user username\n\t\tUse the username's profile.\n");
-    printf("\t-d file.ex4,  --database file.ex4\n\t\tUse the given database to practice.\n\t\tThe file must have a '.ex4' extension\n\t\tand its name is in the form 'theme-question-answer.ex4', where:\n\t\t\t* theme: the theme of the study.\n\t\t\t* question: the first side of the card.\n\t\t\t* answer: the back side of the card.\n");
+    printf("\t-d file.ex4,  --database file.ex4\n\t\tUse the given database to practice.\n\t\tThe file must have a '.ex4' extension and starts with '/' (absolute path)\n\t\tand its name is in the form 'theme-question-answer.ex4', where:\n\t\t\t* theme: the theme of the study.\n\t\t\t* question: the first side of the card.\n\t\t\t* answer: the back side of the card.\n");
     /* add more options here */
     printf("\nExit status:\n\t0 if ok.\n\t1 some error occurred.\n");
     printf("\nTodo:\n\tLong options not implemented yet.\n");
