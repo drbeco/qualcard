@@ -24,6 +24,6 @@ w:23\n3\t3
 x:24\n3\t3
 y:25\n3\t3
 z:26\n3\t3
-a\na\ta:27\noutra\tlinha\taqui\nnao
-a\tb\tb:28\t\ttaba\\\nlinha\\ndoisfim\
-a\tc\tc:29\n\t29
+a\na\ta:27\noutr\\na\tlinha\taqui\nnao
+a\tb\tb:28\t\tta\\bar...\\\nlinha\\ndoisfim\
+a\tc\tc:29\n\t29\\nlinha ou nao?\nsim!

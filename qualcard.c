@@ -391,20 +391,25 @@ char *cardback(char *card)
     return back;
 }
 
-/* change '\\n' and '\\t' to the real thing */
+/* change '\n', '\t' and '\\' to the real thing */
 void changebarnet(char *nt)
 {
     do
         if((nt=strchr(nt,'\\')))
         {
             nt++;
-            if(*nt=='n'||*nt=='t')
+            switch(*nt)
             {
-                if(*nt=='n')
+                case 'n':
                     *nt='\n';
-                else
+                    goto space;
+                case 't':
                     *nt='\t';
-                *(nt-1)=' ';
+                space:
+                case '\\':
+                    *(nt-1)=' ';
+                    nt++;
+                    break;
             }
         }
     while(nt!=NULL);
