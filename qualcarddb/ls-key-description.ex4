@@ -1,0 +1,72 @@
+What does ls command do in short? :: List directory contents
+What is ls synopsis? :: ls [OPTION]... [FILE]...
+Describe ls command :: List information about the FILEs (the current directory by default).  Sort entries alphabetically if none of -cftuvSUX nor --sort is specified
+ls -a :: (--all) do not ignore entries starting with .
+ls -A :: (--almost-all) do not list implied . and ..
+ls --author :: with -l, print the author of each file
+ls -b :: (--escape) print C-style escapes for nongraphic characters
+ls --block-size=SIZE :: scale sizes by SIZE before printing them; e.g., '--block-size=M' prints sizes in units of 1,048,576 bytes; see SIZE format for more information
+ls -B :: (--ignore-backups) do not list implied entries ending with ~
+ls -c :: with -lt sort by, and show, ctime (time of last modification of file status information); with -l show ctime and  sort  by  name; otherwise sort by ctime, newest first
+ls  -C :: list entries by columns
+ls --color[=WHEN] :: colorize the output; WHEN can be 'never', 'auto', or 'always' (the default)
+ls -d :: (--directory) list directories themselves, not their contents
+ls -D :: (--dired) generate output designed for Emacs' dired mode
+ls -f :: do not sort, enable -aU, disable -ls --color
+ls -F :: (--classify)  append indicator (one of */=>@|) to entries
+ls --file-type :: likewise -F, except do not append '*'
+ls --format=WORD :: WORD is one of 'across' (-x), 'commas' (-m), 'horizontal' (-x), 'long' (-l), 'single-column' (-1), 'verbose' (-l), 'vertical' (-C)
+ls --full-time :: like -l --time-style=full-iso
+ls -g :: like -l, but do not list owner
+ls --group-directories-first :: group directories before files; can be augmented with a --sort option, but any use of --sort=none (-U) disables grouping
+ls -G :: (--no-group) in a long listing, don't print group names
+ls -h :: (--human-readable) with -l and/or -s, print human readable sizes (e.g., 1K 234M 2G)
+ls --si :: likewise -h, but use powers of 1000 not 1024
+ls -H :: (--dereference-command-line) follow symbolic links listed on the command line
+ls --dereference-command-line-symlink-to-dir :: follow each command line symbolic link that points to a directory
+ls  --hide=PATTERN :: do not list implied entries matching shell PATTERN (overridden by -a or -A)
+ls --indicator-style=WORD :: append indicator with style WORD to entry names. 'none' (default), 'slash' (-p), 'file-type' (--file-type), 'classify' (-F)
+ls -i :: (--inode) print the index number of each file
+ls -I PATTERN :: (--ignore=PATTERN)  do not list implied entries matching shell PATTERN
+ls -k :: (--kibibytes) default to 1024-byte blocks for disk usage
+ls -l :: use a long listing format
+ls -L :: (--dereference)  when  showing  file  information  for  a  symbolic link, show information for the file the link references rather than for the link itself
+ls -m :: fill width with a comma separated list of entries
+ls -n :: (--numeric-uid-gid) like -l, but list numeric user and group IDs
+ls -N :: (--literal) print raw entry names (don't treat e.g. control characters specially)
+ls -o :: like -l, but do not list group information
+ls -p :: (--indicator-style=slash) append / indicator to directories
+ls -q :: (--hide-control-chars) print ? instead of nongraphic characters
+ls --show-control-chars :: show nongraphic characters as-is (the default, unless program is 'ls' and output is a terminal)
+ls -Q :: (--quote-name) enclose entry names in double quotes
+ls --quoting-style=WORD :: use quoting style WORD for entry names. 'literal', 'locale', 'shell', 'shell-always', 'c', 'escape'
+ls -r :: (--reverse) reverse order while sorting
+ls -R :: (--recursive) list subdirectories recursively
+ls -s :: (--size) print the allocated size of each file, in blocks
+ls -S :: sort by file size
+ls --sort=WORD :: sort by WORD instead of name. 'none' (-U), 'size' (-S), 'time' (-t), 'version' (-v), 'extension' (-X)
+ls --time=WORD :: with -l, show time as WORD instead of default modification time. 'atime' or 'access' or 'use' (-u); 'ctime' or 'status' (-c); also use specified time as sort key if --sort=time
+ls --time-style=STYLE :: with -l, show times using style STYLE. 'full-iso', 'long-iso', 'iso', 'locale', or '+FORMAT'; FORMAT is interpreted like in 'date'; if FORMAT is FORMAT1<newline>FORMAT2, then FORMAT1 applies to non-recent files and FORMAT2 to recent files; if STYLE is prefixed  with 'posix-', STYLE takes effect only outside the POSIX locale
+ls -t :: sort by modification time, newest first
+ls -T :: (--tabsize=COLS) assume tab stops at each COLS instead of 8
+ls -u :: with -lt sort by, and show, access time; with -l show access time and sort by name; otherwise sort by access time
+ls -U :: do not sort; list entries in directory order
+ls -v :: natural sort of (version) numbers within text
+ls -w :: (--width=COLS) assume screen width instead of current value
+ls -x :: list entries by lines instead of by columns
+ls -X :: sort alphabetically by entry extension
+ls -Z :: (--context) print any security context of each file
+ls -1 :: list one file per line
+ls --help :: display this help and exit
+ls --version :: output version information and exit
+SIZE of an argument :: The  SIZE  argument  is  an  integer and optional unit (example 10K is 10*1024).  Units are K,M,G,T,P,E,Z,Y (powers of 1024) or KB,MB,... (powers of 1000)
+How to disable/enable color? :: Using color to distinguish file types is disabled both by default and with --color=never.  With --color=auto, ls emits  color  codes  only when  standard  output is connected to a terminal.
+What are the environment Variables use by ls? :: The LS_COLORS environment variable can change the settings.  Use the dircolors command to set it.
+Which are the exit status of ls? :: 0\tif OK,\n 1\tif minor problems (e.g., cannot access subdirectory),\n 2\tif serious trouble (e.g., cannot access command-line argument).
+Who are the authors of ls? :: Richard M. Stallman and David MacKenzie
+One should report bugs against what package? :: Report core bugs to GNU coreutils and translation bugs to (HTTP translationproject.org/team/)
+What is ls license? :: Copyright 2014 Free Software Foundation, Inc., License GPLv3+, GNU GPL version 3 or later (HTTP gnu.org/licenses/gpl.html). This is free software, you are free to change and redistribute it.
+What are the warranties? :: There is NO WARRANTY, to the extent permitted by law.
+Where is the full documentation? :: At coreutils site (HTTP //www.gnu.org/software/coreutils/ls) or available locally via info '(coreutils) ls invocation'
+This qualcards are based in which version of ls? :: GNU coreutils 8.23, March 2015
+Which manual section is ls description? :: Section 1 (man 1 ls)
