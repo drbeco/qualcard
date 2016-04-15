@@ -159,9 +159,10 @@ char *theme(char *file); /* take the theme from a database file name */
 int newcard(tcfg c, int tencards[10][2]); /* drawn a new card */
 void select10cards(tcfg *c, int tencards[10][2]); /* select 10 cards (old or new) to be presented */
 void sortmemo(tcfg *c); /* prioritary (old) comes first (selection sort) */
-void getcard(tcfg c, int cardnum, char *card); /* given a card number, get it from file */
+void getcard(tcfg c, int cardnum, char *cardfr, char *cardbk); /* given a card number, get it from file */
 char *cardfront(char *card); /* get the front of the card */
 char *cardback(char *card); /* get the back of the card */
+void cardfaces(char *card, char *fr, char *bk); /* get card faces front/back */
 void save2memo(tcfg *c, int i, int card, int score); /* save new or update old card */
 void save2file(tcfg c); /* save updated cards in memory to config file */
 int dbsize(tcfg *c); /* database size */
@@ -210,10 +211,11 @@ int main(int argc, char *argv[])
     int opt; /* return from getopt() and user options */
     tcfg c={0};
     int i; /* index, auxiliary */
-    char card[STRSIZE]; /* card drawn */
+    /*char card[STRSIZE]; / * card drawn */
     int newd;
     int tencards[10][2]; /* ten cards, index in memory (-1 if new), line in file */
     int again=1; /* while some card score presented is still zero */
+    char cardfr[STRSIZE], cardbk[STRSIZE];
 
     IFDEBUG("Starting optarg loop...\n");
 
@@ -285,7 +287,8 @@ int main(int argc, char *argv[])
         {
             if(tencards[i][TMEM]==-2) /* already presented and ok */
                 continue;
-            getcard(c, tencards[i][TFIL], card);
+            getcard(c, tencards[i][TFIL], cardfr, cardbk);
+
             printf("------------------------------------------\n");
             if(tencards[i][TMEM]==-1) /* new card? */
                 printf("Card %d (new card for today)\n", tencards[i][TFIL]+1);
@@ -295,11 +298,11 @@ int main(int argc, char *argv[])
                 printf("Card %d (revision date %s)\n", tencards[i][TFIL]+1, prettydate(newd));
             }
 
-            printf("%s\n\n", cardfront(card));
+            printf("%s\n\n", cardfr);
 
             printf("Press <ENTER> to see the back of the card\n");
             do opt=getchar(); while(opt!='\n');
-            printf("%s\n", cardback(card));
+            printf("%s\n", cardbk);
 
             do
             {
@@ -391,6 +394,32 @@ char *cardback(char *card)
     return back;
 }
 
+/* get card faces */
+void cardfaces(char *card, char *fr, char *bk)
+{
+    char *colon;
+
+    strcpy(fr, card);
+    changebarnet(fr);
+    strcpy(bk, fr); /* default in case of problem: back == front */
+    colon=fr;
+    while(1)
+    {
+        colon=strchr(colon, ':');
+        if(!colon)
+        {
+            fprintf(stderr,"\nWrong card without '::' separator.\n\n%s\n\n", card);
+            return; /* not found, return all card to front and back */
+        }
+        colon++;
+        if(*colon==':') /* found :: */
+            break;
+    }
+    *(colon-1)='\0'; /* front */
+    strcpy(bk, colon+1); /* back */
+    return;
+}
+
 /* change '\n', '\t' and '\\' to the real thing */
 void changebarnet(char *nt)
 {
@@ -398,7 +427,7 @@ void changebarnet(char *nt)
         if((nt=strchr(nt,'\\')))
         {
             nt++;
-            switch(*nt)
+            switch(*nt) /* *++nt */
             {
                 case 'n':
                     *nt='\n';
@@ -409,7 +438,6 @@ void changebarnet(char *nt)
                 case '\\':
                     *(nt-1)=' ';
                     nt++;
-                    break;
             }
         }
     while(nt!=NULL);
@@ -616,9 +644,9 @@ int newcard(tcfg c, int tencards[10][2])
 }
 
 /* given a card number, get it from file */
-void getcard(tcfg c, int cardnum, char *card)
+void getcard(tcfg c, int cardnum, char *cardfr, char *cardbk)
 {
-    char line[TAMLINE];
+    char card[TAMLINE];
     FILE *fp;
     int i;
 
@@ -629,10 +657,12 @@ void getcard(tcfg c, int cardnum, char *card)
     }
     fseek(fp, 0, 0);
     for(i=0; i<=cardnum; i++)
-        fgets(line, TAMLINE, fp);
-    strcpy(card, line);
-
+        fgets(card, TAMLINE, fp);
     fclose(fp);
+
+    cardfaces(card, cardfr, cardbk);
+//     strcpy(cardfr, card);
+
     return;
 }
 

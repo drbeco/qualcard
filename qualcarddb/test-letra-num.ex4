@@ -1,29 +1,15 @@
-a:1\n2 \t3
-b:2\t3 \t3
-c:3\n3 \t3
-d:4\n3 \t3
-e:5\n3 \t3
-f:6\n3 \t3
-g:7\n3 \t3
-h:8\n3 \t3
-i:9\n3 \t3
-j:10\n3\t3
-k:11\n3\t3
-l:12\n3\t3
-m:13\n3\t3
-n:14\n3\t3
-o:15\n3\t3
-p:16\n3\t3
-q:17\n3\t3
-r:18\n3\t3
-s:19\n3\t3
-t:20\n3\t3
-u:21\n3\t3
-v:22\n3\t3
-w:23\n3\t3
-x:24\n3\t3
-y:25\n3\t3
-z:26\n3\t3
-a\na\ta:27\noutr\\na\tlinha\taqui\nnao
-a\tb\tb:28\t\tta\\bar...\\\nlinha\\ndoisfim\
-a\tc\tc:29\n\t29\\nlinha ou nao?\nsim!
+c:a3\n3 \t3
+a:1::aa\naa2 \t3
+\::a:2\t3 \t3
+d:4\::n3 \t3
+\::e:5\:n::3 \t3
+f:6\n3: aa::aa\t3
+g\::733::aa
+h:::aa8\n3 \t3
+:i:9::aa\n3 \t3
+j:10::aa\n3\t3
+k\::11\n3\t3
+l:12\n\::3\t3
+a\na\ta::27\noutr\\na\tlinha\taqui\nnao
+a\tb\tb::28\t\tta\\bar...\\\nlinha\\ndoisfim\
+a\tc\tc::29\n\t29\\nlinha ou nao?\nsim!
