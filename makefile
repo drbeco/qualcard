@@ -32,6 +32,7 @@ o = qualcard
 #binary
 $(o) : % : %.o $(OBJ)
 	$(CC) $(LDLIBS) $^ -o $@ |& tee errors.err
+	echo $(o) version $(VERSION) > VERSION
 
 #library
 libeco-ux64.o : libeco.c
