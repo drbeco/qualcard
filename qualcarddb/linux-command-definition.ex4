@@ -1,0 +1,138 @@
+~ : (atalho) Equivale a /home/seuusuario/
+. : (atalho) Equivale ao nome da pasta atual.
+.. : (atalho) Equivale ao nome da pasta anterior (acima, ou pai).
+coringa (*): Substitui uma sequência de letras quaisquer. Por exemplo, para mostrar apenas os arquivos fontes '.c', na pasta atual, utiliza-se '$ls *.c'. Para copiar todos arquivos texto da pasta atual para a anterior utiliza-se '$cp *.txt ..'
+coringa (?) :  (atalho) Coringa. Um único caracter qualquer.
+seta para cima : Recupera na ordem todas as linhas digitadas no histórico.
+seta para baixo : Volta as linhas digitadas no histórico.
+$ : Usado para indicar o prompt onde se digitam comandos linux. Em expressões regulares, indica o fim da linha.
+argumentos: Sequencia de palavras/valores separados por espaços em branco.
+comando: Um programa do linux (ou de criação própria) que é dado no prompt e pode ou não precisar de argumentos.
+chaves (-): Sequência de hifens e letras (exemplo, '-h -n') que definem o comportamento do comando. Normalmente a chave '-h' é para help.
+chaves longas (--): Sequência de 2 hífens e a palavra reservada da chave. Exemplo '--help'.
+chaves com argumentos: Algumas chaves necessitam ser seguidas de um argumento para funcionar. Exemplo: a chave '-o' (de output) indica o arquivo de saída de um comando. No gcc isso é indicado com o nome do arquivo executável '-o myprog.x'
+diretório: (pasta) Nome dado a um tipo especial de arquivo que se comporta como uma "caixa" onde se podem guardar agrupados arquivos ou outras pastas.
+arquivo: Um grupo de dados gravado com um nome e opcionalmente uma extensão que indica o que são os dados.
+extensão: Parte final de um nome de arquivo, opcional no linux, normalmente um código de três letras. Exemplos\n'.txt' para texto puro\n'.c' para programa em linguagem c (texto legível)\n'.pl' para programa em linguagem prolog (texto legível)\n'.gpt' para programa em linguagem portugol (texto legível)\n'.sh' para programa em linguagem bash (script linux, legível)\n'.x', '.bin' ou '.exe' para binário executável (não legível)
+exit: Para finalizar a sua conexão SSH com o servidor.
+ssh: Para iniciar uma conexão com o servidor. (Comando para unix/linux/mac. Para windows, utilize o putty.exe). Exemplo '$ssh usuario@beco.poli.br'
+passwd: Para mudar sua senha.
+man: Mostra o manual de algum comando. Para sair, tecle 'q'. Exemplo '$man grep'
+man hier: Hierarquia dos diretórios, se refere à estrutura dos diretórios do sistema.
+date: Mostra a data/hora atual do relógio do sistema
+calendar: Mostra eventos cadastrados no calendário. '$calendar -A10' mostra eventos dos próximos 10 dias e '$calendar -B15' mostra eventos da quinzena anterior.
+pwd: Mostra sua pasta atual.
+echo: Imprime uma mensagem na tela. '$echo "Ola mundo"'. A chave '-n' cancela a mudança de linha automatica ao final. A chave '-e' liga a interpretação de caracteres escapados (barra invertida).
+cd: Sem argumentos, move-se para a pasta do usuário '/home/seuusuario' (mesmo que '$cd ~'). Com argumento, move-se para a pasta dada ('$cd /home/usuario/informatica/rascunhos'). '$cd -' muda para a pasta que se estava anteriormente (e duas vezes seguidas, volta para a que se está novamente).
+Caminho absoluto: O caminho absoluto sempre inicia com '/'. Refere-se a uma pasta a partir da raíz, ou seja, o caminho completo independente da sua pasta atual.
+Caminho relativo: Sempre inicia sem o caracter de '/'. Refere-se a uma pasta dada a partir da atual. Se a combinação da pasta atual com o argumento dado não existir, acusa erro.
+ls: Sem argumentos, lista os arquivos da pasta atual ('.') em formato resumido. O mesmo que digitar '$ls .' O '.' representa a pasta atual.
+ls ..: Lista os arquivos da pasta anterior (pai da) à atual. Apenas lista, não muda a pasta atual.
+ls -l: Lista os arquivos da pasta atual em formato completo. Mostra as permições de leitura (r), gravação (w) e execução (x) para o dono (owner, seu usuário), o grupo (group, student) e os outros usuários (others). Mostra uma letra "d" se o "inode" em questão é um diretório ao invés de um arquivo. Os arquivos executáveis devem ter um 'x'. O compilador normalmente já coloca o 'x' automaticamente. As pastas são "executáveis" para poderem ser acessadas.
+ls -la: Faz listas longas e mostra arquivos ocultos (arquivos com nome iniciado por '.'). Sugestão para alias '$la'
+ls -v: Lista arquivos em ordem numérica.
+ls -t: Lista arquivos por ordem de data da modificação.
+ls -s: Lista arquivos por ordem de tamanho do arquivo.
+cp origem destino: copia um arquivo origem colocando uma duplicata em destino. Origem é um arquivo dado com caminho relativo ou absoluto. Se Origem contiver coringas, vários arquivos que casarem serão copiados. Destino é a pasta final, que pode ser relativa ou absoluta. Se destino for um arquivo, a cópia é feita do arquivo original renomeando-o para o nome destino. Caso o destino já exista, será sobrescrito.\nExemplo com caminho absoluto, $cp /home/seuusuario/informatica/rascunhos/ex1.c /home/seuusuario/informatica/trabalhos\nExemplo com caminho relativo, ~/informatica$cp rascunhos/ex1.c trabalhos
+~$cp informatica/rascunhos/* ~/backup: Copia todos (*) os arquivos da pasta /home/seuusuario/informatica/rascunhos para a pasta /home/seuusuario/backup/
+rascunhos$cp ex* ../trabalhos: Copia todos os arquivos com nomes iniciados por "ex" (ex*) da pasta atual (/home/seuusuario/informatica/rascunhos) para a pasta /home/seuusuario/informatica/trabalhos (veja atalho .. para pasta anterior)
+rascunhos$cp *.bf brainforce : Copia todos arquivos com final '.bf' para a pasta relativa a atual rascunhos/brainforce
+$scp origem destino : Comando para cópia remota. Sua sintaxe é igual à do comando cp, com a adição de usuário@servidor para o lado remoto, antes da pasta. Exemplo 1, '$scp carlo@hydra:~/info/* .' copia da origem remota, usuário carlo, servidor hydra, pasta /home/carlo/hydra/info, todos arquivos (*) para a pasta local atual. Exemplo 2, '$scp *.bf carlo@hydra:~/info/bf' copia da origem local, todos arquivos na pasta atual com final '.bf' para o destino remoto, usuário carlo, servidor hydra, pasta '/home/carlo/hydra/info/bf/'
+Como copiar o arquivo ex1.c do meu desktop (windows) para o servidor hydra na pasta informatica/rascunhos?: 'C:meusdoc>scp.exe ex1.c seuusuario@beco.poli.br:~/informatica/rascunhos'
+Como copiar o arquivo ex1.c do servidor hydra na pasta informatica/rascunhos para meu desktop (windows) pasta meusdocumentos?: 'C:meusdoc>scp.exe seuusuario@beco.poli.br:~/informatica/rascunhos/ex1.c .'
+~$mkdir pasta: Cria uma pasta dentro da pasta atual.
+~$mkdir informatica/rascunhos : Cria a pasta rascunhos dentro da pasta relativa a atual informatica. Se a pasta informatica não existir será dado um erro.
+~$mkdir -p informatica/rascunhos: Cria a pasta rascunhos dentro da pasta informatica a partir da pasta atual. Se a pasta informatica não existir, será também criada.
+~$mkdir /home/seuusuario/informatica/rascunhos : Cria a pasta rascunhos dentro de /home/seuusuario/informatica, não importando a pasta atual. Se as pastas anteriores não existirem será acusado um erro.
+rmdir pasta: Remove um diretório chamado 'pasta'. A pasta deve estar vazia! Para apagar seu conteúdo antes de apagar a pasta, utilize o comando 'rm' dentro da pasta em questão ou use a chave '--ignore-fail-on-non-empty'.
+rm arquivo:  Comando para apagar arquivo(s). Pode-se utilizar coringas para vários. Exemplo, 'rascunhos$rm *.obj' para apagar todos arquivos final '.obj' da pasta atual (rascunhos). Dica importante, antes de usar o comando rm, escreva o que quer apagar exatamente, mas no lugar de 'rm' use o comando 'ls'. O 'ls' vai LISTAR os arquivos para você conferir. Se a lista é a que você quer apagar, substitua o 'ls' por 'rm' que eles serão apagados.
+rm pasta1/arquivo.txt: Apaga o arquivo.txt do diretório pasta1 (a partir da pasta atual).
+rm rascunhos/c/testes/*: Apaga todos arquivos da pasta testes (caminho relativo a partir da atual).
+rm /home/seuusuario/informatica/rascunhos/c/testes/*.txt: Apaga todos arquivos '.txt' da pasta /home/seuusuario/informatica/rascunhos/c/testes/ (caminho absoluto)
+rm pasta1/ex1*: Apaga todos arquivos iniciados com ex1, ou seja, ex1.c, ex11.c, ex120.bf, etc.
+cat -n arquivo.txt: Mostra o conteúdo do arquivo numerando suas linhas, e volta ao prompt.
+cat -A arquivo.txt: Mostra o conteúdo do arquivo mostrando caracteres de controle.
+less arquivo.txt: Parecido com o cat, mostra o conteúdo de um arquivo, mas dá uma pausa a cada tela cheia. Use Page-UP e Page-Down para se mover e tecle 'q' para sair.
+less -N arquivo.c: Mostra o conteúdo do arquivo numerando as linhas e paginando.
+hexdump -C arquivo.x: Parecido com cat e less, mostra o conteúdo de um arquivo, mas é útil para ver o conteúdo de arquivos binários (executáveis), pois mostra os códigos hexadecimais.
+tail -n15 arquivo.txt : Mostra apenas as 15 últimas linhas do arquivo.txt e retorna para o prompt
+tail -f saida.txt: Mostra as últimas linhas do aquivo saida.txt e continua atualizando a tela até que se interrompa (CONTROL+C).
+wc resumo.txt: Conta linhas, palavras e bytes (caracteres) do arquivo resumo.txt. Exemplo de saída, 30 450 3150, que significa que o arquivo tem 30 linhas, 450 palavras e aproximadamente 3 KBytes.
+mv origem destino: Comando para mover um arquivo ou pasta de um local para outro. Também usado renomear (caso mova com outro nome). O comando mv tem sintaxe idêntica ao comando cp. A diferença é que cria o destino e apaga a origem (move o arquivo, não duplica).
+mv arquivo.txt ..: Move o arquivo.txt da pasta atual para pasta "acima" (ou pasta pai, atalho '..')
+usuario@hydra~/branca$mv /home/user/verde/prog.c /home/user/azul/: Move o arquivo prog.c da pasta verde para a pasta azul usando caminhos absolutos, independente de qual seja a pasta atual (no caso a branca).
+~/branca$mv prog1.c ex1.c: Renomeia o arquivo prog1.c que tenha o novo nome ex1.c, operação realizada na pasta corrente (branca).
+$finger: Sem argumentos, mostra todos que estão logados, seus logins e nomes, e tempo sem iteração (idle). Com usuário (ou nome) '$finger usuario', mostra os dados do usuário. O usuário pode ser você ou outro colega de sala. Informa se está online. Mostra também o conteúdo do arquivo escondido '~/.plan'
+vi ex1.c: Editor de textos completo. Edita um arquivo fonte em C. Para iniciar a digitação (modo inserção), tecle <i>. Para gravar e sair, tecle <ESC> (modo comando) e depois o comando ":x". Para sair sem gravar, comando ":q" ou caso tenha alterado o arquivo ":q!"
+who : Mostra todos usuários online.
+mesg: Estado do bate-papo (write). Sem argumentos, imprime a configuração atual. 'mesg y' liga o recebimento de mensagens do write. 'mesg n' desliga o recebimento de mensagens.
+echo 'Bom dia' | cowsay | write usuario:A vaquinha falante diz\n _________\n< Bom dia >\n ---------\n        \   ^__^\n         \  (oo)\_______\n            (__)\       )\/\\n                ||----w |\n                ||     ||\n
+history : Mostra os comandos que estão na memória (na mesma ordem que aparecem quando se tecla as setas para cima/baixo)
+akernaak : Jogo storyteller Akernaak. Sem argumentos, inicia o jogo! Chave '-h' mostra o help, '-v' a versão, '-s' os placares e '-p' dá uma dica para criar sua nova senha. Lembre-se: o pergaminho que está dentro do diamante tem o segredo!
+chfn -r "dados": Muda informações apresentadas pelo finger. A chave '-r' se refere ao "office room number", e no servidor hydra é utilizada para o email. $chfn -r "novo@email.com" Não esqueça das aspas.
+chfn -w "dados": Muda informações apresentadas pelo finger. A chave '-w' se refere ao "work phone". No servidor hydra era utilizada para o CPF. Para esconder alguns números faça por exemplo, $chfn -w "****56789-01" Não esqueça das aspas.
+chfn -h "dados": Muda informações apresentadas pelo finger. A chave '-h' se refere ao "home phone". Para acertar seu telefone exatamente no formato $chfn -h "(81) 98765-4321" (coloque os parênteses e o hífen como indicado). Não esqueça das aspas.
+~/.plan: Arquivo com informações sobre seus hobbies, atividades, etc. Para mudar as notas do "Plan", basta editar o arquivo com o editor '$vi ~/.plan'
+write:$write usuario\nMensagem aqui\no\nCONTROL-D\nEscreve uma mensagem para outro usuário. Para sair tecle CONTROL+D. Dica hacker: Escreva o que tiver que escrever em uma linha. Cada linha a mais desloca a tela do colega e atrapalha. Se desejar que ele responda, escreva uma linha com a letra 'o' (over, isto é, sua vez, ou "câmbio" usado em português). Se estiver desligando, deixe uma linha com duas letras "oo" (ou seja: over and out, equivalente a "câmbio e desligo"). Caso alguém mande uma mensagem enquanto você estiver no editor VI, basta usar CONTROL+L para limpar a tela.
+$echo 'mensagem' | write usuario: envia uma mensagem a um dado usuário. Veja também o comando 'mesg'.
+ps:Lista os processos do sistema. Exemplo, '$ps -U seuusuario' dá uma lista de processos rodando em seu nome. Pode-se escolher quais colunas serão impressas. Por exemplo o comando 'ps -u usuario -o pid,nice,command' imprime apenas o PID, o valor NICE e a linha de comando. Com o PID em mãos, prepare-se para utilizar o comando mais violento do sistema, e amado pelos hackers: kill!
+kill:Envia um sinal a um processo (dado pelo seu PID). Por exemplo, suponha que o PID do processo seja 998877, então '$kill -KILL 998877' irá "matar" o processo. Antes de usar esse poderoso comando, tente interromper com CONTROL-C (equivalente a enviar -SIGINT), ou enviar outros sinais de término mais amenos como -SIGTERM por exemplo. A dupla de sinais -SIGSTOP e -SIGCONT pausa e continua a execução de um programa, sem terminá-lo. O comando '$kill -l' lista todos os sinais disponíveis.
+mail: Mostra mensagens (emails) internos. O email não é entregue para fora do sistema do servidor. Apenas para comunicação interna.
+lastlog : Mostra os últimos logins realizados pelos usuários do sistema. 'lastlog -u usuario' mostra só o login do usuário dado.
+time: Este comando serve para avaliar o tempo de resposta de um programa. Basta escrever 'time' na frente do nome do programa a se avaliar. Programas iterativos (que dependem da entrada do teclado pelo usuário) não são bons candidatos para análise. Por exemplo, você criou dois programa para ordenar uma matriz de 20000 elementos com dois algoritmos diferentes e quer cronometar para descobrir o melhor. Basta rodar:\n$time progr1.x\ne depois rodar:\n$time progr2.x\ne então analisar ambos resultados. Ao terminar, 'time' imprime três tempos, como no exemplo abaixo:\nreal\t0m1.886s,\ttempo total (do relógio, em segundos)\nuser\t0m1.876s,\ttempo de CPU usado pelo processo\nsys\t0m0.004s,\ttempo de CPU usado pelo sistema para cuidar do processo.
+make:Roda o arquivo makefile com receita para compilação para o alvo determinado (exemplo, '$make ex1.x', o alvo é ex1.x). Se não for dado o alvo '$make' roda o primeiro alvo disponívle no makefile.
+Filtros: São comandos que estão intercalados entre outros, que recebem como entrada a saída do comando anterior, a transforma de algum modo, e envia sua saída para a entrada de um próximo comando, todos encadeados em uma linha de comandos utilizando 'pipes' (caracter "|", barra vertical). Exemplos de filtros são os comandos: grep, sort, sprunge, cut, less, wc, tail, head, cat, tac, tee, nl, join, paste e muitos outros.
+| (pipe): Transmite a saída de um comando para a entrada do comando seguinte, e assim sucessivamente. Exemplo:\n$./ex1.x | ./ex2.x\nIsto enviaria a saída do programa ex1.x como entrada para o programa ex2.x. Os programas que recebem entrada via pipe e a transformam para impressão ou para outros programas são chamados filtros.
+grep:Este comando filtra a sua entrada, linha a linha, imprimindo em sua saída apenas as linhas que contém determinado padrão a ser pesquisado. Com a chave '-v', inverte a saída, imprimindo as linhas que NÃO contém o padrão. Outras chaves úteis: -n para numerar as linhas, -i para ignorar diferença de maiúsculas/minúsculas, -H para imprimir o nome do arquivo. Exemplo:\n$cat animais.txt | grep -n cachorro
+sort: Filtro que recebe uma entrada e gera uma saída ordenada. Exemplo, ordenar um arquivo com nomes e emails, um por linha, chamado agenda.txt, eliminando as linhas duplicadas:\n$cat agenda.txt | sort -u
+sprunge: É um utilitário de cortesia mantido por um site externo. Não é um comando linux. Ele é útil para mostrar erros de comandos e pedir ajuda pela internet. Este comando é usado como filtro (após um pipe) e cria uma página na internet com a saída do comando. Por exemplo, para mostrar um erro dado pelo compilador gcc faz-se:\n$gcc pi.c -o pi.x -Wall 2>&1 | sprunge\nhttp://sprunge.us/gcRN\nA resposta é um link para uma página pública que pode ser compartilhada com a equipe de programação (ou saída de qualquer programa). Cuidado ao publicar dados pois a página criada na internet é pública! Não publique dados dos servidor, endereços, informações pessoais ou senhas.
+O que é redirecionamento?:Serve para controlar como são transmitidas as informações para os programas, tanto para entrada como para saída, provindas de arquivos ou pelo par teclado/tela. Se nada for indicado, as saídas dos comandos vão para a tela (saída padrão) e as entradas vem do teclado (entrada padrão).
+>:Operador de redirecionamento de saída para arquivo. A saída do comando irá para o arquivo indicado. Se o arquivo não existir, será criado. Se já existir, seu conteúdo será apagado e será gravado a nova saída. Exemplo, para salvar a saída do comando ls:\n$ls > saidals.txt
+>>:Operador de redirecionamento de saída ao final do arquivo. A saída do comando irá para o arquivo indicado. Se o arquivo não existir, será criado. Se o arquivo já existir, a saída será adicionada ao final, preservando o conteúdo anterior. Exemplo, adicionar uma linha com nome/telefone ao final de um arquivo de agenda telefônica:\n$echo "Jose Maria, (18) 98765-4321" >> agenda.txt
+<:Operador de redirecionamento de entrada. Faz com que um comando que precise de uma entrada (normalmente do teclado) passe a buscar os valores lendo o arquivo de entrada indicado. Por exemplo, para ordenar o arquivo agenda.txt e salvá-lo na agendaordenada.txt faz-se:\n$sort < agenta.txt > agendaordenada.txt
+<<:Operador de redirecionamento de entrada com token de finalização. Por exemplo, o comando '$sort <<EOF' aceita palavras pelo teclado e termina a fase de entrada com o token "EOF" digitado. Após isso, imprime as palavras digitadas em ordem alfabética.
+Entrada padrão: Os comandos lêem da entrada padrão (stdin), e escrevem tanto na saída padrão como na saída de erros. A entrada padrão é capturada pelo operador de redirecionamento de entrada "<", que envia o conteúdo de um arquivo para um programa que está pedindo dados. O dispositivo vinculado é o file descriptor número 0, isto é, /dev/fd/0.
+Saída padrão: A saída de um programa pode ser enviada para a saída padrão (stdout), ou saída número 1 (dispositivo /dev/fd/1). É a saída normal de um comando de impressão (seja em C, com printf(), ou em algoritmo com imprima).
+Saída de erros: A saída de erros (stderr), ou saída número 2 (dispositivo /dev/fd/2) parece ser a mesma da saída padrão, pois ambas aparecem na "tela", mas é um outro "canal" de saída que pode ser redirecionado separadamente. Por exemplo, as mensagens de erro do compilador gcc usam a saída de erros. Portanto, para enviá-las para um arquivo é necessário usar o operador "2>". Se usar apenas ">" os erros continuarão aparecendo na tela ao invés de ir para arquivo. O comando completo é:\n$gcc pi.c -o pi.x -Wall 2> arquivoerrogcc.txt
+tee: É um comando que ajuda a fazer a ponte entre entradas, saídas e pipes. Seu objetivo é permitir salvar em arquivo uma fase intermediária de uma sequência de comandos em pipe sem com isso quebrar a sequência. Um exemplo muito usado é permitir salvar os erros emitidos pelo gcc em arquivo e ainda assim visualizá-los na tela. O comando para isto é:\n$gcc pi.c -o pi.x -Wall 2>&1 | tee saidagcc.txt
+\nOnde 2>&1 redireciona a saída de erros para a saída padrão, e o tee salva esta em arquivo sem interromper o fluxo da saída padrão para a tela. O comando tee pode ser entendido pelo gráfico:\n             +-----+\nentrada ---->| tee |----> saída padrão\npadrão       +-----+\n                |\n                +-------> arqsaida.txt\nOutro exemplo:\n$ls | tee saidals.txt | wc
+md5sum:Comando para checar (ou gerar) um número conhecido por "checksum" que permite dizer com certeza que o arquivo verificado é o mesmo que o autor que gerou o "checksum".\nPara gerar um arquivo com códigos checksum use:\n$md5sum arquivos* > md5sums\nPara conferir um arquivo md5sums use:\n$md5sum -c md5sums
+clear: Comando para limpar a tela (mesmo efeito que teclar CONTROL+L).
+CONTROL+L:Limpa (redesenha no VI) a tela. Útil para limpar a tela após o recebimento de mensagens.
+CONTROL+C:Envia o sinal -SIGINT (interrupção) para o programa em execução, terminando-o. Para copiar texto para as áreas de transferência veja CONTROL+SHIFT+C
+CONTROL+D:Envia o caracter de controle ASCII 0x4 EOT (end of transmission). Tem o efeito de EOF (end of file) em determinados contextos. Por exemplo, para finalizar uma mensagem ou fechar uma entrada de dados via teclado.
+CONTROL+[:Envia o caracter de controle ASCII 0x27 ESC (escape), em linguagem C representado por \e.
+Botão central do mouse:Cola (paste) a área de transferência 2 (texto selecionado)
+CONTROL+SHIFT+INSERT:Cola (paste) a área de transferência 2 (texto selecionado)
+SHIFT+INSERT:Cola (paste) a área de transferência 1 (texto copiado)
+CONTROL+SHIFT+V:Cola (paste) a área de transferência 1 (texto copiado)
+CONTROL+Y:Cola (yank ou paste), cola um texto previamente recortado com CONTROL-U (cut) no prompt do bash shell (área de transferência 3, texto digitado).
+CONTROL+INSERT:Copia (copy) para a área de transferência 1 o texto selecionado (também CONTROL+SHIFT+C).
+CONTROL+SHIFT+C:Copia (copy) para a área de transferência 1 o texto selecionado (também CONTROL+INSERT).
+CONTROL+U: Recorta (cut) um texto digitado no prompt do bash shell (área de transferência 3), desde a posição do cursor até o início da linha. Para colar use CONTROL+Y.
+CONTROL+K: Recorta (kill) um texto digitado no prompt do bash shell (área de transferência 3), desde a posição do cursor até o fim da linha. Para colar use CONTROL+Y.
+CONTROL+A: Move o cursor para o início da linha.
+CONTROL+E: Move o cursor para o fim da linha.
+CONTROL+XX: Move o cursor para o início ou para o fim da linha, alternadamente.
+CONTROL+P: Comando anterior do histórico.
+CONTROL+N: Comando seguinte no histórico.
+CONTROL+R:Inicia uma busca reversa no histórico para o comando sendo digitado no prompt.
+CONTROL+V: Verbatim, isto é, inserir o próximo caracter literalmente, sem realizar qualquer operação associada com a tecla que virá em seguida. Para "colar", veja botão central do mouse, CONTROL+Y, CONTROL+SHIFT+INSERT ou CONTROL+SHIFT+V.
+CONTROL+A CONTROL+R CONTROL+Y:Inicia uma busca reversa no histórico aproveitando um comando já digitado (inteiramente ou parcialmente) no prompt
+CONTROL+Z:Envia o programa corrente para background. Veja o comando 'fg' para trazê-lo de volta.
+Bash Bang!:!!\troda o último comando\n!Num\troda o comando do histórico de número fornecido\n!bla\troda o último comando que inicia com 'bla'\n!$\a última palavra do comando anterior\n!*\ta última linha do histórico completa exceto pela primeira palavra (o comando). Por exemplo:\n$echo A B\timprime "A B"\nread !*\tequivale a 'read A B'.
+^str1^str2:Substitui uma string do comando anterior por outra. Exemplo:\n$ls -l\n$^-l^-la\tequivale a 'ls -la'
+alias c='clear':Cria um alias (apelido) 'c' para o comando 'clear'. Para apagar use 'unalias c'.
+uname:Mostra o nome do sistema operacional em execução. Com a chave '-a' mostra também as versões de Kernel entre outras informações.
+chsh:Troca o tipo de shell do seu login.
+usermod:Modifica uma conta de usuário.
+vipw:Para editar com segurança o arquivo de senhas /etc/passwd
+vigr:Para editar com segurança o arquivo de grupos /etc/group
+addgroup:Adiciona um grupo ao sistema. É uma interface amigável para o comando de baixo nível groupadd.
+adduser:Adiciona um novo usuário ao sistema. É uma interface amigável para o comando de baixo nível useradd.
+groupadd:Adiciona um grupo ao sistema. Este comando de baixo nível. Prefira a interface amigável addgroup.
+useradd:Adiciona um novo usuário ao sistema. Este comando de baixo nível. Prefira a interface amigável adduser.
+vi:Editor de textos baseado no modo visual do ex. (Atalho para Vim, VI Improved).
+visudo:Para editar com segurança o arquivo dos sudoers.
+su:Muda para outro usuário ou para o superusuário.
+sudo:Executa um comando com privilégios de superusuário.
