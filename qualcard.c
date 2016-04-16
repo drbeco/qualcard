@@ -1,5 +1,5 @@
 /***************************************************************************
- *   qualcard.c                               Version 1.3.20160412.203737  *
+ *   qualcard.c                                                Version 1.4 *
  *                                                                         *
  *   Learn cards by Spaced Repetition Method.                              *
  *   This program helps you learn from a set of cards with questions       *
@@ -233,31 +233,31 @@ int main(int argc, char *argv[])
     while((opt = getopt(argc, argv, "hcvqsu:d:i")) != EOF)
         switch(opt)
         {
-            case 'h': /* exit */
+            case 'h': /* help and exit */
                 help();
                 break;
-            case 'c': /* exit */
+            case 'c': /* copyright and exit */
                 copyr();
                 break;
-            case 'v':
+            case 'v': /* verbose */
                 verb++;
                 break;
-            case 'q':
+            case 'q': /* quiet */
                 verb--;
                 break;
-            case 's':
+            case 's': /* summary */
                 SUMMA=1;
                 break;
-            case 'u':
+            case 'u': /* username */
                 strcpy(c.user, optarg);
                 break;
-            case 'i':
+            case 'i': /* invert */
                 c.invert=1;
                 break;
-            case 'd':
+            case 'd': /* database */
                 strcpy(c.dbasef, optarg);
                 break;
-            case '?':  /* exit */
+            case '?':  /* wrong option, exit */
             default:
                 printf("Type\n\t$man %s\nor\n\t$%s -h\nfor help.\n\n", argv[0], argv[0]);
                 return EXIT_FAILURE;
