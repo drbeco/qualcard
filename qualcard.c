@@ -441,7 +441,7 @@ char *filenopath(char *filepath)
     return filename;
 }
 
-/* prioritary (old) comes first (selection sort) */
+/* prioritary (older) comes first (selection sort) */
 void sortmemo(tcfg *c)
 {
     int i, j, iux;
@@ -457,6 +457,8 @@ void sortmemo(tcfg *c)
             kj=newdate(c->cfdate[j], ave2day(c->cfave[j]));
             if(ki>=kj) /* ki is after, invert */
             {
+                if(ki==kj && c->cfave[i]<=c->cfave[j]) /* 1st score is lower, do not swap */
+                    continue;
                 /* swap cards number */
                 iux=c->cfcard[i];
                 c->cfcard[i]=c->cfcard[j];
