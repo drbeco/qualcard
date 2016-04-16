@@ -112,8 +112,7 @@
 #define IFDEBUG(M) if(DEBUG) fprintf(stderr, "[DEBUG file:%s line:%d]: " M "\n", __FILE__, __LINE__); else {;}
 
 /* limits */
-#define TAMLINE 1500
-#define STRSIZE 256 /**< String buffer size */
+#define STRSIZE 1500 /**< String buffer size */
 #define PATHSIZE 256 /**< Maximum $PATH size */
 #define DTSIZE 9 /**< String with yyyymmdd */
 #define PEREXEC 10 /**< How many cards presented per round (execution) */
@@ -512,7 +511,7 @@ void select10cards(tcfg *c, int tencards[10][2])
 /* database size */
 int dbsize(tcfg *c)//, char *dbname)
 {
-    char line[TAMLINE];
+    char line[STRSIZE];
     int qtdl=0;
     FILE *fp;
 
@@ -525,7 +524,7 @@ int dbsize(tcfg *c)//, char *dbname)
     fseek(fp, 0, 0 ); /* linha 0 */
     do
     {
-        fgets(line, TAMLINE, fp);
+        fgets(line, STRSIZE, fp);
         qtdl++;
     }while(!feof(fp));
     fclose(fp);
@@ -691,7 +690,7 @@ int newcard(tcfg c, int tencards[10][2])
 /* given a card number, get it from file */
 void getcard(tcfg c, int cardnum, char *cardfr, char *cardbk)
 {
-    char card[TAMLINE];
+    char card[STRSIZE];
     FILE *fp;
     int i;
 
@@ -702,7 +701,7 @@ void getcard(tcfg c, int cardnum, char *cardfr, char *cardbk)
     }
     fseek(fp, 0, 0);
     for(i=0; i<=cardnum; i++)
-        fgets(card, TAMLINE, fp);
+        fgets(card, STRSIZE, fp);
     fclose(fp);
 
     cardfaces(card, cardfr, cardbk);
