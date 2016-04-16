@@ -362,7 +362,7 @@ void save2file(tcfg c)
     }
     else
         fprintf(stderr, "save2file(): can't open config file %s for writing.\n", c.configf);
-    return; /* leu do arquivo para os vetores */
+    return;
 }
 
 /* get card faces */
@@ -396,9 +396,8 @@ void changebarnet(char *nt)
 {
     do
         if((nt=strchr(nt,'\\')))
-        {
             nt++;
-            switch(*nt) /* *++nt */
+            switch(*nt)//(*++nt)
             {
                 case 'n':
                     *nt='\n';
@@ -410,7 +409,6 @@ void changebarnet(char *nt)
                     *(nt-1)=' ';
                     nt++;
             }
-        }
     while(nt!=NULL);
 }
 
@@ -521,10 +519,9 @@ int dbsize(tcfg *c)//, char *dbname)
 }
 
 /* history analises */
-/* incluir nota em número para conceito "A+" */
 void cfanalyses(tcfg *c, int *view, int *learn, float *avescore)
 {
-    int card, date, revd;
+    int card, date, revd; /* card number, card date last seen, card review date */
     int late; /* days late */
     float ave; /* average of a single card written in disk */
     FILE *fp;
@@ -548,7 +545,6 @@ void cfanalyses(tcfg *c, int *view, int *learn, float *avescore)
             late=diffdays(revd, c->today);
         *avescore += score(ave, late);
     }
-
     *avescore /= ((float)c->QTDCARD);
 
     fclose(fp);
@@ -580,32 +576,29 @@ int diffdays(int newd, int oldd)
 //         oldd=newd;
 //     }
 
-    ano = oldd/10000; /* 20160410/10000=2016.0410 */
+    ano = oldd/10000;
     oldd -= ano*10000;
-    mes = oldd/100; /* 0410/100=04.10 */
+    mes = oldd/100;
     oldd -= mes*100;
     dia = oldd;
     tmold.tm_year = ano-1900;
     tmold.tm_mon = mes-1;
-    tmold.tm_mday = dia; /* add the number of days */
+    tmold.tm_mday = dia;
     ttold = mktime(&tmold);
 
-    ano = newd/10000; /* 20160410/10000=2016.0410 */
+    ano = newd/10000;
     newd -= ano*10000;
-    mes = newd/100; /* 0410/100=04.10 */
+    mes = newd/100;
     newd -= mes*100;
     dia = newd;
     tmnew.tm_year = ano-1900;
     tmnew.tm_mon = mes-1;
-    tmnew.tm_mday = dia; /* add the number of days */
+    tmnew.tm_mday = dia;
     ttnew = mktime(&tmnew);
 
-    fsec=difftime(ttnew,ttold);
+    fsec=difftime(ttnew,ttold); /* difference in seconds */
     dia = fsec/86400.0;
 
-//     tmold = *gmtime(&tt); /* atribuir valor, nao o ponteiro */
-//     sprintf(snewd, "%04d%02d%02d",tmold.tm_year+1900,tmold.tm_mon+1,tmold.tm_mday);
-//     oldd=(int)strtol(snewd, NULL, 10);
     return dia;
 }
 
@@ -629,8 +622,10 @@ void summary(tcfg *cfg)
     float pview, plearn; /* percentages */
     float average; /* average 0...5 of ALL cards in a database */
     int maxlen=14, len;
-
-    /* Example: English: total 1500, viewed 300 (20%), learned 45 (3%). Score: E */
+/*Examples:
+( 89.9%)            test: total   15, viewed   15 (  1.0%), learned   14 (  0.9%), score   4.5
+(  1.3%)         english: total 1500, viewed   27 (  0.0%), learned    8 (  0.0%), score   0.1
+*/
     for(i=0; i<cfg->dbfsize; i++) /* database file list */
         if((len=strlen(theme(filenopath(cfg->dbfiles[i]))))>maxlen)
             maxlen=len;
@@ -676,8 +671,6 @@ int newcard(tcfg c, int tencards[10][2])
     for(i=0; i<10; i++) /* remove from tencards */
         if(tencards[i][TFIL]!=-2)
             randnorep(REMOVEBASKET, &tencards[i][TFIL]);
-//          if(randnorep(REMOVEBASKET, &tencards[i][TFIL])!=BASKETOK)
-//              printf("erro randnorep() = %d\n", tencards[i][TFIL]);
 
     for(i=0; i<c.cfsize; i++) /* remove from history */
         randnorep(REMOVEBASKET, &c.cfcard[i]);
@@ -896,18 +889,17 @@ int newdate(int oldd, int days)
     struct tm date={0}; /* date fields */
     char snewd[DTSIZE];
 
-    ano = oldd/10000; /* 20160410/10000=2016.0410 */
+    ano = oldd/10000;
     oldd -= ano*10000;
-    mes = oldd/100; /* 0410/100=04.10 */
+    mes = oldd/100;
     oldd -= mes*100;
     dia = oldd;
-
     date.tm_year = ano-1900;
     date.tm_mon = mes-1;
     date.tm_mday = dia + days; /* add the number of days */
 
     tt = mktime(&date);
-    date = *gmtime(&tt); /* atribuir valor, nao o ponteiro */
+    date = *gmtime(&tt);
     sprintf(snewd, "%04d%02d%02d",date.tm_year+1900,date.tm_mon+1,date.tm_mday);
     oldd=(int)strtol(snewd, NULL, 10);
     return oldd;
@@ -920,9 +912,9 @@ char *prettydate(int oldd)
     static char dd[12];
     int ano, mes, dia;
 
-    ano = oldd/10000; /* 20160410/10000=2016.0410 */
+    ano = oldd/10000;
     oldd -= ano*10000;
-    mes = oldd/100; /* 0410/100=04.10 */
+    mes = oldd/100;
     oldd -= mes*100;
     dia = oldd;
 
@@ -969,7 +961,7 @@ void readcfg(tcfg *c)
     }
     else
         printf("No previous history. Starting new study.\n");
-    return; /* leu do arquivo para os vetores */
+    return;
 }
 
 /* ---------------------------------------------------------------------- */
