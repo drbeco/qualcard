@@ -164,11 +164,13 @@ void cardfaces(char *card, char *fr, char *bk); /* get card faces front/back */
 void save2memo(tcfg *c, int i, int card, int score); /* save new or update old card */
 void save2file(tcfg c); /* save updated cards in memory to config file */
 int dbsize(tcfg *c); /* database size */
-void cfanalyses(tcfg *c, int *view, int *learn); /* analyses a history file */
+void cfanalyses(tcfg *c, int *view, int *learn, float *average); /* analyses a history file */
 void createcfgdir(tcfg *c); /* creates /home/user/.config/qualcard/ */
 char *filenopath(char *filepath); /* get filename with no path */
 int randnorep(int mode, int *n); /* drawn numbers from a list with no repetition */
 void changebarnet(char *s); /* change \n and \t to the real thing */
+int diffdays(int newd, int oldd); /* return the difference of two dates in days */
+float score(float ave, int late); /* return the new score when the revision is late */
 
 /* ---------------------------------------------------------------------- */
 /* @ingroup GroupUnique */
@@ -209,8 +211,7 @@ int main(int argc, char *argv[])
     int opt; /* return from getopt() and user options */
     tcfg c={0};
     int i; /* index, auxiliary */
-    /*char card[STRSIZE]; / * card drawn */
-    int newd;
+    int newd; /* new date after adding up day's equivalent score */
     int tencards[10][2]; /* ten cards, index in memory (-1 if new), line in file */
     int again=1; /* while some card score presented is still zero */
     char cardfr[STRSIZE], cardbk[STRSIZE];
@@ -520,14 +521,17 @@ int dbsize(tcfg *c)//, char *dbname)
 }
 
 /* history analises */
-void cfanalyses(tcfg *c, int *view, int *learn)
+/* incluir nota em número para conceito "A+" */
+void cfanalyses(tcfg *c, int *view, int *learn, float *avescore)
 {
-    int card, date;
-    float ave;
+    int card, date, revd;
+    int late; /* days late */
+    float ave; /* average of a single card written in disk */
     FILE *fp;
 
     *view=0;
     *learn=0;
+    *avescore=0.0;
 
     if(!(fp=fopen(c->configf,"r")))
         return;
@@ -535,12 +539,76 @@ void cfanalyses(tcfg *c, int *view, int *learn)
     while(3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave))
     {
         (*view)++;
-        if(ave>=SCOREA)
+        if(ave >= SCOREA)
             (*learn)++;
+
+        revd=newdate(date, ave2day(ave));
+        late=0;
+        if(c->today - revd>0) /* atrasado */
+            late=diffdays(revd, c->today);
+        *avescore += score(ave, late);
     }
+
+    *avescore /= ((float)c->QTDCARD);
+
     fclose(fp);
     return;
 }
+
+/* return the new score when the revision is late */
+float score(float ave, int late)
+{
+    ave -= ((float)late/3.0);
+    if(ave<0.0)
+        ave=0.0;
+    return ave;
+}
+
+/* return the difference of two dates in days */
+int diffdays(int newd, int oldd)
+{
+    int ano, mes, dia;//, aux;
+    float fsec; /* seconds */
+    time_t ttnew, ttold; /* epochs */
+    struct tm tmnew={0}, tmold={0}; /* date fields */
+//     char snewd[DTSIZE];
+
+//     if(newd<oldd) /* return always positive */
+//     {
+//         aux=newd;
+//         newd=oldd;
+//         oldd=newd;
+//     }
+
+    ano = oldd/10000; /* 20160410/10000=2016.0410 */
+    oldd -= ano*10000;
+    mes = oldd/100; /* 0410/100=04.10 */
+    oldd -= mes*100;
+    dia = oldd;
+    tmold.tm_year = ano-1900;
+    tmold.tm_mon = mes-1;
+    tmold.tm_mday = dia; /* add the number of days */
+    ttold = mktime(&tmold);
+
+    ano = newd/10000; /* 20160410/10000=2016.0410 */
+    newd -= ano*10000;
+    mes = newd/100; /* 0410/100=04.10 */
+    newd -= mes*100;
+    dia = newd;
+    tmnew.tm_year = ano-1900;
+    tmnew.tm_mon = mes-1;
+    tmnew.tm_mday = dia; /* add the number of days */
+    ttnew = mktime(&tmnew);
+
+    fsec=difftime(ttnew,ttold);
+    dia = fsec/86400.0;
+
+//     tmold = *gmtime(&tt); /* atribuir valor, nao o ponteiro */
+//     sprintf(snewd, "%04d%02d%02d",tmold.tm_year+1900,tmold.tm_mon+1,tmold.tm_mday);
+//     oldd=(int)strtol(snewd, NULL, 10);
+    return dia;
+}
+
 
 /* ---------------------------------------------------------------------- */
 /**
@@ -558,10 +626,17 @@ void summary(tcfg *cfg)
 {
     int i, view=0, learn=0;
     char *dot, dbcore[STRSIZE];
+    float pview, plearn; /* percentages */
+    float average; /* average 0...5 of ALL cards in a database */
+    int maxlen=14, len;
 
     /* Example: English: total 1500, viewed 300 (20%), learned 45 (3%). Score: E */
+    for(i=0; i<cfg->dbfsize; i++) /* database file list */
+        if((len=strlen(theme(filenopath(cfg->dbfiles[i]))))>maxlen)
+            maxlen=len;
+    maxlen++; /* 15 or more */
 
-    for(i=0; i<cfg->dbfsize; i++)
+    for(i=0; i<cfg->dbfsize; i++) /* database file list */
     {
         strcpy(cfg->dbasef, cfg->dbfiles[i]);
         strcpy(dbcore, filenopath(cfg->dbasef));
@@ -570,8 +645,10 @@ void summary(tcfg *cfg)
         sprintf(cfg->configf, "%s/%s-%s%s", cfg->cfgpath, cfg->user, dbcore, EXTCF);
         cfg->QTDCARD=dbsize(cfg);
 
-        cfanalyses(cfg, &view, &learn);
-        printf("%s: total %d, viewed %d, learned %d\n", theme(filenopath(cfg->dbfiles[i])), cfg->QTDCARD, view, learn);
+        cfanalyses(cfg, &view, &learn, &average);
+        pview=((float)view/(float)cfg->QTDCARD)*100.0;
+        plearn=((float)learn/(float)cfg->QTDCARD)*100.0;
+        printf("(%5.1f%%) %*s: total %4d, viewed %4d (%5.1f%%), learned %4d (%5.1f%%), score %5.1f\n", average*20.0, maxlen, theme(filenopath(cfg->dbfiles[i])), cfg->QTDCARD, view, pview, learn, plearn, average);
     }
     return;
 }
@@ -589,7 +666,7 @@ char *theme(char *file)
     return theme;
 }
 
-/* Sorteia um cartao novo que esta no arquivo e nunca foi visto */
+/* Sorteia um cartao novo que esta no arquivo config e nunca foi visto */
 int newcard(tcfg c, int tencards[10][2])
 {
     int l, i;
@@ -815,8 +892,8 @@ int ave2day(float ave)
 int newdate(int oldd, int days)
 {
     int ano, mes, dia;
-    time_t timer; /* epochs */
-    struct tm date={0}; /* campos da data */
+    time_t tt; /* epochs */
+    struct tm date={0}; /* date fields */
     char snewd[DTSIZE];
 
     ano = oldd/10000; /* 20160410/10000=2016.0410 */
@@ -829,8 +906,8 @@ int newdate(int oldd, int days)
     date.tm_mon = mes-1;
     date.tm_mday = dia + days; /* add the number of days */
 
-    timer = mktime(&date);
-    date = *gmtime(&timer); /* atribuir valor, nao o ponteiro */
+    tt = mktime(&date);
+    date = *gmtime(&tt); /* atribuir valor, nao o ponteiro */
     sprintf(snewd, "%04d%02d%02d",date.tm_year+1900,date.tm_mon+1,date.tm_mday);
     oldd=(int)strtol(snewd, NULL, 10);
     return oldd;
