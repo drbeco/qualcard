@@ -379,7 +379,8 @@ void cardfaces(char *card, char *fr, char *bk)
         colon=strchr(colon, ':');
         if(!colon)
         {
-            fprintf(stderr,"\nWrong card without '::' separator.\n\n%s\n\n", card);
+            fprintf(stderr,"\n------------------------------------------\n");
+            fprintf(stderr,"Wrong card without '::' separator.\n%s\n", card);
             return; /* not found, return all card to front and back */
         }
         colon++;
@@ -396,8 +397,7 @@ void changebarnet(char *nt)
 {
     do
         if((nt=strchr(nt,'\\')))
-            nt++;
-            switch(*nt)//(*++nt)
+            switch(*++nt)
             {
                 case 'n':
                     *nt='\n';
