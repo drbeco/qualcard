@@ -139,6 +139,7 @@ typedef struct scfg /* configuration data struct */
     int cfsize; /* size of config file */
     char **dbfiles; /* char dbfiles[number of files][string lenght];*/
     int dbfsize; /* first dimension / lines */
+    int invert; /* if true, print first the back, then the front of the card */
 } tcfg; /* configuration data type */
 
 /* ---------------------------------------------------------------------- */
@@ -209,7 +210,7 @@ float score(float ave, int late); /* return the new score when the revision is l
 int main(int argc, char *argv[])
 {
     int opt; /* return from getopt() and user options */
-    tcfg c={0};
+    tcfg c={0}; /* struct to configuration variables */
     int i; /* index, auxiliary */
     int newd; /* new date after adding up day's equivalent score */
     int tencards[10][2]; /* ten cards, index in memory (-1 if new), line in file */
@@ -226,9 +227,10 @@ int main(int argc, char *argv[])
      *        -s            status of reviews
      *        -u username   set the username (default: whoami)
      *        -d database   set the database to use (default: ask)
+     *        -i            invert presentation order (first the back, then the front of the card)
      */
     opterr = 0;
-    while((opt = getopt(argc, argv, "hcvqsu:d:")) != EOF)
+    while((opt = getopt(argc, argv, "hcvqsu:d:i")) != EOF)
         switch(opt)
         {
             case 'h': /* exit */
@@ -248,6 +250,9 @@ int main(int argc, char *argv[])
                 break;
             case 'u':
                 strcpy(c.user, optarg);
+                break;
+            case 'i':
+                c.invert=1;
                 break;
             case 'd':
                 strcpy(c.dbasef, optarg);
@@ -297,11 +302,18 @@ int main(int argc, char *argv[])
                 printf("Card %d (revision date %s)\n", tencards[i][TFIL]+1, prettydate(newd));
             }
 
-            printf("%s\n\n", cardfr);
+            if(c.invert)
+                printf("%s\n", cardbk);
+            else
+                printf("%s\n\n", cardfr);
 
             printf("Press <ENTER> to see the back of the card\n");
             do opt=getchar(); while(opt!='\n');
-            printf("%s\n", cardbk);
+
+            if(c.invert)
+                printf("%s\n\n", cardfr);
+            else
+                printf("%s\n", cardbk);
 
             do
             {
@@ -1209,6 +1221,7 @@ void help(void)
     printf("\t-s,  --status\n\t\tShow how many cards needs review in each database.\n");
     printf("\t-u username,  --user username\n\t\tUse the username's profile.\n");
     printf("\t-d file.ex4,  --database file.ex4\n\t\tUse the given database to practice.\n\t\tThe file must have a '.ex4' extension and starts with '/' (absolute path)\n\t\tand its name is in the form 'theme-question-answer.ex4', where:\n\t\t\t* theme: the theme of the study.\n\t\t\t* question: the first side of the card.\n\t\t\t* answer: the back side of the card.\n");
+    printf("\t-i,  --invert\n\t\tInvert presentation order (show first the back, then the front of the card).\n");
     /* add more options here */
     printf("\nExit status:\n\t0 if ok.\n\t1 some error occurred.\n");
     printf("\nTodo:\n\tLong options not implemented yet.\n");
