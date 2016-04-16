@@ -170,7 +170,7 @@ void createcfgdir(tcfg *c); /* creates /home/user/.config/qualcard/ */
 char *filenopath(char *filepath); /* get filename with no path */
 int randnorep(int mode, int *n); /* drawn numbers from a list with no repetition */
 void changebarnet(char *s); /* change \n and \t to the real thing */
-int diffdays(int newd, int oldd); /* return the difference of two dates in days */
+int diffdays(int newd, int oldd); /* Difference of two dates in days. Positive if new>old, 0 if equals, negative c.c. */
 float score(float ave, int late); /* return the new score when the revision is late */
 
 /* ---------------------------------------------------------------------- */
@@ -572,21 +572,13 @@ float score(float ave, int late)
     return ave;
 }
 
-/* return the difference of two dates in days */
+/* Difference of two dates in days. Positive if new>old, 0 if equals, negative c.c. */
 int diffdays(int newd, int oldd)
 {
     int ano, mes, dia;//, aux;
     float fsec; /* seconds */
     time_t ttnew, ttold; /* epochs */
     struct tm tmnew={0}, tmold={0}; /* date fields */
-//     char snewd[DTSIZE];
-
-//     if(newd<oldd) /* return always positive */
-//     {
-//         aux=newd;
-//         newd=oldd;
-//         oldd=newd;
-//     }
 
     ano = oldd/10000;
     oldd -= ano*10000;
@@ -609,7 +601,7 @@ int diffdays(int newd, int oldd)
     ttnew = mktime(&tmnew);
 
     fsec=difftime(ttnew,ttold); /* difference in seconds */
-    dia = fsec/86400.0;
+    dia = fsec/86400.0; /* difference in days */
 
     return dia;
 }
