@@ -162,7 +162,7 @@ void select10cards(tcfg *c, int tencards[10][2]); /* select 10 cards (old or new
 void sortmemo(tcfg *c); /* prioritary (old) comes first (selection sort) */
 void getcard(tcfg c, int cardnum, char *cardfr, char *cardbk); /* given a card number, get it from file */
 void cardfaces(char *card, char *fr, char *bk); /* get card faces front/back */
-void save2memo(tcfg *c, int i, int card, int score); /* save new or update old card */
+void save2memo(tcfg *c, int i, int card, int scor); /* save new or update old card */
 void save2file(tcfg c); /* save updated cards in memory to config file */
 int dbsize(tcfg *c); /* database size */
 void cfanalyses(tcfg *c, int *view, int *learn, float *average); /* analyses a history file */
@@ -339,7 +339,7 @@ int main(int argc, char *argv[])
 }
 
 /* save new or update old card */
-void save2memo(tcfg *c, int i, int card, int score)
+void save2memo(tcfg *c, int i, int card, int scor)
 {
     if(i==-1) /* new memory block */
     {
@@ -349,13 +349,13 @@ void save2memo(tcfg *c, int i, int card, int score)
         c->cfave=(float *)reallocordie(c->cfave, sizeof(float)*c->cfsize);
         c->cfcard[c->cfsize-1]=card;
         c->cfdate[c->cfsize-1]=c->today;
-        c->cfave[c->cfsize-1]=(float)score; /* first score */
+        c->cfave[c->cfsize-1]=(float)scor; /* first score */
         return;
     }
 
     assert(c->cfcard[i] == card); /* if c->cfcard[i] != card; then error; */
     c->cfdate[i] = c->today;
-    c->cfave[i] = (c->cfave[i] + (float)score)/2.0;
+    c->cfave[i] = (c->cfave[i] + (float)scor)/2.0;
     return;
 }
 
@@ -558,6 +558,8 @@ void cfanalyses(tcfg *c, int *view, int *learn, float *avescore)
         *avescore += score(ave, late);
     }
     *avescore /= ((float)c->QTDCARD);
+    if(*avescore>4.93) /* it is not impossible to achieve 100% */
+        *avescore=5.0;
 
     fclose(fp);
     return;
