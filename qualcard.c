@@ -164,7 +164,7 @@ void cardfaces(char *card, char *fr, char *bk); /* get card faces front/back */
 void save2memo(tcfg *c, int i, int card, int scor); /* save new or update old card */
 void save2file(tcfg c); /* save updated cards in memory to config file */
 int dbsize(tcfg *c); /* database size */
-void cfanalyses(tcfg *c, int *view, int *learn, float *average); /* analyses a history file */
+void cfanalyses(tcfg *c, int *view, int *learn, float *pct, float *addscore, int *ncardl); /* analyses a history file */
 void createcfgdir(tcfg *c); /* creates /home/user/.config/qualcard/ */
 char *filenopath(char *filepath); /* get filename with no path */
 int randnorep(int mode, int *n); /* drawn numbers from a list with no repetition */
@@ -532,16 +532,18 @@ int dbsize(tcfg *c)//, char *dbname)
 }
 
 /* history analises */
-void cfanalyses(tcfg *c, int *view, int *learn, float *avescore)
+void cfanalyses(tcfg *c, int *view, int *learn, float *pct, float *addscore, int *ncardl)
 {
     int card, date, revd; /* card number, card date last seen, card review date */
     int late; /* days late */
     float ave; /* average of a single card written in disk */
     FILE *fp;
 
-    *view=0;
-    *learn=0;
-    *avescore=0.0;
+    *view=0; /* number of cards viewed from the total */
+    *learn=0; /* number of cards with score greater than SCOREA */
+    *pct=0.0; /* percentage of completeness decays with time */
+    *addscore=0.0; /* just the scores of cards seen */
+    *ncardl=0; /* number of cards late that need review */
 
     if(!(fp=fopen(c->configf,"r")))
         return;
@@ -549,20 +551,34 @@ void cfanalyses(tcfg *c, int *view, int *learn, float *avescore)
     while(3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave))
     {
         (*view)++;
+        *addscore += ave;
         if(ave >= SCOREA)
             (*learn)++;
 
         revd=newdate(date, ave2day(ave));
         late=0;
-        if(c->today - revd>0) /* atrasado */
+        if(c->today - revd>0) /* late */
+        {
             late=diffdays(revd, c->today);
-        *avescore += score(ave, late);
+            (*ncardl)++;
+        }
+        *pct += score(ave, late);
     }
-    *avescore /= ((float)c->QTDCARD);
-    if(*avescore>4.93) /* it is not impossible to achieve 100% */
-        *avescore=5.0;
-
     fclose(fp);
+
+    *pct /= ((float)c->QTDCARD);
+    if(*pct>4.93) /* it is not impossible to achieve 100% */
+        *pct=5.0;
+    *pct *= 20.0; /* 0%..100% */
+
+    if(*view==0)
+        *addscore = 0.0;
+    else
+        *addscore /= ((float)*view); /* average of scores you've got so far */
+
+    if(*addscore>4.93) /* it is not impossible to achieve 5.0 */
+        *addscore=5.0;
+
     return;
 }
 
@@ -626,7 +642,9 @@ void summary(tcfg *cfg)
     int i, view=0, learn=0;
     char *dot, dbcore[STRSIZE];
     float pview, plearn; /* percentages */
-    float average; /* average 0...5 of ALL cards in a database */
+    float ave; /* average 0...5 of cards you've seen in a database */
+    float pct; /* percentage of your achievements, decay with time */
+    int clate; /* number of cards late */
     int maxlen=14, len;
 /*Examples:
 ( 89.9%)            test: total   15, viewed   15 (  1.0%), learned   14 (  0.9%), score   4.5
@@ -646,10 +664,10 @@ void summary(tcfg *cfg)
         sprintf(cfg->configf, "%s/%s-%s%s", cfg->cfgpath, cfg->user, dbcore, EXTCF);
         cfg->QTDCARD=dbsize(cfg);
 
-        cfanalyses(cfg, &view, &learn, &average);
+        cfanalyses(cfg, &view, &learn, &pct, &ave, &clate);
         pview=((float)view/(float)cfg->QTDCARD)*100.0;
         plearn=((float)learn/(float)cfg->QTDCARD)*100.0;
-        printf("(%5.1f%%) %*s: total %4d, viewed %4d (%5.1f%%), learned %4d (%5.1f%%), score %5.1f\n", average*20.0, maxlen, theme(filenopath(cfg->dbfiles[i])), cfg->QTDCARD, view, pview, learn, plearn, average);
+        printf("(%5.1f%%) %*s: total %4d, viewed %4d (%5.1f%%), learned %4d (%5.1f%%), to review %4d, score %5.1f\n", pct, maxlen, theme(filenopath(cfg->dbfiles[i])), cfg->QTDCARD, view, pview, learn, plearn, clate, ave);
     }
     return;
 }
