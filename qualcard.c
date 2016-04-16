@@ -455,7 +455,7 @@ void sortmemo(tcfg *c)
         {
             ki=newdate(c->cfdate[i], ave2day(c->cfave[i]));
             kj=newdate(c->cfdate[j], ave2day(c->cfave[j]));
-            if(ki>kj) /* ki is after, invert */
+            if(ki>=kj) /* ki is after, invert */
             {
                 /* swap cards number */
                 iux=c->cfcard[i];
@@ -605,7 +605,6 @@ int diffdays(int newd, int oldd)
 
     return dia;
 }
-
 
 /* ---------------------------------------------------------------------- */
 /**
