@@ -761,7 +761,7 @@ void createcfgdir(tcfg *c)
 {
     char path1[PATHSIZE];
 
-    sprintf(path1, "/home/%s/.config", c->realuser);
+    sprintf(path1, "/home/%s/.config", c->user);
     if(0 != access(path1, F_OK))
     {
         if(ENOENT == errno) /* does not exist */
