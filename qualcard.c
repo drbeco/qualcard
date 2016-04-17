@@ -161,7 +161,7 @@ void select10cards(tcfg *c, int tencards[10][2]); /* select 10 cards (old or new
 void sortmemo(tcfg *c); /* prioritary (old) comes first (selection sort) */
 void getcard(tcfg c, int cardnum, char *cardfr, char *cardbk); /* given a card number, get it from file */
 void cardfaces(char *card, char *fr, char *bk); /* get card faces front/back */
-void save2memo(tcfg *c, int i, int card, int scor); /* save new or update old card */
+void save2memo(tcfg *c, int i, int card, float scor); /* save new or update old card */
 void save2file(tcfg c); /* save updated cards in memory to config file */
 int dbsize(tcfg *c); /* database size */
 void cfanalyses(tcfg *c, int *view, int *learn, float *pct, float *addscore, int *ncardl); /* analyses a history file */
@@ -214,7 +214,9 @@ int main(int argc, char *argv[])
     int newd; /* new date after adding up day's equivalent score */
     int tencards[10][2]; /* ten cards, index in memory (-1 if new), line in file */
     int again=1; /* while some card score presented is still zero */
-    char cardfr[STRSIZE], cardbk[STRSIZE];
+    int repet[10]={0}; /* which card repeated how many times */
+    float sco; /* the score to a card */
+    char cardfr[STRSIZE], cardbk[STRSIZE]; /* card front and back */
 
     IFDEBUG("Starting optarg loop...\n");
 
@@ -320,10 +322,17 @@ int main(int argc, char *argv[])
                 scanf("%d%*c", &opt); /* discard the '\n'. Better use fgets() */
             } while(opt<0 || opt>5);
             if(opt==0)
+            {
+                repet[i]++;
                 again=1;
+            }
             else
             {
-                save2memo(&c, tencards[i][TMEM], tencards[i][TFIL], opt);
+                if(repet[i])
+                    sco=(float)opt/((float)repet[i]+1.0);
+                else
+                    sco=(float)opt;
+                save2memo(&c, tencards[i][TMEM], tencards[i][TFIL], sco);
                 tencards[i][TMEM]=-2; /* presented and ok */
             }
         }
@@ -338,7 +347,7 @@ int main(int argc, char *argv[])
 }
 
 /* save new or update old card */
-void save2memo(tcfg *c, int i, int card, int scor)
+void save2memo(tcfg *c, int i, int card, float scor)
 {
     if(i==-1) /* new memory block */
     {
@@ -348,13 +357,13 @@ void save2memo(tcfg *c, int i, int card, int scor)
         c->cfave=(float *)reallocordie(c->cfave, sizeof(float)*c->cfsize);
         c->cfcard[c->cfsize-1]=card;
         c->cfdate[c->cfsize-1]=c->today;
-        c->cfave[c->cfsize-1]=(float)scor; /* first score */
+        c->cfave[c->cfsize-1]=scor; /* first score */
         return;
     }
 
     assert(c->cfcard[i] == card); /* if c->cfcard[i] != card; then error; */
     c->cfdate[i] = c->today;
-    c->cfave[i] = (c->cfave[i] + (float)scor)/2.0;
+    c->cfave[i] = (c->cfave[i] + scor)/2.0;
     return;
 }
 
