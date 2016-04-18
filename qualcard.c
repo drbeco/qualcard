@@ -1113,9 +1113,8 @@ void readdbfiles(tcfg *c)
             {
                 if(!(dot=strrchr(ep->d_name, '.'))) /* grab extension */
                     continue;
-                sprintf(fullname, "%s/%s", (dois?c->dbpath:c->cfgrealpath), ep->d_name);
-                len=strlen(fullname);
-                if(len>(STRSIZE-1))
+                len=snprintf(fullname, PATHSIZE, "%s/%s", (dois?c->dbpath:c->cfgrealpath), ep->d_name);
+                if(len>=PATHSIZE)
                 {
                     fprintf(stderr, "Ignoring file with too big name: %s\n", fullname);
                     continue;
