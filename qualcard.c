@@ -232,7 +232,8 @@ int main(int argc, char *argv[])
      *        -v            verbose++
      *        -q            quiet (verbose--)
      *        -s            status of reviews
-     *        -u username   set the username (default: whoami)
+     *        -u username   set the player name (default: whoami)
+     *        -p username   set the username for config path (together with -s only)
      *        -d database   set the database to use (default: ask)
      *        -i            invert presentation order (first the back, then the front of the card)
      */
@@ -1299,6 +1300,7 @@ void help(void)
     printf("\t-q,  --quiet\n\t\tReduces verbose level (also cumulative).\n");
     printf("\t-s,  --status\n\t\tShow how many cards needs review in each database.\n");
     printf("\t-u username,  --user username\n\t\tUse the username's profile.\n");
+    printf("\t-p username,  --path username\n\t\tSet the username used for the config path (it is mandatory to use together with -s).\n");
     printf("\t-d file.ex4,  --database file.ex4\n\t\tUse the given database to practice.\n\t\tThe file must have a '.ex4' extension and starts with '/' (absolute path)\n\t\tand its name is in the form 'theme-question-answer.ex4', where:\n\t\t\t* theme: the theme of the study.\n\t\t\t* question: the first side of the card.\n\t\t\t* answer: the back side of the card.\n");
     printf("\t-i,  --invert\n\t\tInvert presentation order (show first the back, then the front of the card).\n");
     /* add more options here */
