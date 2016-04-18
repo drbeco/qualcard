@@ -161,7 +161,7 @@ char *theme(char *file); /* take the theme from a database file name */
 int newcard(tcfg c, int tencards[10][2]); /* drawn a new card */
 void select10cards(tcfg *c, int tencards[10][2]); /* select 10 cards (old or new) to be presented */
 void sortmemo(tcfg *c); /* prioritary (old) comes first (selection sort) */
-void getcard(tcfg c, int cardnum, char *cardfr, char *cardbk); /* given a card number, get it from file */
+void getcard(char *dbfile, int cardnum, char *cardfr, char *cardbk); /* given a card number, get it from file */
 void cardfaces(char *card, char *fr, char *bk); /* get card faces front/back */
 void save2memo(tcfg *c, int i, int card, float scor); /* save new or update old card */
 void save2file(tcfg c); /* save updated cards in memory to config file */
@@ -316,7 +316,7 @@ int main(int argc, char *argv[])
         {
             if(tencards[i][TMEM]==-2) /* already presented and ok */
                 continue;
-            getcard(c, tencards[i][TFIL], cardfr, cardbk);
+            getcard(c.dbasef, tencards[i][TFIL], cardfr, cardbk);
 
             printf("------------------------------------------\n");
             if(tencards[i][TMEM]==-1) /* new card? */
@@ -750,15 +750,15 @@ int newcard(tcfg c, int tencards[10][2])
 }
 
 /* given a card number, get it from file */
-void getcard(tcfg c, int cardnum, char *cardfr, char *cardbk)
+void getcard(char *dbfile, int cardnum, char *cardfr, char *cardbk)
 {
     char card[STRSIZE];
     FILE *fp;
     int i;
 
-    if(!(fp=fopen(c.dbasef,"r")))
+    if(!(fp=fopen(dbfile,"r")))
     {
-        printf("Fail to open database %s.\n", c.dbasef);
+        printf("Fail to open database %s.\n", dbfile);
         exit(EXIT_FAILURE);
     }
     fseek(fp, 0, 0);
