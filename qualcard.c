@@ -128,11 +128,14 @@ typedef struct scfg /* configuration data struct */
 {
     int QTDCARD; /* database size */
     int today; /* yyyymmdd */
-    char dbpath[PATHSIZE]; /* path to commom database path */
-    char cfgpath[PATHSIZE]; /* path to config directory (history and databases) */
-    char user[STRSIZE]; /* user name of the program */
+    char dbpath[PATHSIZE]; /* path to commom database */
+    char cfgrealpath[PATHSIZE]; /* path to own config directory (history and databases), read and write */
+    char cfguserpath[PATHSIZE]; /* path to some user config directory (just for read) */
+    char pathuser[STRSIZE]; /* pathuser/.config another user name account for read only */
+    char fileuser[STRSIZE]; /* fileuser-theme-question-answer user name current practicing */
     char realuser[STRSIZE]; /* user name of the account */
-    char dbasef[STRSIZE], configf[STRSIZE]; /* current filenames: database and configuration */
+    char dbasef[STRSIZE], configwf[STRSIZE]; /* current filenames: database and configuration */
+    char summaryf[STRSIZE]; /* temporary config file */
     int *cfcard, *cfdate; /* card num, last date */
     float *cfave; /* card average */
     int cfsize; /* size of config file */
@@ -171,6 +174,9 @@ int randnorep(int mode, int *n); /* drawn numbers from a list with no repetition
 void changebarnet(char *s); /* change \n and \t to the real thing */
 int diffdays(int newd, int oldd); /* Difference of two dates in days. Positive if new>old, 0 if equals, negative c.c. */
 float score(float ave, int late); /* return the new score when the revision is late */
+
+void menudb(tcfg *c); /* read menu */
+char *dbcore(char *s); /* grab the core name of the file */
 
 /* ---------------------------------------------------------------------- */
 /* @ingroup GroupUnique */
@@ -231,7 +237,7 @@ int main(int argc, char *argv[])
      *        -i            invert presentation order (first the back, then the front of the card)
      */
     opterr = 0;
-    while((opt = getopt(argc, argv, "hcvqsu:d:i")) != EOF)
+    while((opt = getopt(argc, argv, "hcvqsp:u:d:i")) != EOF)
         switch(opt)
         {
             case 'h': /* help and exit */
@@ -250,7 +256,10 @@ int main(int argc, char *argv[])
                 SUMMA=1;
                 break;
             case 'u': /* username */
-                strcpy(c.user, optarg);
+                strcpy(c.fileuser, optarg);
+                break;
+            case 'p': /* username for other account (path) */
+                strcpy(c.pathuser, optarg);
                 break;
             case 'i': /* invert */
                 c.invert=1;
@@ -266,6 +275,16 @@ int main(int argc, char *argv[])
 
     if(verb>1)
         printf("Verbose level set at: %d\n", verb);
+    if(c.pathuser[0]!='\0' && SUMMA!=1)
+    {
+        printf("Option '-p user' only valid with -s. See the help (-h).\n");
+        exit(EXIT_FAILURE);
+    }
+//     if(c.userro[0]!='\0' && c.user[0]!='\0')
+//     {
+//         printf("You can't set both '-U user' and '-u user' options. See the help (-h).\n");
+//         exit(EXIT_FAILURE);
+//     }
 
     qualcard_init(&c); /* initialization function */
 
@@ -275,10 +294,15 @@ int main(int argc, char *argv[])
         exit(EXIT_SUCCESS);
     }
 
+//     sprintf(c.cfgrealpath, "/home/%s/.config/qualcard", c.realuser);
+//     sprintf(c.cfguserpath, "/home/%s/.config/qualcard", c.pathuser);
+
+    menudb(&c);
+
     if(verb>0)
     {
         printf("\nDataBase file: %s (%d cards)\n", filenopath(c.dbasef), c.QTDCARD);
-        printf("History  file: %s\n", filenopath(c.configf));
+        printf("History  file: %s\n", filenopath(c.configwf));
     }
 
     readcfg(&c);
@@ -372,8 +396,18 @@ void save2file(tcfg c)
 {
     int i;
     FILE *fp;
+    /* char *savef;*/
 
-    if((fp=fopen(c.configf, "w"))!=NULL) /* create from scratch */
+    /* BUG do not attempt to save when user != realuser */
+
+//     if(strcmp(c.user, c.realuser))
+//         savef=change2realuser(c);
+
+    if(verb>1)
+        fprintf(stderr, "trying to save2file() %s.\n", c.configwf);
+
+    // if((fp=fopen(savef, "w"))!=NULL) /* create from scratch */
+    if((fp=fopen(c.configwf, "w"))!=NULL) /* create from scratch */
     {
         for(i=0; i<c.cfsize; i++)
             fprintf(fp, "%d %d %f\n", c.cfcard[i], c.cfdate[i], c.cfave[i]);
@@ -381,7 +415,8 @@ void save2file(tcfg c)
         fclose(fp);
     }
     else
-        fprintf(stderr, "save2file(): can't open config file %s for writing.\n", c.configf);
+        /* /home/carol/.config/qualcard/carol-ls-key-description.cf4 */
+        fprintf(stderr, "save2file(): can't open config file %s for writing.\n", c.configwf);
     return;
 }
 
@@ -554,7 +589,7 @@ void cfanalyses(tcfg *c, int *view, int *learn, float *pct, float *addscore, int
     *addscore=0.0; /* just the scores of cards seen */
     *ncardl=0; /* number of cards late that need review */
 
-    if(!(fp=fopen(c->configf,"r")))
+    if(!(fp=fopen(c->summaryf,"r"))) /* temporary configwf in a loop */
         return;
 
     while(3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave))
@@ -649,7 +684,7 @@ int diffdays(int newd, int oldd)
 void summary(tcfg *cfg)
 {
     int i, view=0, learn=0;
-    char *dot, dbcore[STRSIZE];
+    char *dbc;
     float pview, plearn; /* percentages */
     float ave; /* average 0...5 of cards you've seen in a database */
     float pct; /* percentage of your achievements, decay with time */
@@ -667,11 +702,13 @@ void summary(tcfg *cfg)
     for(i=0; i<cfg->dbfsize; i++) /* database file list */
     {
         strcpy(cfg->dbasef, cfg->dbfiles[i]);
-        strcpy(dbcore, filenopath(cfg->dbasef));
-        if((dot=strrchr(dbcore, '.'))) /* find the dot */
-            *dot='\0'; /* delete from dot on */
-        sprintf(cfg->configf, "%s/%s-%s%s", cfg->cfgpath, cfg->user, dbcore, EXTCF);
-        cfg->QTDCARD=dbsize(cfg);
+        cfg->QTDCARD=dbsize(cfg); /* send char * direct BUG */
+        // strcpy(dbcore, filenopath(cfg->dbasef));
+        // if((dot=strrchr(dbcore, '.'))) /* find the dot */
+        //      *dot='\0'; /* delete from dot on */
+
+        dbc=dbcore(cfg->dbfiles[i]);
+        sprintf(cfg->summaryf, "%s/%s-%s%s", cfg->cfguserpath, cfg->fileuser, dbc, EXTCF);
 
         cfanalyses(cfg, &view, &learn, &pct, &ave, &clate);
         pview=((float)view/(float)cfg->QTDCARD)*100.0;
@@ -756,12 +793,12 @@ double randmm(double min, double max)
     return s;
 }
 
-/* create /home/user/.config/qualcard/ */
+/* create /home/realuser/.config/qualcard/ */
 void createcfgdir(tcfg *c)
 {
     char path1[PATHSIZE];
 
-    sprintf(path1, "/home/%s/.config", c->user);
+    sprintf(path1, "/home/%s/.config", c->realuser);
     if(0 != access(path1, F_OK))
     {
         if(ENOENT == errno) /* does not exist */
@@ -780,20 +817,20 @@ void createcfgdir(tcfg *c)
             }
     }
 
-    sprintf(c->cfgpath, "%s/%s", path1, "qualcard");
-    if(0 != access(c->cfgpath, F_OK))
+//     sprintf(c->cfgpath, "%s/%s", path1, "qualcard");
+    if(0 != access(c->cfgrealpath, F_OK))
     {
         if(ENOENT == errno) /* does not exist */
         {
-            if(mkdir(c->cfgpath, S_IRWXU|S_IRGRP|S_IXGRP) == 0) /* successifully created */
+            if(mkdir(c->cfgrealpath, S_IRWXU|S_IRGRP|S_IXGRP) == 0) /* successifully created */
                 return;
-            printf("cannot create directory %s. I can't save your progress.\n", c->cfgpath);
+            printf("cannot create directory %s. I can't save your progress.\n", c->cfgrealpath);
             exit(EXIT_FAILURE);
         }
         else
             if(ENOTDIR == errno) /* not a directory */
             {
-                printf("%s is not a directory. I can't save your progress.\n", c->cfgpath);
+                printf("%s is not a directory. I can't save your progress.\n", c->cfgrealpath);
                 exit(EXIT_FAILURE);
             }
     }
@@ -819,9 +856,6 @@ void qualcard_init(tcfg *cfg)
 
     time_t lt;
     struct tm *timeptr;
-    int i, dbnum;
-    char dbcore[STRSIZE];
-    char *dot;
     char stoday[DTSIZE];
     char binpath[PATHSIZE]={0};
 
@@ -833,13 +867,15 @@ void qualcard_init(tcfg *cfg)
     srand((unsigned)time(&lt)); /* new unknow seed */
 
     strcpy(cfg->realuser, getenv("USER"));
-    if(cfg->user[0]=='\0')
-        strcpy(cfg->user, cfg->realuser);
+    if(cfg->fileuser[0]=='\0')
+        strcpy(cfg->fileuser, cfg->realuser);
+    if(cfg->pathuser[0]=='\0')
+        strcpy(cfg->pathuser, cfg->realuser);
 
     printf("QualCard v.%s - Spaced Repetition\n", VERSION);
     if(verb>0)
     {
-        printf("%s, ", cfg->user);
+        printf("Hello %s, ", cfg->fileuser);
         printf("today is %s\n", prettydate(cfg->today));
     }
 
@@ -850,24 +886,35 @@ void qualcard_init(tcfg *cfg)
         exit(EXIT_FAILURE);
     }
     sprintf(cfg->dbpath, "%sdb", binpath); /* /usr/local/bin/qualcarddb/ */
+    sprintf(cfg->cfgrealpath, "/home/%s/.config/qualcard", cfg->realuser);
+    sprintf(cfg->cfguserpath, "/home/%s/.config/qualcard", cfg->pathuser);
 
-    createcfgdir(cfg); /* /home/user/.config/qualcard/ */
+
+    createcfgdir(cfg); /* /home/realuser/.config/qualcard/ */
 
     if(verb>1)
     {
-        printf("database path: %s/\n", cfg->dbpath);
-        printf("config path: %s/\n", cfg->cfgpath);
+        printf("Database path: %s/\n", cfg->dbpath);
+        printf("Config path for writing: %s\n", cfg->cfgrealpath);
+        printf("Config path for reading: %s\n", cfg->cfguserpath);
     }
 
-    readdbfiles(cfg);
+    readdbfiles(cfg); /* update dbfiles[] vector from dbpath and cfgrealpath */
     if(!cfg->dbfsize)
     {
         printf("No databases found.\n");
         exit(EXIT_FAILURE);
     }
 
-    if(SUMMA)
-        return;
+    return;
+}
+
+/* read database from menu, set dbsize, dbasef and configwf */
+void menudb(tcfg *cfg)
+{
+    int i, dbnum;
+    char *dbc;
+
     if(cfg->dbasef[0]=='\0')
     {
         do
@@ -884,22 +931,31 @@ void qualcard_init(tcfg *cfg)
             }
         }while(dbnum<1 || dbnum>cfg->dbfsize);
         dbnum--;
-        strcpy(cfg->dbasef, cfg->dbfiles[dbnum]);
+        strcpy(cfg->dbasef, cfg->dbfiles[dbnum]); /* dbasef set */
     }
-
-    strcpy(dbcore, filenopath(cfg->dbasef));
-    if((dot=strrchr(dbcore, '.'))) /* find the dot */
-        *dot='\0'; /* delete from dot on */
-    sprintf(cfg->configf, "%s/%s-%s%s", cfg->cfgpath, cfg->user, dbcore, EXTCF);
     cfg->QTDCARD=dbsize(cfg);
-
     if(cfg->QTDCARD<10)
     {
         printf("Error in database %s.\nMust have at least 10 questions:answers (lines).\n", cfg->dbasef);
         exit(EXIT_FAILURE);
     }
 
+    dbc=dbcore(cfg->dbasef);
+    sprintf(cfg->configwf, "%s/%s-%s%s", cfg->cfgrealpath, cfg->fileuser, dbc, EXTCF);
+
     return;
+}
+
+/* grab the core name of the file */
+char *dbcore(char *s)
+{
+    static char dbc[PATHSIZE];
+    char *dot;
+
+    strcpy(dbc, filenopath(s));
+    if((dot=strrchr(dbc, '.'))) /* find the dot */
+        *dot='\0'; /* delete from dot on */
+    return dbc;
 }
 
 /* given an average, return how many days */
@@ -978,7 +1034,7 @@ void readcfg(tcfg *c)
     c->cfcard=c->cfdate=NULL;
     c->cfave=NULL;
     c->cfsize=0;
-    if((fp=fopen(c->configf, "r"))!=NULL) /* we've got a file! */
+    if((fp=fopen(c->configwf, "r"))!=NULL) /* we've got a file! */
     {
         for(i=0; 3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave); i++)
         {
@@ -1047,14 +1103,14 @@ void readdbfiles(tcfg *c)
 
     do
     {
-        dp = opendir(dois?c->dbpath:c->cfgpath);
+        dp = opendir(dois?c->dbpath:c->cfgrealpath);
         if(dp != NULL)
         {
             while((ep=readdir(dp))) /* while there is a file, get it */
             {
                 if(!(dot=strrchr(ep->d_name, '.'))) /* grab extension */
                     continue;
-                sprintf(fullname, "%s/%s", (dois?c->dbpath:c->cfgpath), ep->d_name);
+                sprintf(fullname, "%s/%s", (dois?c->dbpath:c->cfgrealpath), ep->d_name);
                 len=strlen(fullname);
                 if(len>(STRSIZE-1))
                 {
@@ -1074,7 +1130,7 @@ void readdbfiles(tcfg *c)
         }
         else
         {
-            fprintf(stderr, "Error: %s\n", (dois?c->dbpath:c->cfgpath));
+            fprintf(stderr, "Error: %s\n", (dois?c->dbpath:c->cfgrealpath));
             perror ("Couldn't open the directory");
         }
         dois--;
