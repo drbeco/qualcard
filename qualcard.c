@@ -135,7 +135,6 @@ typedef struct scfg /* configuration data struct */
     char fileuser[STRSIZE]; /* fileuser-theme-question-answer user name current practicing */
     char realuser[STRSIZE]; /* user name of the account */
     char dbasef[STRSIZE], configwf[STRSIZE]; /* current filenames: database and configuration */
-    char summaryf[STRSIZE]; /* temporary config file */
     int *cfcard, *cfdate; /* card num, last date */
     float *cfave; /* card average */
     int cfsize; /* size of config file */
@@ -166,8 +165,8 @@ void getcard(tcfg c, int cardnum, char *cardfr, char *cardbk); /* given a card n
 void cardfaces(char *card, char *fr, char *bk); /* get card faces front/back */
 void save2memo(tcfg *c, int i, int card, float scor); /* save new or update old card */
 void save2file(tcfg c); /* save updated cards in memory to config file */
-int dbsize(tcfg *c); /* database size */
-void cfanalyses(tcfg *c, int *view, int *learn, float *pct, float *addscore, int *ncardl); /* analyses a history file */
+int dbsize(char *dbname); /* database size */
+void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float *pct, float *addscore, int *ncardl); /* analyses a history file */
 void createcfgdir(tcfg *c); /* creates /home/user/.config/qualcard/ */
 char *filenopath(char *filepath); /* get filename with no path */
 int randnorep(int mode, int *n); /* drawn numbers from a list with no repetition */
@@ -554,15 +553,15 @@ void select10cards(tcfg *c, int tencards[10][2])
 }
 
 /* database size */
-int dbsize(tcfg *c)//, char *dbname)
+int dbsize(char *dbname)
 {
     char line[STRSIZE];
     int qtdl=0;
     FILE *fp;
 
-    if(!(fp=fopen(c->dbasef,"r")))
+    if(!(fp=fopen(dbname,"r")))
     {
-        printf("Fail to open database %s.\n", c->dbasef);
+        printf("Fail to open database %s.\n", dbname);
         exit(EXIT_FAILURE);
     }
 
@@ -577,7 +576,7 @@ int dbsize(tcfg *c)//, char *dbname)
 }
 
 /* history analises */
-void cfanalyses(tcfg *c, int *view, int *learn, float *pct, float *addscore, int *ncardl)
+void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float *pct, float *addscore, int *ncardl)
 {
     int card, date, revd; /* card number, card date last seen, card review date */
     int late; /* days late */
@@ -590,7 +589,7 @@ void cfanalyses(tcfg *c, int *view, int *learn, float *pct, float *addscore, int
     *addscore=0.0; /* just the scores of cards seen */
     *ncardl=0; /* number of cards late that need review */
 
-    if(!(fp=fopen(c->summaryf,"r"))) /* temporary configwf in a loop */
+    if(!(fp=fopen(sumfile,"r"))) /* temporary configwf in a loop */
         return;
 
     while(3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave))
@@ -602,16 +601,16 @@ void cfanalyses(tcfg *c, int *view, int *learn, float *pct, float *addscore, int
 
         revd=newdate(date, ave2day(ave));
         late=0;
-        if(c->today - revd>0) /* late */
+        if(today - revd>0) /* late */
         {
-            late=diffdays(revd, c->today);
+            late=diffdays(revd, today);
             (*ncardl)++;
         }
         *pct += score(ave, late);
     }
     fclose(fp);
 
-    *pct /= ((float)c->QTDCARD);
+    *pct /= ((float)qtd);
     if(*pct>4.93) /* it is not impossible to achieve 100% */
         *pct=5.0;
     *pct *= 20.0; /* 0%..100% */
@@ -684,13 +683,14 @@ int diffdays(int newd, int oldd)
  */
 void summary(tcfg *cfg)
 {
-    int i, view=0, learn=0;
+    int i, view=0, learn=0, qtd=0;
     char *dbc;
     float pview, plearn; /* percentages */
     float ave; /* average 0...5 of cards you've seen in a database */
     float pct; /* percentage of your achievements, decay with time */
     int clate; /* number of cards late */
     int maxlen=14, len;
+    char summaryf[PATHSIZE];
 /*Examples:
 ( 89.9%)            test: total   15, viewed   15 (  1.0%), learned   14 (  0.9%), score   4.5
 (  1.3%)         english: total 1500, viewed   27 (  0.0%), learned    8 (  0.0%), score   0.1
@@ -702,19 +702,16 @@ void summary(tcfg *cfg)
 
     for(i=0; i<cfg->dbfsize; i++) /* database file list */
     {
-        strcpy(cfg->dbasef, cfg->dbfiles[i]);
-        cfg->QTDCARD=dbsize(cfg); /* send char * direct BUG */
-        // strcpy(dbcore, filenopath(cfg->dbasef));
-        // if((dot=strrchr(dbcore, '.'))) /* find the dot */
-        //      *dot='\0'; /* delete from dot on */
+//         strcpy(cfg->dbasef, cfg->dbfiles[i]);
+        qtd=dbsize(cfg->dbfiles[i]); /* send char * direct BUG */
 
         dbc=dbcore(cfg->dbfiles[i]);
-        sprintf(cfg->summaryf, "%s/%s-%s%s", cfg->cfguserpath, cfg->fileuser, dbc, EXTCF);
+        sprintf(summaryf, "%s/%s-%s%s", cfg->cfguserpath, cfg->fileuser, dbc, EXTCF);
 
-        cfanalyses(cfg, &view, &learn, &pct, &ave, &clate);
-        pview=((float)view/(float)cfg->QTDCARD)*100.0;
-        plearn=((float)learn/(float)cfg->QTDCARD)*100.0;
-        printf("(%5.1f%%) %*s: total %4d, viewed %4d (%5.1f%%), learned %4d (%5.1f%%), to review %4d, score %5.1f\n", pct, maxlen, theme(filenopath(cfg->dbfiles[i])), cfg->QTDCARD, view, pview, learn, plearn, clate, ave);
+        cfanalyses(summaryf, cfg->today, qtd, &view, &learn, &pct, &ave, &clate);
+        pview=((float)view/(float)qtd)*100.0;
+        plearn=((float)learn/(float)qtd)*100.0;
+        printf("(%5.1f%%) %*s: total %4d, viewed %4d (%5.1f%%), learned %4d (%5.1f%%), to review %4d, score %5.1f\n", pct, maxlen, theme(filenopath(cfg->dbfiles[i])), qtd, view, pview, learn, plearn, clate, ave);
     }
     return;
 }
@@ -937,7 +934,7 @@ void menudb(tcfg *cfg)
         dbnum--;
         strcpy(cfg->dbasef, cfg->dbfiles[dbnum]); /* dbasef set */
     }
-    cfg->QTDCARD=dbsize(cfg);
+    cfg->QTDCARD=dbsize(cfg->dbasef);
     if(cfg->QTDCARD<10)
     {
         printf("Error in database %s.\nMust have at least 10 questions:answers (lines).\n", cfg->dbasef);
