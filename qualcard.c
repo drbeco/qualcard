@@ -876,8 +876,11 @@ void qualcard_init(tcfg *cfg)
     if(verb>0)
     {
         printf("Hello %s, ", cfg->fileuser);
-        printf("today is %s\n", prettydate(cfg->today));
+        printf("today is %s. ", prettydate(cfg->today));
     }
+    if(verb>1)
+        printf("Welcome back!");
+    printf("\n");
 
     if(readlink("/proc/self/exe", binpath, PATHSIZE) == -1)
     {
