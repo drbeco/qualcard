@@ -13,7 +13,7 @@ Projeto de Aprendizado de temas diversos via repetição espaçada de cartões (
     - Qualquer quantidade de cartões repetidos não atrasados para completar a lista de 10
 * Os cartões apresentados são auto-avaliados pelo estudante com uma nota N de 0 a 5 (sendo 0 para não conhecer/lembrar, e 5 para acerto com facilidade e confiança)
 * Cartões que recebem a nota zero são repetidos ao final, quantas vezes forem necessárias, até que receba nota maior. Os zeros acumulam para cálculo da nota que passa a ser uma média.
-* De posse da nota (N), uma nova média (M1) é calculada com a fórmula: M1 = (M0 + N) / 2, onde M0 é a média anterior. No primeiro ciclo, M0=0, M1 = N/2.
+* De posse da nota (N), uma nova média (M1) é calculada com a fórmula: M1 = (M0 + N) / 2, onde M0 é a média anterior. No primeiro ciclo, M1 = N - 23%.
 * Uma vez apresentados, os cartões são agendados para reapresentação com a seguinte escala:
     - (H) Média == 0.00   -> reapresentar hoje ao final
     - (G) Média <= 0.60   -> reagendar para  1 dia
@@ -23,7 +23,7 @@ Projeto de Aprendizado de temas diversos via repetição espaçada de cartões (
     - (C) Média <= 3.90   -> reagendar para  7 dias
     - (B) Média <= 4.92   -> reagendar para  9 dias
     - (A) Caso contrário  -> reagendar para 11 dias
-* Iniciando um cartão com a nota máxima 5.0, registrada como (0+5)/2=2.5, e recebendo sempre a nota máxima 5.0, sua progressão é: 2.500 (D), 3.750 (C), 4.375 (B), 4.688 (B), 4.844 (B) e 4.922 (A).
+* Iniciando um cartão com a nota máxima 5.0, registrada como 5-23%=3.84, e recebendo sempre a nota máxima 5.0, sua progressão é: 3.84 (C), 4.42 (B), 4.71 (B), 4.85 (B), 4.93 (A).
 * A nota, para efeito da porcentagem final, decai com o tempo:
     - Decaimento com taxa de 1 ponto a cada meia semana (3.5 dias).
     - Isso significa que se um cartão estiver com nota máxima 5.0, seu valor será considerado zero para efeito de cálculo de porcentagem após 25 dias vencido.
@@ -35,6 +35,7 @@ Projeto de Aprendizado de temas diversos via repetição espaçada de cartões (
     - Data de conclusão
     - Carga horária
     - Número de cartões aprendidos
+    - Pontuação obtida (coluna Compl.%)
     - Tema do estudo
     - Número de série de certificação
     - Assinatura do Prof. Dr. Ruben Carlo Benante <rcb@beco.cc>
