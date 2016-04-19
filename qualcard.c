@@ -273,7 +273,12 @@ int main(int argc, char *argv[])
         }
 
     if(verb>=0)
-        printf("QualCard v.%s - Spaced Repetition\n", VERSION);
+    {
+        printf("QualCard v.%s - Spaced Repetition", VERSION);
+        if(verb>0)
+            printf(", by Dr. Beco");
+        printf("\n");
+    }
 
     if(verb>1)
         printf("Verbose level set at: %d\n", verb);
