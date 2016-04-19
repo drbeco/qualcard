@@ -404,7 +404,7 @@ void save2file(tcfg c)
     if((fp=fopen(c.configwf, "w"))!=NULL) /* create from scratch */
     {
         for(i=0; i<c.cfsize; i++)
-            fprintf(fp, "%5d %d %f\n", c.cfcard[i], c.cfdate[i], c.cfave[i]);
+            fprintf(fp, "%5d %8d %6.4f\n", c.cfcard[i], c.cfdate[i], c.cfave[i]);
 
         fclose(fp);
     }
@@ -575,6 +575,7 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
     int late; /* days late */
     float ave; /* average of a single card written in disk */
     FILE *fp;
+    int alla=1; /* all cards are A */
 
     *view=0; /* number of cards viewed from the total */
     *learn=0; /* number of cards with score greater than SCOREA */
@@ -591,6 +592,8 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
         *addscore += ave;
         if(ave >= SCOREB)
             (*learn)++;
+        if(ave < SCOREA)
+            alla=0; /* not all cards are A */
 
         revd=newdate(date, ave2day(ave));
         late=0;
@@ -604,7 +607,7 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
     fclose(fp);
 
     *pct /= ((float)qtd);
-    if(*pct>SCOREA) /* it is not impossible to achieve 100% */
+    if(*pct>SCOREA && alla) /* it is not impossible to achieve 100% */
         *pct=5.0;
     *pct *= 20.0; /* 0%..100% */
 
@@ -613,7 +616,7 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
     else
         *addscore /= ((float)*view); /* average of scores you've got so far */
 
-    if(*addscore>SCOREA) /* it is not impossible to achieve 5.0 */
+    if(*addscore>SCOREA && alla) /* it is not impossible to achieve 5.0 */
         *addscore=5.0;
 
     return;
