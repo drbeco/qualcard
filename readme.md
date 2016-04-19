@@ -13,13 +13,22 @@ Projeto de Aprendizado de temas diversos via repetição espaçada de cartões (
 * Se não houver cartões que precisam de repetição por reforço, todos os 10 cartões serão novos
 * Os cartões apresentados são auto-avaliados pelo estudante com uma nota N de 0 a 5 (sendo 0 para não conhecer/lembrar, e 5 para acerto com facilidade e confiança)
 * Cartões que recebem a nota zero são repetidos ao final, quantas vezes forem necessárias, até que receba nota maior.
-* De posse da nota (N), uma nova média (M1) é calculada com a fórmula: M1 = (M0 + N) / 2, onde M0 é a média anterior. No primeiro ciclo, M1 = M0 = N.
+* De posse da nota (N), uma nova média (M1) é calculada com a fórmula: M1 = (M0 + N) / 2, onde M0 é a média anterior. No primeiro ciclo, M0=0, M1 = N/2.
 * Uma vez apresentados, os cartões são agendados para reapresentação com a seguinte escala:
-    - (D) Média < 2.25   -> reagendar para o dia seguinte
-    - (C) Média < 3.25   -> reagendar para 3 dias
-    - (B) Média < 4.25   -> reagendar para 5 dias
-    - (A) Caso contrário -> reagendar para 7 dias
-* Quando todos os cartões estiverem com média (A) o programa parabeniza o estudante e imprime um certificado com:
+    - (H) Média == 0.00   -> reapresentar hoje ao final
+    - (G) Média <= 0.25   -> reagendar para  1 dia
+    - (F) Média <= 1.25   -> reagendar para  2 dias
+    - (E) Média <= 2.25   -> reagendar para  3 dias
+    - (D) Média <= 3.25   -> reagendar para  5 dias
+    - (C) Média <= 4.25   -> reagendar para  7 dias
+    - (B) Média <= 4.93   -> reagendar para  9 dias
+    - (A) Caso contrário  -> reagendar para 11 dias
+* A nota, para efeito da porcentagem final, decai com o tempo:
+    - Decaimento com taxa de 1 ponto a cada meia semana (3.5 dias).
+    - Isso significa que se um cartão estiver com nota máxima 5.0, seu valor será considerado zero para efeito de cálculo de porcentagem após 25 dias vencido.
+    - No mesmo exemplo, a nota máxima 5.0 será avaliada em 4.0 (perda de 1 ponto) em aproximadamente 10.5 dias.
+    - Quando na reapresentação do cartão atrasado, para cálculo de M1, a nota M0 continua tendo o valor 5.0.
+* Quando todos os cartões estiverem com média (A) ou (B), i.é, Nota>=4.25, e dentro do prazo de revisão, o programa parabeniza o estudante e imprime um certificado com:
     - Nome completo e usuário
     - Data de início
     - Data de conclusão
@@ -83,5 +92,4 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 

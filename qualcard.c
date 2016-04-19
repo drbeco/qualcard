@@ -85,9 +85,13 @@
 /* #define BUILD (20160409.000957) / * * < Build Version Number */
 #define EXTDB ".ex4" /**< Database extension: theme-question-answer.ex4 (example: english-word-definition.ex4) */
 #define EXTCF ".cf4" /**< Configuration file extension: user-qualcard.cf4 */
-#define SCOREA 4.25
-#define SCOREB 3.25
-#define SCOREC 2.25
+#define SCOREA 4.93
+#define SCOREB 4.25
+#define SCOREC 3.25
+#define SCORED 2.25
+#define SCOREE 1.25
+#define SCOREF 0.25
+#define SCOREG 0.00
 #define TMEM 0 /**< tencards memory index */
 #define TFIL 1 /**< tencards file index (card number) */
 
@@ -586,7 +590,7 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
     {
         (*view)++;
         *addscore += ave;
-        if(ave >= SCOREA)
+        if(ave >= SCOREB)
             (*learn)++;
 
         revd=newdate(date, ave2day(ave));
@@ -597,11 +601,12 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
             (*ncardl)++;
         }
         *pct += score(ave, late); /* late is positive or zero */
+        /*printf("score(%.3f, %d)=%.3f, revd=%d\n", ave, late, score(ave, late), revd);*/
     }
     fclose(fp);
 
     *pct /= ((float)qtd);
-    if(*pct>4.93) /* it is not impossible to achieve 100% */
+    if(*pct>SCOREA) /* it is not impossible to achieve 100% */
         *pct=5.0;
     *pct *= 20.0; /* 0%..100% */
 
@@ -610,7 +615,7 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
     else
         *addscore /= ((float)*view); /* average of scores you've got so far */
 
-    if(*addscore>4.93) /* it is not impossible to achieve 5.0 */
+    if(*addscore>SCOREA) /* it is not impossible to achieve 5.0 */
         *addscore=5.0;
 
     return;
@@ -619,6 +624,8 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
 /* return the new score when the revision is late */
 float score(float ave, int late)
 {
+    if(late==1 && ave>SCOREA) /* don't let one day spoil the fun */
+        return SCOREA+0.01;
     ave -= ((float)late/3.5);
     if(ave<0.0)
         ave=0.0;
@@ -964,13 +971,19 @@ char *dbcore(char *s)
 /* given an average, return how many days */
 int ave2day(float ave)
 {
-    if(ave<SCOREC)
-        return 1; /* D: review tomorrow */
-    if(ave<SCOREB)
-        return 3; /* C: review in three days */
-    if(ave<SCOREA)
-        return 5; /* B: review in five days */
-    return 7; /* A: review in a week */
+    if(ave<=SCOREF)
+        return 1; /* G: review tomorrow */
+    if(ave<=SCOREE)
+        return 2; /* F: review in 2 days */
+    if(ave<=SCORED)
+        return 3; /* E: review in 3 days */
+    if(ave<=SCOREC)
+        return 5; /* D: review in 5 days */
+    if(ave<=SCOREB)
+        return 7; /* C: review in 7 days */
+    if(ave<=SCOREA)
+        return 9; /* B: review in 9 days */
+    return 11; /* A: review in 11 days */
 }
 
 /* add days to a date */
