@@ -386,7 +386,7 @@ void save2memo(tcfg *c, int i, int card, float scor)
         c->cfave=(float *)reallocordie(c->cfave, sizeof(float)*c->cfsize);
         c->cfcard[c->cfsize-1]=card;
         c->cfdate[c->cfsize-1]=c->today;
-        c->cfave[c->cfsize-1]=scor/2.0; /* first score M1 = (0+S)/2.0*/
+        c->cfave[c->cfsize-1]=scor/2.0; /* first score M1 = (0+S)/2.0 */
         return;
     }
 
@@ -601,7 +601,6 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
             (*ncardl)++;
         }
         *pct += score(ave, late); /* late is positive or zero */
-        /*printf("score(%.3f, %d)=%.3f, revd=%d\n", ave, late, score(ave, late), revd);*/
     }
     fclose(fp);
 
@@ -918,7 +917,6 @@ void menudb(tcfg *cfg)
     int i, dbnum;
     char *dbc;
 
-
     summary(*cfg);
 
     if(cfg->dbasef[0]=='\0')
@@ -926,10 +924,11 @@ void menudb(tcfg *cfg)
         do
         {
             if(verb>1)
+            {
                 printf("Databases found:\n");
-            for(i=0; i<cfg->dbfsize; i++)
-                if(verb>1)
+                for(i=0; i<cfg->dbfsize; i++)
                     printf("(%d) %s\n", i+1, cfg->dbfiles[i]);
+            }
 
             dbnum=1; /* default */
             if(cfg->dbfsize>1)
