@@ -1,5 +1,5 @@
 /***************************************************************************
- *   qualcard.c                                                Version 1.4 *
+ *   qualcard.c                                                Version 1.5 *
  *                                                                         *
  *   Learn cards by Spaced Repetition Method.                              *
  *   This program helps you learn from a set of cards with questions       *
@@ -681,10 +681,7 @@ void summary(tcfg c)
     int clate; /* number of cards late */
     int maxlen=14, len;
     char summaryf[PATHSIZE];
-/*Examples:
-( 89.9%)            test: total   15, viewed   15 (  1.0%), learned   14 (  0.9%), score   4.5
-(  1.3%)         english: total 1500, viewed   27 (  0.0%), learned    8 (  0.0%), score   0.1
-*/
+
     for(i=0; i<c.dbfsize; i++) /* database file list */
         if((len=strlen(theme(filenopath(c.dbfiles[i]))))>maxlen)
             maxlen=len;
@@ -708,8 +705,6 @@ void summary(tcfg c)
         if(!SUMMA)
             printf("| %2d ", i+1);
         printf("| %-*s | %5.1f%% | %4d | %4d (%5.1f%%) | %4d (%5.1f%%) | %6d | %5.1f |\n", maxlen, theme(filenopath(c.dbfiles[i])), pct, qtd, view, pview, learn, plearn, clate, ave);
-
-//             printf("(%5.1f%%) %*s: total %4d, viewed %4d (%5.1f%%), learned %4d (%5.1f%%), to review %4d, score %5.1f\n", pct, maxlen, theme(filenopath(c.dbfiles[i])), qtd, view, pview, learn, plearn, clate, ave);
     }
     return;
 }
@@ -813,7 +808,6 @@ void createcfgdir(tcfg *c)
             }
     }
 
-//     sprintf(c->cfgpath, "%s/%s", path1, "qualcard");
     if(0 != access(c->cfgrealpath, F_OK))
     {
         if(ENOENT == errno) /* does not exist */
@@ -929,8 +923,6 @@ void menudb(tcfg *cfg)
             for(i=0; i<cfg->dbfsize; i++)
                 if(verb>1)
                     printf("(%d) %s\n", i+1, cfg->dbfiles[i]);
-//                 else
-//                     printf("(%d) %s\n", i+1, filenopath(cfg->dbfiles[i]));
 
             dbnum=1; /* default */
             if(cfg->dbfsize>1)
