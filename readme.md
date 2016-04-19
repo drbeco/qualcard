@@ -6,13 +6,13 @@ Projeto de Aprendizado de temas diversos via repetição espaçada de cartões (
 
 ## Regras Implementadas ##
 
-* A cada execução são apresentadas 10 cartões
-* Pelo menos um desses 10 cartões deve ser novo
-* Se não houverem cartões novos, todos os 10 cartões serão reforçados por repetição
-* No máximo nove cartões que precisam de reforço por repetição são apresentados
-* Se não houver cartões que precisam de repetição por reforço, todos os 10 cartões serão novos
+* A cada execução são apresentados 10 cartões
+* Prioridades nos 10 cartões:
+    - 9 cartões para reforço por repetição se houver atrasados
+    - 1 ou mais cartões novos, se houverem, até completar 10 cartões
+    - Qualquer quantidade de cartões repetidos não atrasados para completar a lista de 10
 * Os cartões apresentados são auto-avaliados pelo estudante com uma nota N de 0 a 5 (sendo 0 para não conhecer/lembrar, e 5 para acerto com facilidade e confiança)
-* Cartões que recebem a nota zero são repetidos ao final, quantas vezes forem necessárias, até que receba nota maior.
+* Cartões que recebem a nota zero são repetidos ao final, quantas vezes forem necessárias, até que receba nota maior. Os zeros acumulam para cálculo da nota que passa a ser uma média.
 * De posse da nota (N), uma nova média (M1) é calculada com a fórmula: M1 = (M0 + N) / 2, onde M0 é a média anterior. No primeiro ciclo, M0=0, M1 = N/2.
 * Uma vez apresentados, os cartões são agendados para reapresentação com a seguinte escala:
     - (H) Média == 0.00   -> reapresentar hoje ao final
@@ -29,7 +29,7 @@ Projeto de Aprendizado de temas diversos via repetição espaçada de cartões (
     - Isso significa que se um cartão estiver com nota máxima 5.0, seu valor será considerado zero para efeito de cálculo de porcentagem após 25 dias vencido.
     - No mesmo exemplo, a nota máxima 5.0 será avaliada em 4.0 (perda de 1 ponto) em aproximadamente 10.5 dias.
     - Quando na reapresentação do cartão atrasado, para cálculo de M1, a nota M0 continua tendo o valor 5.0.
-* Quando todos os cartões estiverem com média (A) ou (B), i.é, Nota>=4.25, e dentro do prazo de revisão, o programa parabeniza o estudante e imprime um certificado com:
+* Quando todos os cartões estiverem com média (A) ou (B), i.é, Nota>3.90, e dentro do prazo de revisão, o programa parabeniza o estudante e imprime um certificado com:
     - Nome completo e usuário
     - Data de início
     - Data de conclusão
