@@ -404,7 +404,7 @@ void save2file(tcfg c)
     if((fp=fopen(c.configwf, "w"))!=NULL) /* create from scratch */
     {
         for(i=0; i<c.cfsize; i++)
-            fprintf(fp, "%d %d %f\n", c.cfcard[i], c.cfdate[i], c.cfave[i]);
+            fprintf(fp, "%5d %d %f\n", c.cfcard[i], c.cfdate[i], c.cfave[i]);
 
         fclose(fp);
     }
