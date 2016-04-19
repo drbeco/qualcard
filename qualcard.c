@@ -593,10 +593,10 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
         late=0;
         if(today - revd>0) /* late */
         {
-            late=diffdays(revd, today);
+            late=diffdays(today, revd);
             (*ncardl)++;
         }
-        *pct += score(ave, late);
+        *pct += score(ave, late); /* late is positive or zero */
     }
     fclose(fp);
 
@@ -619,7 +619,7 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
 /* return the new score when the revision is late */
 float score(float ave, int late)
 {
-    ave -= ((float)late/3.0);
+    ave -= ((float)late/3.5);
     if(ave<0.0)
         ave=0.0;
     return ave;
