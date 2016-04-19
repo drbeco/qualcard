@@ -16,13 +16,14 @@ Projeto de Aprendizado de temas diversos via repetição espaçada de cartões (
 * De posse da nota (N), uma nova média (M1) é calculada com a fórmula: M1 = (M0 + N) / 2, onde M0 é a média anterior. No primeiro ciclo, M0=0, M1 = N/2.
 * Uma vez apresentados, os cartões são agendados para reapresentação com a seguinte escala:
     - (H) Média == 0.00   -> reapresentar hoje ao final
-    - (G) Média <= 0.25   -> reagendar para  1 dia
-    - (F) Média <= 1.25   -> reagendar para  2 dias
-    - (E) Média <= 2.25   -> reagendar para  3 dias
-    - (D) Média <= 3.25   -> reagendar para  5 dias
-    - (C) Média <= 4.25   -> reagendar para  7 dias
-    - (B) Média <= 4.93   -> reagendar para  9 dias
+    - (G) Média <= 0.60   -> reagendar para  1 dia
+    - (F) Média <= 1.35   -> reagendar para  2 dias
+    - (E) Média <= 2.20   -> reagendar para  3 dias
+    - (D) Média <= 3.05   -> reagendar para  5 dias
+    - (C) Média <= 3.90   -> reagendar para  7 dias
+    - (B) Média <= 4.92   -> reagendar para  9 dias
     - (A) Caso contrário  -> reagendar para 11 dias
+* Iniciando um cartão com a nota máxima 5.0, registrada como (0+5)/2=2.5, e recebendo sempre a nota máxima 5.0, sua progressão é: 2.500 (D), 3.750 (C), 4.375 (B), 4.688 (B), 4.844 (B) e 4.922 (A).
 * A nota, para efeito da porcentagem final, decai com o tempo:
     - Decaimento com taxa de 1 ponto a cada meia semana (3.5 dias).
     - Isso significa que se um cartão estiver com nota máxima 5.0, seu valor será considerado zero para efeito de cálculo de porcentagem após 25 dias vencido.
