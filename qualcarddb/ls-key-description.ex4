@@ -49,8 +49,8 @@ ls --time=WORD :: with -l, show time as WORD instead of default modification tim
 ls --time-style=STYLE :: with -l, show times using style STYLE. 'full-iso', 'long-iso', 'iso', 'locale', or '+FORMAT'; FORMAT is interpreted like in 'date'; if FORMAT is FORMAT1<newline>FORMAT2, then FORMAT1 applies to non-recent files and FORMAT2 to recent files; if STYLE is prefixed  with 'posix-', STYLE takes effect only outside the POSIX locale
 ls -t :: sort by modification time, newest first
 ls -T :: (--tabsize=COLS) assume tab stops at each COLS instead of 8
-ls -u :: with -lt sort by, and show, access time; with -l show access time and sort by name; otherwise sort by access time
-ls -U :: do not sort; list entries in directory order
+ls -u :: with -lt sort by, and show, access time; with -l show access time and sort by name; otherwise just sort by access time
+ls -U :: do not sort; list entries in directory order (--sort=none)
 ls -v :: natural sort of (version) numbers within text
 ls -w :: (--width=COLS) assume screen width instead of current value
 ls -x :: list entries by lines instead of by columns

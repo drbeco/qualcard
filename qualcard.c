@@ -173,7 +173,6 @@ int randnorep(int mode, int *n); /* drawn numbers from a list with no repetition
 void changebarnet(char *s); /* change \n and \t to the real thing */
 int diffdays(int newd, int oldd); /* Difference of two dates in days. Positive if new>old, 0 if equals, negative c.c. */
 float score(float ave, int late); /* return the new score when the revision is late */
-
 void menudb(tcfg *c); /* read menu */
 char *dbcore(char *s); /* grab the core name of the file */
 
@@ -273,18 +272,18 @@ int main(int argc, char *argv[])
                 return EXIT_FAILURE;
         }
 
+    if(verb>=0)
+        printf("QualCard v.%s - Spaced Repetition\n", VERSION);
+
     if(verb>1)
         printf("Verbose level set at: %d\n", verb);
+
     if(c.pathuser[0]!='\0' && SUMMA!=1)
     {
-        printf("Option '-p user' only valid with -s. See the help (-h).\n");
-        exit(EXIT_FAILURE);
+        if(verb>1)
+            printf("Option -p must be used with -s. Setting -s forcefully. Use -h for help.\n");
+        SUMMA=1;
     }
-//     if(c.userro[0]!='\0' && c.user[0]!='\0')
-//     {
-//         printf("You can't set both '-U user' and '-u user' options. See the help (-h).\n");
-//         exit(EXIT_FAILURE);
-//     }
 
     qualcard_init(&c); /* initialization function */
 
@@ -294,12 +293,9 @@ int main(int argc, char *argv[])
         exit(EXIT_SUCCESS);
     }
 
-//     sprintf(c.cfgrealpath, "/home/%s/.config/qualcard", c.realuser);
-//     sprintf(c.cfguserpath, "/home/%s/.config/qualcard", c.pathuser);
-
     menudb(&c);
 
-    if(verb>0)
+    if(verb>2)
     {
         printf("\nDataBase file: %s (%d cards)\n", filenopath(c.dbasef), c.QTDCARD);
         printf("History  file: %s\n", filenopath(c.configwf));
@@ -396,17 +392,7 @@ void save2file(tcfg c)
 {
     int i;
     FILE *fp;
-    /* char *savef;*/
 
-    /* BUG do not attempt to save when user != realuser */
-
-//     if(strcmp(c.user, c.realuser))
-//         savef=change2realuser(c);
-
-    if(verb>1)
-        fprintf(stderr, "trying to save2file() %s.\n", c.configwf);
-
-    // if((fp=fopen(savef, "w"))!=NULL) /* create from scratch */
     if((fp=fopen(c.configwf, "w"))!=NULL) /* create from scratch */
     {
         for(i=0; i<c.cfsize; i++)
@@ -414,8 +400,7 @@ void save2file(tcfg c)
 
         fclose(fp);
     }
-    else
-        /* /home/carol/.config/qualcard/carol-ls-key-description.cf4 */
+    else  /* /home/carol/.config/qualcard/carol-ls-key-description.cf4 */
         fprintf(stderr, "save2file(): can't open config file %s for writing.\n", c.configwf);
     return;
 }
@@ -702,8 +687,7 @@ void summary(tcfg *cfg)
 
     for(i=0; i<cfg->dbfsize; i++) /* database file list */
     {
-//         strcpy(cfg->dbasef, cfg->dbfiles[i]);
-        qtd=dbsize(cfg->dbfiles[i]); /* send char * direct BUG */
+        qtd=dbsize(cfg->dbfiles[i]);
 
         dbc=dbcore(cfg->dbfiles[i]);
         sprintf(summaryf, "%s/%s-%s%s", cfg->cfguserpath, cfg->fileuser, dbc, EXTCF);
@@ -711,7 +695,7 @@ void summary(tcfg *cfg)
         cfanalyses(summaryf, cfg->today, qtd, &view, &learn, &pct, &ave, &clate);
         pview=((float)view/(float)qtd)*100.0;
         plearn=((float)learn/(float)qtd)*100.0;
-        printf("(%5.1f%%) %*s: total %4d, viewed %4d (%5.1f%%), learned %4d (%5.1f%%), to review %4d, score %5.1f\n", pct, maxlen, theme(filenopath(cfg->dbfiles[i])), qtd, view, pview, learn, plearn, clate, ave);
+        printf("(%6.1f%%) %*s: total %4d, viewed %4d (%6.1f%%), learned %4d (%6.1f%%), to review %4d, score %5.1f\n", pct, maxlen, theme(filenopath(cfg->dbfiles[i])), qtd, view, pview, learn, plearn, clate, ave);
     }
     return;
 }
@@ -865,20 +849,24 @@ void qualcard_init(tcfg *cfg)
     srand((unsigned)time(&lt)); /* new unknow seed */
 
     strcpy(cfg->realuser, getenv("USER"));
-    if(cfg->fileuser[0]=='\0')
-        strcpy(cfg->fileuser, cfg->realuser);
     if(cfg->pathuser[0]=='\0')
         strcpy(cfg->pathuser, cfg->realuser);
 
-    printf("QualCard v.%s - Spaced Repetition\n", VERSION);
+    if(cfg->fileuser[0]=='\0')
+    {
+        if(strcmp(cfg->realuser, cfg->pathuser) && verb>1)
+            printf("Assuming -u %s. See -h for help.\n", cfg->pathuser);
+        strcpy(cfg->fileuser, cfg->pathuser);
+    }
+
     if(verb>0)
     {
         printf("Hello %s, ", cfg->fileuser);
         printf("today is %s. ", prettydate(cfg->today));
+        if(verb>1)
+            printf("Welcome back!");
+        printf("\n");
     }
-    if(verb>1)
-        printf("Welcome back!");
-    printf("\n");
 
     if(readlink("/proc/self/exe", binpath, PATHSIZE) == -1)
     {
@@ -890,10 +878,9 @@ void qualcard_init(tcfg *cfg)
     sprintf(cfg->cfgrealpath, "/home/%s/.config/qualcard", cfg->realuser);
     sprintf(cfg->cfguserpath, "/home/%s/.config/qualcard", cfg->pathuser);
 
-
     createcfgdir(cfg); /* /home/realuser/.config/qualcard/ */
 
-    if(verb>1)
+    if(verb>2)
     {
         printf("Database path: %s/\n", cfg->dbpath);
         printf("Config path for writing: %s\n", cfg->cfgrealpath);
@@ -922,7 +909,10 @@ void menudb(tcfg *cfg)
         {
             printf("Databases found:\n");
             for(i=0; i<cfg->dbfsize; i++)
-                printf("(%d) %s\n", i+1, filenopath(cfg->dbfiles[i]));
+                if(verb>1)
+                    printf("(%d) %s\n", i+1, cfg->dbfiles[i]);
+                else
+                    printf("(%d) %s\n", i+1, filenopath(cfg->dbfiles[i]));
 
             dbnum=1; /* default */
             if(cfg->dbfsize>1)
@@ -943,6 +933,8 @@ void menudb(tcfg *cfg)
 
     dbc=dbcore(cfg->dbasef);
     sprintf(cfg->configwf, "%s/%s-%s%s", cfg->cfgrealpath, cfg->fileuser, dbc, EXTCF);
+    if(verb>2)
+        printf("Configuration file: %s\n", cfg->configwf);
 
     return;
 }
@@ -1050,7 +1042,8 @@ void readcfg(tcfg *c)
         fclose(fp);
     }
     else
-        printf("No previous history. Starting new study.\n");
+        if(verb>=0)
+            printf("No previous history. Starting new study.\n");
     return;
 }
 
@@ -1296,7 +1289,7 @@ void help(void)
     printf("\t-v,  --verbose\n\t\tSet verbose level (cumulative).\n");
     printf("\t-q,  --quiet\n\t\tReduces verbose level (also cumulative).\n");
     printf("\t-s,  --status\n\t\tShow how many cards needs review in each database.\n");
-    printf("\t-u username,  --user username\n\t\tUse the username's profile.\n");
+    printf("\t-u username,  --user username\n\t\tUse the username's profile. If not given, defaults to the -p username or the username from the system.\n");
     printf("\t-p username,  --path username\n\t\tSet the username used for the config path (it is mandatory to use together with -s).\n");
     printf("\t-d file.ex4,  --database file.ex4\n\t\tUse the given database to practice.\n\t\tThe file must have a '.ex4' extension and starts with '/' (absolute path)\n\t\tand its name is in the form 'theme-question-answer.ex4', where:\n\t\t\t* theme: the theme of the study.\n\t\t\t* question: the first side of the card.\n\t\t\t* answer: the back side of the card.\n");
     printf("\t-i,  --invert\n\t\tInvert presentation order (show first the back, then the front of the card).\n");

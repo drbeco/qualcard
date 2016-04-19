@@ -1,12 +1,12 @@
-~ :: (atalho) Equivale a /home/seuusuario/
-. :: (atalho) Equivale ao nome da pasta atual.
-.. :: (atalho) Equivale ao nome da pasta anterior (acima, ou pai).
 coringa (*):: Substitui uma sequência de letras quaisquer. Por exemplo, para mostrar apenas os arquivos fontes '.c', na pasta atual, utiliza-se '$ls *.c'. Para copiar todos arquivos texto da pasta atual para a anterior utiliza-se '$cp *.txt ..'
 coringa (?) ::  (atalho) Coringa. Um único caracter qualquer.
 seta para cima :: Recupera na ordem todas as linhas digitadas no histórico.
 seta para baixo :: Volta as linhas digitadas no histórico.
-$ :: Usado para indicar o prompt onde se digitam comandos linux. Em expressões regulares, indica o fim da linha.
 argumentos:: Sequencia de palavras/valores separados por espaços em branco.
+$ :: Usado para indicar o prompt onde se digitam comandos linux. Em expressões regulares, indica o fim da linha.
+~ :: (atalho) Equivale a /home/seuusuario/
+. :: (atalho) Equivale ao nome da pasta atual.
+.. :: (atalho) Equivale ao nome da pasta anterior (acima, ou pai).
 comando:: Um programa do linux (ou de criação própria) que é dado no prompt e pode ou não precisar de argumentos.
 chaves (-):: Sequência de hifens e letras (exemplo, '-h -n') que definem o comportamento do comando. Normalmente a chave '-h' é para help.
 chaves longas (--):: Sequência de 2 hífens e a palavra reservada da chave. Exemplo '--help'.
@@ -32,12 +32,12 @@ ls -l:: Lista os arquivos da pasta atual em formato completo. Mostra as permiç�
 ls -la:: Faz listas longas e mostra arquivos ocultos (arquivos com nome iniciado por '.'). Sugestão para alias '$la'
 ls -v:: Lista arquivos em ordem numérica.
 ls -t:: Lista arquivos por ordem de data da modificação.
-ls -s:: Lista arquivos por ordem de tamanho do arquivo.
+ls -S:: Lista arquivos por ordem de tamanho do arquivo.
 cp origem destino :: Copia um arquivo origem colocando uma duplicata em destino. Origem é um arquivo dado com caminho relativo ou absoluto. Se origem contiver coringas, os vários arquivos que casarem serão copiados. Destino é a pasta final, que pode ser relativa ou absoluta. Se destino for um arquivo, a cópia é feita do arquivo original renomeando-o para o nome destino. Caso o destino já exista, será sobrescrito.\nExemplo com caminho absoluto:\n$cp /home/seuusuario/informatica/rascunhos/ex1.c /home/seuusuario/informatica/trabalhos\nExemplo com caminho relativo:\n~/informatica/rascunhos$cp ex1.c ../trabalhos
 :~/logica$cp ../informatica/rascunhos/* ~/backup:: Copia todos (*) os arquivos da pasta /home/seuusuario/informatica/rascunhos/ para a pasta /home/seuusuario/backup/
 rascunhos$cp ex* ../trabalhos:: Copia todos os arquivos com nomes iniciados por "ex" (ex*) da pasta atual (/home/seuusuario/informatica/rascunhos) para a pasta /home/seuusuario/informatica/trabalhos (veja atalho .. para pasta anterior)
 rascunhos$cp *.bf brainforce :: Copia todos arquivos com final '.bf' para a pasta relativa a atual rascunhos/brainforce
-$scp origem destino :: Comando para cópia remota. Sua sintaxe é igual à do comando cp, com a adição de usuário@servidor para o lado remoto, antes da pasta. Exemplo 1, '$scp carlo@hydra:~/info/* .' copia da origem remota, usuário carlo, servidor hydra, pasta '/home/carlo/hydra/info', todos arquivos (*) para a pasta local atual. Exemplo 2, '$scp *.bf carlo@hydra:~/info/bf' copia da origem local, todos arquivos na pasta atual com final '.bf' para o destino remoto, usuário carlo, servidor hydra, pasta '/home/carlo/hydra/info/bf/'
+scp origem destino :: Comando para cópia remota. Sua sintaxe é igual à do comando cp, com a adição de usuário@servidor para o lado remoto, antes da pasta. Exemplo 1, '$scp carlo@hydra:~/info/* .' copia da origem remota, usuário carlo, servidor hydra, pasta '/home/carlo/hydra/info', todos arquivos (*) para a pasta local atual. Exemplo 2, '$scp *.bf carlo@hydra:~/info/bf' copia da origem local, todos arquivos na pasta atual com final '.bf' para o destino remoto, usuário carlo, servidor hydra, pasta '/home/carlo/hydra/info/bf/'
 Como copiar o arquivo ex1.c do meu desktop (windows) para o servidor hydra na pasta informatica/rascunhos?:: 'C:meusdoc>scp.exe ex1.c seuusuario@beco.poli.br:~/informatica/rascunhos'
 Como copiar o arquivo ex1.c do servidor hydra na pasta informatica/rascunhos para meu desktop (windows) pasta meusdocumentos?:: 'C:meusdoc>scp.exe seuusuario@beco.poli.br:~/informatica/rascunhos/ex1.c .'
 mkdir pasta:: Cria uma pasta dentro da pasta atual.
@@ -129,9 +129,9 @@ vipw::Para editar com segurança o arquivo de senhas /etc/passwd
 vigr::Para editar com segurança o arquivo de grupos /etc/group
 addgroup::Adiciona um grupo ao sistema. É uma interface amigável para o comando de baixo nível groupadd.
 adduser::Adiciona um novo usuário ao sistema. É uma interface amigável para o comando de baixo nível useradd.
+vi::Editor de textos baseado no modo visual do ex. (Atalho para Vim, VI Improved).
 groupadd::Adiciona um grupo ao sistema. Este comando de baixo nível. Prefira a interface amigável addgroup.
 useradd::Adiciona um novo usuário ao sistema. Este comando de baixo nível. Prefira a interface amigável adduser.
-vi::Editor de textos baseado no modo visual do ex. (Atalho para Vim, VI Improved).
 visudo::Para editar com segurança o arquivo dos sudoers.
 su::Muda para outro usuário ou para o superusuário.
 sudo::Executa um comando com privilégios de superusuário.
