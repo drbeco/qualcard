@@ -85,13 +85,12 @@
 /* #define BUILD (20160409.000957) / * * < Build Version Number */
 #define EXTDB ".ex4" /**< Database extension: theme-question-answer.ex4 (example: english-word-definition.ex4) */
 #define EXTCF ".cf4" /**< Configuration file extension: user-qualcard.cf4 */
-#define SCOREA 4.93
-#define SCOREB 4.25
-#define SCOREC 3.25
-#define SCORED 2.25
-#define SCOREE 1.25
-#define SCOREF 0.25
-#define SCOREG 0.00
+#define SCOREA 4.92
+#define SCOREB 3.90
+#define SCOREC 3.05
+#define SCORED 2.20
+#define SCOREE 1.35
+#define SCOREF 0.60
 #define TMEM 0 /**< tencards memory index */
 #define TFIL 1 /**< tencards file index (card number) */
 
@@ -970,18 +969,18 @@ char *dbcore(char *s)
 /* given an average, return how many days */
 int ave2day(float ave)
 {
-    if(ave<=SCOREF)
-        return 1; /* G: review tomorrow */
-    if(ave<=SCOREE)
-        return 2; /* F: review in 2 days */
-    if(ave<=SCORED)
-        return 3; /* E: review in 3 days */
-    if(ave<=SCOREC)
-        return 5; /* D: review in 5 days */
-    if(ave<=SCOREB)
-        return 7; /* C: review in 7 days */
-    if(ave<=SCOREA)
-        return 9; /* B: review in 9 days */
+    if(ave<=SCOREF) /* G: review tomorrow */
+        return 1;
+    if(ave<=SCOREE) /* F: review in 2 days */
+        return 2;
+    if(ave<=SCORED) /* E: review in 3 days */
+        return 3;
+    if(ave<=SCOREC) /* D: review in 5 days */
+        return 5;
+    if(ave<=SCOREB) /* C: review in 7 days */
+        return 7;
+    if(ave<=SCOREA) /* B: review in 9 days */
+        return 9;
     return 11; /* A: review in 11 days */
 }
 
