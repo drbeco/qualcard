@@ -386,7 +386,7 @@ void save2memo(tcfg *c, int i, int card, float scor)
         c->cfave=(float *)reallocordie(c->cfave, sizeof(float)*c->cfsize);
         c->cfcard[c->cfsize-1]=card;
         c->cfdate[c->cfsize-1]=c->today;
-        c->cfave[c->cfsize-1]=scor; /* first score */
+        c->cfave[c->cfsize-1]=scor/2.0; /* first score M1 = (0+S)/2.0*/
         return;
     }
 
