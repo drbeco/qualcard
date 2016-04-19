@@ -149,7 +149,7 @@ typedef struct scfg /* configuration data struct */
 void help(void); /* print some help */
 void copyr(void); /* print version and copyright information */
 void qualcard_init(tcfg *cfg); /* global initialization function */
-void summary(tcfg *c); /* how many cards to review */
+void summary(tcfg c); /* how many cards to review */
 double randmm(double min, double max); /* drawn a number from [min, max[ */
 int ave2day(float ave); /* given an average, return how many days */
 int newdate(int oldd, int days); /* add days to a date */
@@ -294,7 +294,7 @@ int main(int argc, char *argv[])
 
     if(SUMMA)
     {
-        summary(&c); /* how many cards to review */
+        summary(c); /* how many cards to review */
         exit(EXIT_SUCCESS);
     }
 
@@ -671,7 +671,7 @@ int diffdays(int newd, int oldd)
  * @todo This function is not ready
  *
  */
-void summary(tcfg *cfg)
+void summary(tcfg c)
 {
     int i, view=0, learn=0, qtd=0;
     char *dbc;
@@ -685,22 +685,31 @@ void summary(tcfg *cfg)
 ( 89.9%)            test: total   15, viewed   15 (  1.0%), learned   14 (  0.9%), score   4.5
 (  1.3%)         english: total 1500, viewed   27 (  0.0%), learned    8 (  0.0%), score   0.1
 */
-    for(i=0; i<cfg->dbfsize; i++) /* database file list */
-        if((len=strlen(theme(filenopath(cfg->dbfiles[i]))))>maxlen)
+    for(i=0; i<c.dbfsize; i++) /* database file list */
+        if((len=strlen(theme(filenopath(c.dbfiles[i]))))>maxlen)
             maxlen=len;
     maxlen++; /* 15 or more */
 
-    for(i=0; i<cfg->dbfsize; i++) /* database file list */
+    if(!SUMMA)
+        printf("|  N ");
+
+    printf("| %-*s | %6s | %5s| %13s | %13s | %5s | %5s |\n", maxlen, "Database", "Comp.%", "Total", "Viewed (%)", "Learned (%)", "Review", "Score");
+
+    for(i=0; i<c.dbfsize; i++) /* database file list */
     {
-        qtd=dbsize(cfg->dbfiles[i]);
+        qtd=dbsize(c.dbfiles[i]);
 
-        dbc=dbcore(cfg->dbfiles[i]);
-        sprintf(summaryf, "%s/%s-%s%s", cfg->cfguserpath, cfg->fileuser, dbc, EXTCF);
+        dbc=dbcore(c.dbfiles[i]);
+        sprintf(summaryf, "%s/%s-%s%s", c.cfguserpath, c.fileuser, dbc, EXTCF);
 
-        cfanalyses(summaryf, cfg->today, qtd, &view, &learn, &pct, &ave, &clate);
+        cfanalyses(summaryf, c.today, qtd, &view, &learn, &pct, &ave, &clate);
         pview=((float)view/(float)qtd)*100.0;
         plearn=((float)learn/(float)qtd)*100.0;
-        printf("(%6.1f%%) %*s: total %4d, viewed %4d (%6.1f%%), learned %4d (%6.1f%%), to review %4d, score %5.1f\n", pct, maxlen, theme(filenopath(cfg->dbfiles[i])), qtd, view, pview, learn, plearn, clate, ave);
+        if(!SUMMA)
+            printf("| %2d ", i+1);
+        printf("| %-*s | %5.1f%% | %4d | %4d (%5.1f%%) | %4d (%5.1f%%) | %6d | %5.1f |\n", maxlen, theme(filenopath(c.dbfiles[i])), pct, qtd, view, pview, learn, plearn, clate, ave);
+
+//             printf("(%5.1f%%) %*s: total %4d, viewed %4d (%5.1f%%), learned %4d (%5.1f%%), to review %4d, score %5.1f\n", pct, maxlen, theme(filenopath(c.dbfiles[i])), qtd, view, pview, learn, plearn, clate, ave);
     }
     return;
 }
@@ -908,16 +917,20 @@ void menudb(tcfg *cfg)
     int i, dbnum;
     char *dbc;
 
+
+    summary(*cfg);
+
     if(cfg->dbasef[0]=='\0')
     {
         do
         {
-            printf("Databases found:\n");
+            if(verb>1)
+                printf("Databases found:\n");
             for(i=0; i<cfg->dbfsize; i++)
                 if(verb>1)
                     printf("(%d) %s\n", i+1, cfg->dbfiles[i]);
-                else
-                    printf("(%d) %s\n", i+1, filenopath(cfg->dbfiles[i]));
+//                 else
+//                     printf("(%d) %s\n", i+1, filenopath(cfg->dbfiles[i]));
 
             dbnum=1; /* default */
             if(cfg->dbfsize>1)
