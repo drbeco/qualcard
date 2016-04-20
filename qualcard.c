@@ -182,7 +182,7 @@ char *dbcore(char *s); /* grab the core name of the file */
 /* ---------------------------------------------------------------------- */
 /* @ingroup GroupUnique */
 /**
- * @brief This is the main event of the evening
+ * @brief Main function, loops the cards, save and exit 
  * @details Ladies and Gentleman... It's tiiiime!
  * Fightiiiiing at the blue corner,
  * he, who has compiled more C code than any other adversary in the history,
