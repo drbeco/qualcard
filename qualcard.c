@@ -597,7 +597,7 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
 
         revd=newdate(date, ave2day(ave));
         late=0;
-        if(today - revd>0) /* late */
+        if(today - revd>=0) /* late or due today */
         {
             late=diffdays(today, revd);
             (*ncardl)++;
