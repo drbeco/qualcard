@@ -219,10 +219,11 @@ int main(int argc, char *argv[])
     tcfg c={0}; /* struct to configuration variables */
     int i; /* index, auxiliary */
     int newd; /* new date after adding up day's equivalent score */
+    int futd; /* future revision date after presenting today */
     int tencards[10][2]; /* ten cards, index in memory (-1 if new), line in file */
     int again=1; /* while some card score presented is still zero */
     int repet[10]={0}; /* which card repeated how many times */
-    float sco; /* the score to a card */
+    float sco, oldsco; /* the score to a card */
     char cardfr[STRSIZE], cardbk[STRSIZE]; /* card front and back */
 
     IFDEBUG("Starting optarg loop...\n");
@@ -322,34 +323,39 @@ int main(int argc, char *argv[])
                 continue;
             getcard(c.dbasef, tencards[i][TFIL], cardfr, cardbk);
 
-            printf("------------------------------------------\n");
-            if(tencards[i][TMEM]==-1) /* new card? */
-                printf("Card %d (new card for today)\n", tencards[i][TFIL]+1);
+            printf("-----------------------------------------------------------\n");
+            if(-1==tencards[i][TMEM]) /* new card? */
+            {
+                printf("Card %d (new card for today)\n\n", tencards[i][TFIL]+1);
+                oldsco=0.0;
+            }
             else
             {
-                newd=newdate(c.cfdate[tencards[i][TMEM]], ave2day(c.cfave[tencards[i][TMEM]]));
-                printf("Card %d (revision date %s)\n", tencards[i][TFIL]+1, prettydate(newd));
+                oldsco=c.cfave[tencards[i][TMEM]];
+                newd=newdate(c.cfdate[tencards[i][TMEM]], ave2day(oldsco));
+                printf("Card %d (revision date %s)\n\n", tencards[i][TFIL]+1, prettydate(newd));
             }
 
             if(c.invert)
-                printf("%s\n", cardbk);
+                printf("%s\n", cardbk); /* fgets already get one \n */
             else
                 printf("%s\n\n", cardfr);
 
-            printf("Press <ENTER> to see the back of the card\n");
+
+            printf("---------------Press <ENTER> to turn the card--------------\n");
             do opt=getchar(); while(opt!='\n');
 
             if(c.invert)
                 printf("%s\n\n", cardfr);
             else
-                printf("%s\n", cardbk);
+                printf("%s\n", cardbk);  /* fgets already get one \n */
 
             do
             {
                 printf("Your self-evaluation (from 0 to 5) is: ");
                 scanf("%d%*c", &opt); /* discard the '\n'. Better use fgets() */
             } while(opt<0 || opt>5);
-            if(opt==0)
+            if(!opt)
             {
                 repet[i]++;
                 again=1;
@@ -361,11 +367,15 @@ int main(int argc, char *argv[])
                 else
                     sco=(float)opt;
                 save2memo(&c, tencards[i][TMEM], tencards[i][TFIL], sco);
+                if(tencards[i][TMEM]==-1)
+                    tencards[i][TMEM]=c.cfsize-1;
+                futd=newdate(c.today, ave2day(c.cfave[tencards[i][TMEM]]));
+                printf("Old score: %.1f, new score: %.1f, revision set to %s\n", oldsco, c.cfave[tencards[i][TMEM]], prettydate(futd));
                 tencards[i][TMEM]=-2; /* presented and ok */
             }
-        }
-    }
-    printf("------------------------------------------\n");
+        } /* for i < 10 cards */
+    } /* while(again) */
+    printf("-----------------------------------------------------------\n");
 
     save2file(c);
 
@@ -377,7 +387,7 @@ int main(int argc, char *argv[])
 /* save new or update old card */
 void save2memo(tcfg *c, int i, int card, float scor)
 {
-    if(i==-1) /* new memory block */
+    if(-1==i) /* no index implies new memory block */
     {
         c->cfsize++;
         c->cfcard=(int *)reallocordie(c->cfcard, sizeof(int)*c->cfsize);
