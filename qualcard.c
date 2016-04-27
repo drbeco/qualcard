@@ -131,6 +131,8 @@ typedef struct scfg /* configuration data struct */
 {
     int QTDCARD; /* database size */
     int today; /* yyyymmdd */
+    time_t tstart; /* start time (s) of this session */
+    float session; /* duration of all session (s) */
     char dbpath[PATHSIZE]; /* path to commom database */
     char cfgrealpath[PATHSIZE]; /* path to own config directory (history and databases), read and write */
     char cfguserpath[PATHSIZE]; /* path to some user config directory (just for read) */
@@ -178,6 +180,8 @@ int diffdays(int newd, int oldd); /* Difference of two dates in days. Positive i
 float score(float ave, int late); /* return the new score when the revision is late */
 void menudb(tcfg *c); /* read menu */
 char *dbcore(char *s); /* grab the core name of the file */
+void sessiontime(tcfg *c); /* calculates duration of this session and accumulated time */
+
 
 /* ---------------------------------------------------------------------- */
 /* @ingroup GroupUnique */
@@ -296,11 +300,10 @@ int main(int argc, char *argv[])
 
     qualcard_init(&c); /* initialization function */
 
+    summary(c); /* how many cards to review */
+
     if(SUMMA)
-    {
-        summary(c); /* how many cards to review */
         exit(EXIT_SUCCESS);
-    }
 
     menudb(&c);
 
@@ -377,6 +380,7 @@ int main(int argc, char *argv[])
     } /* while(again) */
     printf("-----------------------------------------------------------\n");
 
+    sessiontime(&c); /* calculates duration of this session and accumulated time */
     save2file(c);
 
     printf("\nLive as if you were to die tomorrow. Learn as if you were to live forever. (Mahatma Gandhi)\n");
@@ -413,6 +417,7 @@ void save2file(tcfg c)
 
     if((fp=fopen(c.configwf, "w"))!=NULL) /* create from scratch */
     {
+        fprintf(fp, "%f\n", c.session); /* accumulated time */
         for(i=0; i<c.cfsize; i++)
             fprintf(fp, "%5d %8d %6.4f\n", c.cfcard[i], c.cfdate[i], c.cfave[i]);
 
@@ -596,6 +601,13 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
     if(!(fp=fopen(sumfile,"r"))) /* temporary configwf in a loop */
         return;
 
+    /*fgets(line, STRSIZE, fp);*/
+    if(1 != fscanf(fp, "%f\n", &ave)) /* ignore first line: accumulated time */
+    {
+        fclose(fp);
+        return;
+    }
+
     while(3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave))
     {
         (*view)++;
@@ -641,6 +653,33 @@ float score(float ave, int late)
     if(ave<0.0)
         ave=0.0;
     return ave;
+}
+
+/* calculates duration of this session and accumulated time */
+void sessiontime(tcfg *c)
+{
+    float fsec; /* seconds */
+    time_t ttnow;
+    int h0, m0, s0, h1, m1, s1;
+
+    ttnow=time(NULL);
+
+    fsec=difftime(ttnow,c->tstart); /* this session's duration in s */
+
+    c->session+=fsec; /* all sessions */
+
+    h0=(int)fsec/3600;
+    m0=(int)(((fsec/3600.0)-((int)fsec/3600))*60.0);
+    s0=(int)(((fsec/60.0)-((int)(h0*60+m0)))*60.0);
+
+    h1=(int)c->session/3600;
+    m1=(int)(((c->session/3600.0)-((int)c->session/3600))*60.0);
+    s1=(int)(((c->session/60.0)-((int)(h1*60+m1)))*60.0);
+
+    /* printf("end=%f, start=%f, diff=%f\n", (double)ttnow, (double)c->tstart, fsec); */
+
+    printf("This session: %02d:%02d:%02d. Accumulated time: %02d:%02d:%02d\n", h0, m0, s0, h1, m1, s1);
+    return;
 }
 
 /* Difference of two dates in days. Positive if new>old, 0 if equals, negative c.c. */
@@ -862,17 +901,16 @@ void qualcard_init(tcfg *cfg)
 {
     IFDEBUG("qualcard_init()");
 
-    time_t lt;
     struct tm *timeptr;
     char stoday[DTSIZE];
     char binpath[PATHSIZE]={0};
 
-    lt=time(NULL);
-    timeptr=localtime(&lt);
+    cfg->tstart=time(NULL);
+    timeptr=localtime(&cfg->tstart);
     sprintf(stoday, "%04d%02d%02d", 1900 + timeptr->tm_year, 1 + timeptr->tm_mon, timeptr->tm_mday);
     cfg->today=(int)strtol(stoday, NULL, 10);
 
-    srand((unsigned)time(&lt)); /* new unknow seed */
+    srand((unsigned)time(&cfg->tstart)); /* new unknow seed */
 
     strcpy(cfg->realuser, getenv("USER"));
     if(cfg->pathuser[0]=='\0')
@@ -929,7 +967,7 @@ void menudb(tcfg *cfg)
     int i, dbnum;
     char *dbc;
 
-    summary(*cfg);
+//     summary(*cfg);
 
     if(cfg->dbasef[0]=='\0')
     {
@@ -1063,21 +1101,23 @@ void readcfg(tcfg *c)
     c->cfsize=0;
     if((fp=fopen(c->configwf, "r"))!=NULL) /* we've got a file! */
     {
-        for(i=0; 3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave); i++)
-        {
-            c->cfcard=(int *)reallocordie(c->cfcard, sizeof(int)*(i+1));
-            c->cfdate=(int *)reallocordie(c->cfdate, sizeof(int)*(i+1));
-            c->cfave=(float *)reallocordie(c->cfave, sizeof(float)*(i+1));
-            c->cfcard[i]=card;
-            c->cfdate[i]=date;
-            c->cfave[i]=ave;
-            c->cfsize++;
-        }
+        if(1 == fscanf(fp, "%f\n", &c->session)) /* read first line: accumulated time */
+            for(i=0; 3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave); i++)
+            {
+                c->cfcard=(int *)reallocordie(c->cfcard, sizeof(int)*(i+1));
+                c->cfdate=(int *)reallocordie(c->cfdate, sizeof(int)*(i+1));
+                c->cfave=(float *)reallocordie(c->cfave, sizeof(float)*(i+1));
+                c->cfcard[i]=card;
+                c->cfdate[i]=date;
+                c->cfave[i]=ave;
+                c->cfsize++;
+            }
         fclose(fp);
+        return;
     }
-    else
-        if(verb>=0)
-            printf("No previous history. Starting new study.\n");
+
+    if(verb>=0)
+        printf("No previous history. Starting new study.\n");
     return;
 }
 
