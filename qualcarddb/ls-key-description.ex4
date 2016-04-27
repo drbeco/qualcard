@@ -61,7 +61,7 @@ ls --help :: display this help and exit
 ls --version :: output version information and exit
 SIZE of an argument :: The  SIZE  argument  is  an  integer and optional unit (example 10K is 10*1024).  Units are K,M,G,T,P,E,Z,Y (powers of 1024) or KB,MB,... (powers of 1000)
 How to disable/enable color? :: Using color to distinguish file types is disabled both by default and with --color=never.  With --color=auto, ls emits  color  codes  only when  standard  output is connected to a terminal.
-What are the environment Variables use by ls? :: The LS_COLORS environment variable can change the settings.  Use the dircolors command to set it.
+What are the environment variables used by ls? :: The LS_COLORS environment variable can change the settings.  Use the dircolors command to set it.
 Which are the exit status of ls? :: 0\tif OK,\n 1\tif minor problems (e.g., cannot access subdirectory),\n 2\tif serious trouble (e.g., cannot access command-line argument).
 Who are the authors of ls? :: Richard M. Stallman and David MacKenzie
 One should report bugs against what package? :: Report core bugs to GNU coreutils and translation bugs to (HTTP translationproject.org/team/)
