@@ -573,7 +573,6 @@ int dbsize(char *dbname)
         exit(EXIT_FAILURE);
     }
 
-    fseek(fp, 0, 0 ); /* linha 0 */
     do
     {
         fgets(line, STRSIZE, fp);
@@ -827,7 +826,7 @@ void getcard(char *dbfile, int cardnum, char *cardfr, char *cardbk)
         printf("Fail to open database %s.\n", dbfile);
         exit(EXIT_FAILURE);
     }
-    fseek(fp, 0, 0);
+
     for(i=0; i<=cardnum; i++)
         fgets(card, STRSIZE, fp);
     fclose(fp);
@@ -982,8 +981,6 @@ void menudb(tcfg *cfg)
 {
     int i, dbnum;
     char *dbc;
-
-//     summary(*cfg);
 
     if(cfg->dbasef[0]=='\0')
     {
