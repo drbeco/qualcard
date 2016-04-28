@@ -181,7 +181,7 @@ float score(float ave, int late); /* return the new score when the revision is l
 void menudb(tcfg *c); /* read menu */
 char *dbcore(char *s); /* grab the core name of the file */
 void sessiontime(tcfg *c); /* calculates duration of this session and accumulated time */
-
+float getactime(FILE *fp); /* read time if exists. points to first card stat */
 
 /* ---------------------------------------------------------------------- */
 /* @ingroup GroupUnique */
@@ -583,6 +583,27 @@ int dbsize(char *dbname)
     return --qtdl;
 }
 
+/* read time if exists. points to first card stat */
+float getactime(FILE *fp)
+{
+    int card, date;
+    float ac;
+
+    fseek(fp, 0, 0);
+    if(3 == fscanf(fp, "%d %d %f\n", &card, &date, &ac))
+    {
+        fseek(fp, 0, 0);
+        return 0.0; /* old file format, no accumulated time */
+    }
+
+    if(1 == fscanf(fp, "%f\n", &ac)) /* read first line of accumulated time */
+        return ac; /* let it point to the second line and return */
+
+    perror("some strange error\n");
+    fseek(fp, 0, 0);
+    return 0.0; /* no accumulated time */
+}
+
 /* history analises */
 void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float *pct, float *addscore, int *ncardl)
 {
@@ -601,12 +622,7 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
     if(!(fp=fopen(sumfile,"r"))) /* temporary configwf in a loop */
         return;
 
-    /*fgets(line, STRSIZE, fp);*/
-    if(1 != fscanf(fp, "%f\n", &ave)) /* ignore first line: accumulated time */
-    {
-        fclose(fp);
-        return;
-    }
+    ave=getactime(fp); /* ignore accumulated time if it exists */
 
     while(3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave))
     {
@@ -1101,17 +1117,17 @@ void readcfg(tcfg *c)
     c->cfsize=0;
     if((fp=fopen(c->configwf, "r"))!=NULL) /* we've got a file! */
     {
-        if(1 == fscanf(fp, "%f\n", &c->session)) /* read first line: accumulated time */
-            for(i=0; 3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave); i++)
-            {
-                c->cfcard=(int *)reallocordie(c->cfcard, sizeof(int)*(i+1));
-                c->cfdate=(int *)reallocordie(c->cfdate, sizeof(int)*(i+1));
-                c->cfave=(float *)reallocordie(c->cfave, sizeof(float)*(i+1));
-                c->cfcard[i]=card;
-                c->cfdate[i]=date;
-                c->cfave[i]=ave;
-                c->cfsize++;
-            }
+        c->session=getactime(fp);
+        for(i=0; 3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave); i++)
+        {
+            c->cfcard=(int *)reallocordie(c->cfcard, sizeof(int)*(i+1));
+            c->cfdate=(int *)reallocordie(c->cfdate, sizeof(int)*(i+1));
+            c->cfave=(float *)reallocordie(c->cfave, sizeof(float)*(i+1));
+            c->cfcard[i]=card;
+            c->cfdate[i]=date;
+            c->cfave[i]=ave;
+            c->cfsize++;
+        }
         fclose(fp);
         return;
     }
