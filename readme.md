@@ -49,11 +49,6 @@ Projeto de Aprendizado de temas diversos via repetição espaçada de cartões (
     - Email: <rcb@beco.cc>
     - Data da criação: 2016-04-07
 
-### Colaboradores ###
-
-* Gerônimo de Sá Barreto Neto
-    - Email: <geronimoneto1994@gmail.com>
-
 ### Licença pt\_BR ###
 
 qualcosa : um programa para estudar cartões usando repetição espaçada.
