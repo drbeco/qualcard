@@ -431,7 +431,7 @@ void save2file(tcfg c)
 /* get card faces */
 void cardfaces(char *card, char *fr, char *bk)
 {
-    char *colon;
+    char *colon, *nline;  /*nline = next line for any "///" */
 
     strcpy(fr, card);
     changebarnet(fr);
@@ -452,6 +452,22 @@ void cardfaces(char *card, char *fr, char *bk)
     }
     *(colon-1)='\0'; /* front */
     strcpy(bk, colon+1); /* back */
+    nline=bk;
+    do
+    {
+        //nline=bk;
+        nline=strchr(nline, '/');
+        if(nline!=NULL)
+        {
+            if(*nline=='/' && *(nline+1)=='/' && *(nline+2)=='/')
+            {
+                *nline=' ';
+                *(nline+1)=' ';
+                *(nline+2)='\n';
+            }
+            nline=nline+1;
+        }
+    }while(nline!=NULL);
     return;
 }
 
