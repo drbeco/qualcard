@@ -24,7 +24,7 @@ stato (sostantivi)::state / estado
 caso (sostantivi)::case / caso
 città (sostantivi)::city / cidade
 guerra (sostantivi)::war / guerra
-strada (sostantivi)::street / estrada
+strada (sostantivi)::street / rua, estrada
 figlio (sostantivi)::son / filho
 notte (sostantivi)::night / noite
 voce (sostantivi)::voice / voz
@@ -48,7 +48,7 @@ sole (sostantivi)::sun / sol
 famiglia (sostantivi)::family / família
 piede (sostantivi)::foot / pé
 persona (sostantivi)::character / caráter
-via (sostantivi)::through / através
+via (sostantivi)::through, street / através, via, rua
 signora (sostantivi)::missis, madam / senhora
 governo (sostantivi)::government / governo
 senso (sostantivi)::sense / sentido
@@ -81,9 +81,9 @@ piazza (sostantivi)::square / praça
 questione (sostantivi)::question / questão
 nemico (sostantivi)::enemy / inimigo
 pena di morte (sostantivi)::death penalty / pena de morte 
-motivo (sostantivi)::reason / razão
+motivo (sostantivi)::reason / razão, motivo
 esperienza (sostantivi)::experience / experiência
-ricordo (sostantivi)::reminder (souvenir)/ lembrança (lembrancinha)
+ricordo (sostantivi)::reminder (souvenir), memory / lembrança (lembrancinha), memória
 albero (sostantivi)::tree / árvore
 politica (sostantivi)::policy / política
 processo (sostantivi)::process / processo
@@ -105,7 +105,7 @@ effetto (sostantivi)::effect / efeito
 giardino (sostantivi)::garden / jardim
 attività (sostantivi)::activities / atividades
 volontà (sostantivi)::will / vontade
-volto (sostantivi)::face (di fronte: facing) / face (di fronte: frente a)
+volto (sostantivi)::face / face, rosto
 base (sostantivi)::basis / base
 carattere (sostantivi)::character / caráter
 coscienza (sostantivi)::consciousness / consciência
@@ -156,7 +156,7 @@ grazia (sostantivi)::grace / graça
 passato (sostantivi)::past / passado
 spazio (sostantivi)::space / espaço
 stella (sostantivi)::star / estrela
-corsa (sostantivi)::race / raça
+corsa (sostantivi)::race, run / corrida
 erba (sostantivi)::herb, grass / erva, grama
 massa (sostantivi)::mass / massa
 origine (sostantivi)::origin / origem, fonte
@@ -167,7 +167,7 @@ madre (sostantivi)::mother / mãe
 paura (sostantivi)::fear / medo
 cuore (sostantivi)::heart / coração
 idea (sostantivi)::idea / ideia
-fondo (sostantivi)::background / fundo
+fondo (sostantivi)::background, bottom / fundo
 esempio (sostantivi)::example / exemplo
 ordine (sostantivi)::order / ordem
 posto (sostantivi)::place / lugar
@@ -211,7 +211,7 @@ ragazza (sostantivi)::girl / menina
 scuola (sostantivi)::school / escola
 camera (sostantivi)::room/ câmera
 gruppo (sostantivi)::group / grupo
-lira (sostantivi)::lira / lira
+lira (sostantivi)::lira (coin), lyre (musical instrument) / lira (moeda), harpa (instrumento musical)
 discorso (sostantivi)::speech / discurso
 centro (sostantivi)::center / centro
 secolo (sostantivi)::century / século
@@ -220,7 +220,7 @@ tipo (sostantivi)::type, guy / tipo, cara
 colpa (sostantivi)::fault / culpa
 rispetto (sostantivi)::respect / respeito
 scena (sostantivi)::scene / cena
-don (sostantivi)::don / dom
+don (sostantivi)::don (title), priest / dom (título), sacerdote
 oggetto (sostantivi)::object / objeto
 possibilità (sostantivi)::possibility / possibilidade
 mamma (sostantivi)::mum / mamãe
@@ -246,18 +246,19 @@ potere (sostantivi)::power / poder
 musica (sostantivi)::music / música
 dottore (sostantivi)::doctor / médico, doutor
 sentimento (sostantivi)::feeling / sentimento
-nave (sostantivi)::boat / barco 
+nave (sostantivi)::ship / navio
+barca (sostantivi)::boat / barco 
 pietra (sostantivi)::stone / pedra
 produzione (sostantivi)::production / produção
 speranza (sostantivi)::hope / esperança
 dolore (sostantivi)::pain / dor
 carne (sostantivi)::meat / carne
-generale (sostantivi)::general / geral
+generale (sostantivi)::general / general
 proposito (sostantivi)::purpose / propósito
 elemento (sostantivi)::element / elemento
 stazione (sostantivi)::railway station / estação (de trem ou metrô)
 materia (sostantivi)::matter / matéria, assunto
-scala (sostantivi)::ladder / escala
+scala (sostantivi)::ladder / escada
 maniera (sostantivi)::way / maneira
 arma (sostantivi)::weapon / arma
 autorità (sostantivi)::authority / autoridade
@@ -279,7 +280,8 @@ sorriso (sostantivi)::smile / sorriso
 frase (sostantivi)::phrase / frase
 limite (sostantivi)::limit / limite
 ritorno (sostantivi)::return / retorno
-bosco (sostantivi)::wood / madeira
+bosco (sostantivi)::wood / bosque
+legno (sostantivi)::wood / madeira
 esame (sostantivi)::exam / exame
 lato (sostantivi)::side / lado
 operazione (sostantivi)::operation / operação
@@ -375,7 +377,7 @@ partito (sostantivi)::party / partido
 macchina (sostantivi)::machine / máquina
 carta (sostantivi)::paper / papel
 minuto (sostantivi)::minute / minuto
-tratto (sostantivi)::stretch / extensão
+tratto (sostantivi)::range, part / trecho, faixa
 settimana (sostantivi)::week / semana
 notizia (sostantivi)::news / notícia
 fratello (sostantivi)::brother / irmão
@@ -417,7 +419,8 @@ immagine (sostantivi)::image / retrato
 montagna (sostantivi)::mountain / montanha
 energia (sostantivi)::power / energia
 fede (sostantivi)::faith / fé
-pane (sostantivi)::glass / vidro
+vetro (sostantivi)::glass / vidro
+pane (sostantivi):: bread / pão
 seguito (sostantivi)::following / seguido
 estate (sostantivi)::summer / verão 
 film (sostantivi)::movie / filme
@@ -441,7 +444,7 @@ tono (sostantivi)::tone / tom
 croce (sostantivi)::cross / cruz
 decisione (sostantivi)::decision / decisão
 poesia (sostantivi)::poetry / poesia
-fiducia (sostantivi)::confidence / confiança
+fiducia (sostantivi)::trust / confiança
 filo (sostantivi)::wire / fio, arame
 folla (sostantivi)::crowd / multidão
 qualità (sostantivi)::quality / qualidade
@@ -457,7 +460,7 @@ fabbrica (sostantivi)::factory / fábrica
 giugno (sostantivi)::june / junho
 giustizia (sostantivi)::justice / justiça
 avvocato (sostantivi)::lawyer / advogado
-messa (sostantivi)::commissioning / comissionamento
+messa (sostantivi)::mass / missa 
 orecchio (sostantivi)::ear / ouvido
 sonno (sostantivi)::sleep / sono
 congresso (sostantivi)::congress / congresso
@@ -477,703 +480,692 @@ ricchezza (sostantivi)::wealth / riqueza
 sacrificio (sostantivi)::sacrifice / sacrifício
 atteggiamento (sostantivi)::attitude / atitude
 concetto (sostantivi)::concept / conceito
-mestiere (sostantivi)::craft / ofício
+mestiere (sostantivi)::job / trabalho
 attesa (sostantivi)::waiting / espera
 bagno (sostantivi)::bathroom / banheiro
 foglia (sostantivi)::leaf / folha
 istante (sostantivi)::instant / instante
-lago (sostantivi)::lake / lago                            
-
-# aggettivi
-questo                      this                       esta
-quello                      one                        um
-più                         more                       mais
-tutto                       all                        tudo
-suo                         his                        sua
-altro                       other                      mais
-mio                         my                         meu
-quale                       which                      que
-tanto                       much                       muito
-grande                      great                      grande
-poco                        little                     pouco
-molto                       very                       muito
-nostro                      our                        nossa
-stesso                      same                       mesmo
-primo                       first                      primeiro
-loro                        their                      seu
-ogni                        every                      cada
-proprio                     own                        próprio
-solo                        only                       unicamente
-quanto                      how much                   como
-bello                       beautiful                  belo
-qualche                     some                       alguns
-nuovo                       new                        novo
-certo                       of course                  alguns
-vero                        true                       real
-buono                       good                       bom
-tuo                         your                       seu
-nessuno                     nobody                     ninguém
-alcuno                      any                        qualquer
-italiano                    italian                    italiano
-ultimo                      last                       passado
-vecchio                     old                        velho
-piccolo                     small                      pequeno
-troppo                      too much                   demais
-tale                        such                       tal
-giovane                     young                      jovem
-alto                        high                       alto
-vostro                      your                       seu
-diverso                     different                  diferente
-meglio                      better                     mais
-lungo                       long                       juntamente
-povero                      poor                       pobre
-maggiore                    greater                    maior
-mezzo                       half                       meios
-secondo                     second                     segundo
-lontano                     far                        longe
-vicino                      close                      perto
-possibile                   possible                   possível
-caro                        expensive                  querido
-pieno                       full                       completo
-nero                        black                      preto
-particolare                 particular                 particular
-bianco                      white                      branco
-forte                       strong                     forte
-politico                    politic                    político
-attuale                     current                    atual
-latino                      latin                      latino
-impossibile                 impossible                 impossível
-sereno                      serene                     sereno
-puro                        pure                       puro
-normale                     normal                     normal
-perfetto                    perfect                    perfeito
-piano                       plan                       plano
-caratteristico              characteristic             característica
-russo                       russian                    russo
-continuo                    continuous                 contínuo
-stupido                     stupid                     estúpido
-estremo                     extreme                    extremo
-grigio                      grey                       cinza
-reale                       real                       real
-interessante                interesting                interessante
-medesimo                    same                       mesmo
-religioso                   religious                  religioso
-ampio                       large                      grande
-biondo                      blond                      loiro
-ufficiale                   official                   oficial
-attento                     careful                    cuidadoso
-enorme                      huge                       enorme
-sottile                     thin                       fino
-triste                      sad                        triste
-minimo                      minimum                    mínimo
-privato                     private                    privado
-rapido                      rapid                      rápido
-quarto                      fourth                     quarto
-diretto                     direct                     direto
-nobile                      noble                      nobre
-parecchio                   quite a lot of             alguns
-pericoloso                  dangerous                  perigoso
-giallo                      yellow                     amarelo
-pazzo                       crazy                      louco
-sacro                       sacred                     sagrado
-comodo                      comfortable                confortável
-elettrico                   electric                   elétrico
-assoluto                    absolute                   absoluto
-cristiano                   christian                  cristão
-antico                      ancient                    velho
-rosso                       red                        vermelho
-chiaro                      clear                      claro
-unico                       single                     unicamente
-sicuro                      sure                       proteger
-importante                  important                  importante
-vario                       varied                     variado
-giusto                      quite right                direito
-francese                    french                     francês
-vivo                        i live                     viver
-generale                    general                    geral
-ricco                       rich                       rico
-grosso                      big                        grande
-necessario                  necessary                  necessário
-libero                      free                       livre
-nazionale                   national                   nacional
-basso                       bass                       baixo
-semplice                    simple                     simples
-grave                       serious                    sério
-pubblico                    public                     público
-comune                      common                     comum
-freddo                      cold                       frio
-economico                   cheap                      barato
-felice                      happy                      feliz
-difficile                   hard                       difícil
-tedesco                     german                     alemão
-breve                       short                      curto
-pronto                      ready                      pronto
-serio                       serious                    sério
-presente                    here i'm                   presente
-migliore                    best                       mais
-facile                      easy                       fácil
-terzo                       third                      terceiro
-caldo                       hot                        quente
-estero                      abroad                     estrangeiro
-largo                       wide                       largo
-pricipale                   pricipale                  pricipale
-verde                       green                      verde
-romano                      roman                      romano
-umano                       human                      humano
-inutile                     useless                    inútil
-moderno                     modern                     moderno
-numeroso                    numerous                   numeroso
-simile                      similar                    como
-fresco                      fresh                      fresca
-militare                    military                   militar
-americano                   american                   americano
-vuoto                       empty                      vácuo
-ciascuno                    each                       cada
-tranquillo                  quiet                      tranquilo
-contento                    happy                      feliz
-storico                     historical                 histórico
-superiore                   higher                     superior
-inglese                     english                    inglês
-fermo                       stationary                 estacionário
-solito                      usual                      usual
-buio                        dark                       escuro
-strano                      strange                    estranho
-noto                        known                      conhecido
-prossimo                    next one                   próximo
-profondo                    deep                       profundo
-sociale                     social                     social
-cattivo                     bad                        ruim
-massimo                     maximum                    máximo
-intero                      full                       completo
-uguale                      equal                      igual
-bravo                       good boy                   bom
-brutto                      ugly                       ruim
-preciso                     accurate                   preciso
-qualsiasi                   any                        qualquer
-improvviso                  sudden                     repentino
-famoso                      famous                     famoso
-straniero                   foreigner                  estrangeiro
-civile                      civil                      civil
-internazionale              international              internacional
-interno                     indoor                     interno
-vasto                       extensive                  extenso
-segreto                     secret                     segredo
-greco                       greek                      grego
-naturale                    natural                    natural
-sinistro                    left                       esquerda
-duro                        hard                       difícil
-stanco                      tired out                  cansado
-azzurro                     light blue                 azul
-recente                     recent                     recente
-notevole                    remarkable                 notável
-cittadino                   citizen                    cidadão
-destro                      right                      direito
-europeo                     european                   europeu
-zitto                       shut up                    silencioso
-medio                       average                    média
-qualunque                   whatever                   qualquer
-straordinario               extraordinary              extraordinário
-nudo                        naked                      nu
-futuro                      future                     futuro
-cattolico                   catholic                   católico
-capace                      to be able                 capaz
-industriale                 industrial                 industrial
-personale                   staff                      pessoal
-centrale                    central                    central
-tecnico                     technical                  técnico
-dolce                       sweet                      doce
-leggero                     light                      luz
-morale                      moral                      moral
-utile                       helpful                    útil
-contrario                   contrary                   contrário
-speciale                    special                    especial
-peggio                      worse                      pior
-minore                      lower                      baixar
-contadino                   farmer                     agricultor               
-
-# verbi
-essere                      to be                      ser
-avere                       to have                    ter
-dire                        to say                     dizer
-potere                      power                      poder
-volere                      want                       querer
-sapere                      know                       saber
-stare                       to stay                    ficar
-dovere                      must                       dever
-vedere                      to see                     ver
-andare                      to go                      ir
-venire                      to come                    vir
-dare                        give                       dar
-parlare                     speak                      conversa
-trovare                     to find                    encontrar
-sentire                     feel                       ouvir
-lasciare                    to leave                   deixar
-prendere                    to take                    tomar
-guardare                    to watch                   olhar
-mettere                     to put                     pôr
-pensare                     to think                   pensar
-passare                     to pass                    passar
-credere                     to believe                 acreditar
-portare                     bring                      levar
-parere                      opinion                    pensar
-tornare                     return                     retorno
-sembrare                    to seem                    olhar
-tenere                      to keep                    manter
-capire                      to understand              entender
-morire                      to die                     morrer
-chiamare                    to call                    chamada
-conoscere                   know                       saber
-rimanere                    stay                       ficar
-chiedere                    to ask                     perguntar
-cercare                     search for                 pesquisa
-entrare                     to come in                 entrar
-vivere                      to live                    viver
-aprire                      to open                    aberto
-uscire                      go out                     saída
-ricordare                   to remember                lembrar
-bisognare                   bisognare                  bisognare
-cominciare                  begin                      começar
-rispondere                  reply                      resposta
-aspettare                   wait                       esperar
-riuscire                    to success                 suceder
-chiudere                    to close                   perto
-finire                      to end                     final
-arrivare                    arrive                     obter
-scrivere                    to write                   escrever
-diventare                   become                     tornar-se
-restare                     to remain                  ficar
-seguire                     follow                     seguir
-bastare                     suffice                    bastar
-perdere                     to lose                    perder
-rendere                     make                       fazer
-correre                     to run                     corrida
-salvare                     to save                    salvar
-vestire                     to dress                   vestido
-costruire                   build                      construir
-camminare                   to walk                    andar
-ritrovare                   find                       encontrar
-durare                      to last                    passado
-accendere                   switch on                  interruptor
-evitare                     to avoid                   evitar
-immaginare                  to imagine                 imaginar
-ridurre                     reduce                     reduzir
-contenere                   to contain                 conter
-fissare                     fix                        fixar
-costringere                 force                      força
-abbandonare                 abandon                    deixar
-attendere                   wait for                   esperar
-preferire                   to prefer                  preferir
-scegliere                   to choose                  escolher
-avvertire                   warn                       advertir
-proporre                    to propose                 propor
-temere                      to fear                    medo
-esprimere                   to express                 expressar
-spingere                    to push                    empurrão
-salutare                    to greet                   saudável
-udire                       hear                       ouvir
-difendere                   stick up for               defender
-dirigere                    direct                     levar
-cantare                     to sing                    cantar
-sorgere                     to rise                    subir
-assicurare                  ensure                     garantir
-assumere                    to hire                    tomar
-tendere                     to tend                    trecho
-dividere                    to divide                  dividir
-scusare                     excuse                     desculpa
-mantenere                   to maintain                manter
-ritenere                    consider                   considerar
-concludere                  to conclude                concluir
-saltare                     jump                       saltar
-stabilire                   to establish               estabelecer
-appartenere                 to belong                  pertencer
-possedere                   to possess                 próprio
-risultare                   result                     resultado
-suonare                     play                       jogar
-coprire                     cover up                   cobertura
-insegnare                   to teach                   ensinar
-affermare                   to assert                  afirmar
-rivelare                    reveal                     revelar
-conservare                  to preserve                salvar
-risolvere                   to solve                   resolver
-concedere                   grant                      conceder
-limitare                    to limit                   limite
-abitare                     live                       viver
-convincere                  to convince                convencer
-comprare                    to buy                     comprar
-legare                      to tie                     laço
-sostenere                   to sustain                 apoio
-nascere                     to be born                 subir
-presentare                  to introduce               presente
-trattare                    to deal                    tratar
-piacere                     pleasure                   prazer
-continuare                  to continue                continuar
-partire                     leave                      deixar
-servire                     to serve                   servir
-giungere                    reach                      alcançar
-fermare                     stop                       parar
-apparire                    to appear                  aparecer
-amare                       to love                    amor
-esistere                    to exist                   existir
-intendere                   hear                       ouvir
-salire                      to go up                   subir
-mancare                     to miss                    perder
-ridere                      to laugh                   risada
-lavorare                    to work                    trabalho
-alzare                      raise up                   levantar
-riconoscere                 to recognize               reconhecer
-sedere                      sit down                   sentar
-leggere                     to read                    ler
-cadere                      fall                       cair
-mangiare                    to eat                     comer
-dormire                     to sleep                   sono
-raggiungere                 to reach                   alcançar
-comprendere                 understand                 entender
-scendere                    alight                     aceso
-compiere                    fulfill                    fazer
-toccare                     to touch                   tocar
-considerare                 to consider                considerar
-muovere                     move                       mudança
-stringere                   tighten                    apertar
-mandare                     send                       enviar
-domandare                   ask                        perguntar
-ascoltare                   to listen                  ouvir
-decidere                    to decide                  decidir
-ricevere                    receive                    receber
-osservare                   to observe                 observar
-permettere                  to allow                   permitir
-avvenire                    occur                      ocorrer
-spiegare                    explain                    explicar
-raccogliere                 to collect                 reunir
-ottenere                    get                        obter
-offrire                     to offer                   oferta
-mostrare                    to exhibit                 espetáculo
-accompagnare                accompany                  acompanhar
-dimenticare                 forget                     esquecer
-pregare                     to pray                    rezar
-raccontare                  to tell                    dizer
-bere                        drinking                   bebida
-ritornare                   to return                  retorno
-cambiare                    to change                  mudança
-dimostrare                  to demonstrate             espetáculo
-sperare                     to hope                    esperança
-sposare                     to marry                   casar
-ammettere                   to admit                   admitir
-fuggire                     run away                   fugir
-liberare                    to free                    livre
-riferire                    report                     relatório
-svegliare                   to wake up                 acordar
-capitare                    happen                     acontecer
-posare                      place                      lugar
-impedire                    to prevent                 prevenir
-gettare                     to throw                   jogar
-vendere                     to sell                    vender
-distinguere                 to distinguish             distinguir
-offendere                   to offend                  ofender
-rimettere                   return                     retorno
-rompere                     break                      pausa
-godere                      to enjoy                   apreciar
-imporre                     to impose                  impor
-significare                 mean                       significar
-desiderare                  to desire                  desejar
-divertire                   amuse                      entreter
-volgere                     turn                       vez
-giudicare                   to judge                   juiz
-produrre                    to produce                 produzir
-avvicinare                  approach                   aproximação
-diffondere                  spread                     propagação
-ordinare                    to sort                    ordem
-invitare                    to invite                  convidar
-discutere                   to discuss                 discutir
-sbagliare                   make a mistake             errar
-badare                      look after                 cuidar de
-tagliare                    to cut                     corte
-pubblicare                  to publish                 publicar
-attaccare                   attack                     ataque
-imparare                    learn                      aprender
-prevedere                   forecast                   prever
-scappare                    to run away                fuga
-spegnere                    switch off                 desligar
-annunciare                  to announce                anunciar
-baciare                     to kiss                    beijo
-esporre                     to expose                  expor
-attraversare                go across                  atravessar
-fornire                     to provide                 fornecimento
-segnare                     mark                       marca
-superare                    overcome                   superar
-rivedere                    to review                  revisão
-allontanare                 remove                     remover
-ammazzare                   kill                       matar
-accogliere                  receive                    bem-vindo
-voltare                     turn                       vez
-preoccupare                 worry                      preocupação
-provocare                   cause                      causa
-riempire                    to fill                    preencher
-partecipare                 take part                  participar
-piantare                    plant                      planta
-rientrare                   re-enter                   reentrar
-richiedere                  request                    pedido
-nascondere                  to hide                    esconder
-ripetere                    to repeat                  repetição
-scoprire                    to discover                descobrir
-preparare                   prepare                    preparar
-scorrere                    slide                      slide
-rappresentare               to represent               representar
-riprendere                  to resume                  resumo
-costituire                  constitute                 constituir
-incontrare                  meet                       reunir-se
-valere                      be worth                   valer a pena
-accorgersi                  notice                     aviso
-provare                     try out                    tentar
-formare                     to form                    trem
-uccidere                    kill                       matar
-tirare                      pull                       puxar
-togliere                    remove                     remover
-notare                      to notice                  nota
-aggiungere                  to add                     adicionar
-succedere                   happen                     acontecer
-pagare                      to pay                     pagar
-tentare                     to attempt                 tateou
-accadere                    to happen                  acontecer
-creare                      create                     criar
-importare                   import                     importação
-pesare                      weigh                      pesar
-usare                       use                        uso
-accettare                   to accept                  aceitar
-indicare                    indicate                   indicar
-buttare                     throw                      jogar
-battere                     beat                       bater
-interessare                 to interest                interesse
-sorridere                   to smile                   sorriso
-condurre                    to conduct                 levar
-disporre                    have                       ter
-unire                       to merge                   juntar
-aiutare                     to help                    ajudar
-piangere                    to cry                     grito
-girare                      turn                       atirar
-levare                      upbeat                     otimista
-soffrire                    suffer                     sofrer
-recare                      cause                      causa
-riguardare                  concern                    preocupação
-rivolgere                   turn                       vez
-tacere                      be silent                  ficar em silêncio
-occorrere                   take                       tomar
-porre                       place                      lugar
-vincere                     to win                     vencer
-svolgere                    perform                    realizar
-studiare                    to study                   estudo
-crescere                    to grow up                 crescer
-divenire                    become                     tornar-se
-gridare                     shout                      grito
-dichiarare                  declare                    declarar
-contare                     to count                   contar
-giocare                     to play                    jogar
-assistere                   assist                     auxiliar
-aumentare                   to increase                aumentar
-lanciare                    to launch                  lançamento
-determinare                 to determine               determinar
-scherzare                   joke                       piada
-elevare                     raise                      levantar
-promettere                  to promise                 promessa
-scomparire                  to disappear               desaparecer
-trarre                      draw                       desenhar
-distruggere                 to destroy                 destruir
-meritare                    deserve                    mérito
-dedicare                    devote                     dedicar
-iniziare                    to start                   começo
-sorprendere                 to surprise                surpresa
-trasformare                 to commute                 transformar
-confessare                  to confess                 confessar
-arrestare                   stop                       parar
-ringraziare                 to thank                   obrigado
-riunire                     gather                     reunir
-volare                      to fly                     voar
-fondare                     to found                   encontrado
-guidare                     to drive                   levar
-ferire                      to hurt                    machucar
-opporre                     to oppose                  oferta
-procedere                   proceed                    prosseguir
-smettere                    stop                       parar
-consentire                  allow                      permitir
-innamorare                  fall in love               apaixonar
-organizzare                 to organize                organizar
-rifiutare                   to reject                  recusar
-riportare                   to report                  relatório
-dipendere                   to depend                  depender
-provvedere                  provide                    fornecer
-trascinare                  to drag                    arrasto
-fumare                      to smoke                   fumaça
-scoppiare                   burst                      explosão
-sognare                     to dream                   sonhar
-appoggiare                  support                    apoio
-armare                      arm                        braço
-celebrare                   to celebrate               celebrar
-descrivere                  to describe                descrever
-resistere                   resist                     resistir
-bruciare                    burn                       queimar
-colpire                     hit                        bater
-estendere                   extend                     estender
-staccare                    remove                     remover
-affrontare                  face up to                 face
-avanzare                    push forward               avançar
-comporre                    to compose                 compor
-escludere                   to exclude                 excluir
-figurare                    appear                     aparecer
-insistere                   to insist                  insistir                
-
-# locuzioni varie
-il                          the                        o
-di                          of                         de
-e                           is                         e
-a                           to                         para
-un                          a                          um
-in                          in                         em
-che                         that                       que
-non                         not                        não
-si                          yes                        um
-da                          from                       de
-lo                          the                        o
-per                         for                        para
-con                         with                       com
-ma                          but                        mas
-come                        such as                    como
-su                          on                         em
-mi                          me                         me
-anche                       also                       também
-o                           or                         ou
-io                          i                          eu
-se                          self                       se
-perché                      why                        porque
-li                          there                      eles
-ci                          us                         nós
-ne                          neither                    qualquer
-lei                         she                        ela
-ancora                      yet                        mais
-tu                          you                        você
-lui                         he                         ele
-senza                       without                    sem
-bene                        well                       bem
-cui                         which                      que
-chi                         who                        quem
-già                         already                    já
-dopo                        after                      depois
-uno                         one                        um
-noi                         we                         nós
-dove                        where is it                onde
-qui                         here                       aqui
-no                          no                         não
-allora                      then                       em seguida
-tra                         between                    entre
-vi                          you                        você
-ora                         now                        agora
-fra                         between                    entre
-prima                       before                     primeiro
-forse                       perhaps                    talvez
-sì                          yup                        sim
-sotto                       under                      abaixo
-voi                         you                        você
-fino                        till                       até
-oggi                        today                      hoje
-quasi                       almost                     quase
-pure                        mashed potato              também
-egli                        he                         ele
-mentre                      while                      enquanto
-contro                      versus                     contra
-invece                      instead                    em vez
-esso                        it                         ele
-là                          there                      lá
-però                        however                    contudo
-né                          neither                    nem
-subito                      immediately                imediatamente
-verso                       to                         para
-ciò                         it                         ele
-ecco                        here                       aqui
-loro                        their                      seu
-essa                        it                         ele
-fuori                       out                        fora
-meno                        less                       menos
-adesso                      now                        agora
-niente                      anything                   nada
-cioè                        that is                    que é
-male                        bad                        ruim
-nulla                       nothing                    nada
-ah                          ha                         ha
-oh                          oh                         ó
-quindi                      then                       em seguida
-appena                      as soon as                 há pouco
-insieme                     together                   juntos
-dunque                      therefore                  portanto
-dentro                      inside                     dentro
-durante                     during                     durante
-almeno                      at least                   pelo menos
-secondo                     second                     segundo
-anzi                        rather                     mais
-oramai                      now                        agora
-oltre                       over                       sobre
-intorno                     around                     volta
-sopra                       over it                    sobre
-dietro                      behind                     atrás
-davanti                     front                      frente
-soltanto                    only                       unicamente
-infatti                     indeed                     na verdade
-qualcosa                    something                  algo
-spesso                      often                      freqüentemente
-accordo                     agreement                  acordo
-ieri                        yesterday                  ontem
-davvero                     really                     realmente
-lì                          there                      lá
-qualcuno                    someone                    alguém
-avanti                      forward                    para a frente
-assai                       very                       muito
-presto                      soon                       em breve
-qua                         here                       aqui
-domani                      tomorrow                   amanhã
-circa                       about                      sobre
-giù                         down                       para baixo
-soprattutto                 mostly                     acima de tudo
-nemmeno                     not even                   nem sequer
-grazie                      thank you                  obrigado
-tuttavia                    however                    contudo
-appunto                     just                       há pouco
-neppure                     neither                    nem
-eh                          huh                        huh
-veramente                   really                     realmente
-tardi                       late                       tarde
-insomma                     in conclusion              em resumo
-presso                      at                         em
-intanto                     in the meantime            entretanto
-lungo                       long                       juntamente
-neanche                     neither                    nem
-piuttosto                   rather                     mais
-stasera                     tonight                    hoje à noite
-perciò                      therefore                  portanto
-naturalmente                naturally                  naturalmente
-accanto                     next                       próximo
-eppure                      but yet                    e ainda
-eccetera                    etc                        etc.
-finalmente                  long last                  finalmente
-infine                      finally                    finalmente
-poiché                      as                         porque
-comunque                    anyway                     contudo
-dinanzi                     before                     antes
-abbastanza                  quite                      suficiente
-peccato                     sin                        pecado
-certamente                  of course                  certamente
-coloro                      they                       eles
-attorno                     about                      sobre
-magari                      maybe                      talvez
-oppure                      or                         ou
-inoltre                     moreover                   também
-indietro                    back                       de volta
-addosso                     on                         em
-addirittura                 even                       mesmo
-finché                      until                      até
-perfino                     even                       mesmo
-affatto                     at all                     absolutamente
-stamattina                  this morning               esta manhã
-completamente               completely                 completamente
-probabilmente               probably                   provavelmente
-chissà                      who knows                  quem sabe
-sino                        yes no                     para cima
-ognuno                      each one                   cada
-entro                       within                     dentro                    
-
+piano (sostantivi)::plan, piano / plano, piano
+lago (sostantivi)::lake / lago
+crampo (sostantivi)::cramp / cãibra
+rivolto (aggettivi)::(di fronte) facing / frente a
+questo (aggettivi)::this / esta
+quello (aggettivi)::that / aquele
+più (aggettivi)::more / mais
+tutto (aggettivi)::all / tudo
+suo (aggettivi)::his / seu
+altro (aggettivi)::other / outro
+mio (aggettivi)::my / meu
+quale (aggettivi)::which / qual
+tanto (aggettivi)::much / muito
+grande (aggettivi)::great / grande
+poco (aggettivi)::little / pouco
+molto (aggettivi)::very / muito
+nostro (aggettivi)::our / nosso
+stesso (aggettivi)::same / mesmo
+primo (aggettivi)::first / primeiro
+loro (aggettivi)::their / seu
+ogni (aggettivi)::every / cada
+proprio (aggettivi)::own / próprio
+solo (aggettivi)::only / único
+quanto (aggettivi)::how much / quanto
+bello (aggettivi)::beautiful / belo
+qualche (aggettivi)::some / alguns
+nuovo (aggettivi)::new / novo
+certo (aggettivi)::of course / certo
+vero (aggettivi)::true / verdade
+buono (aggettivi)::good / bom
+tuo (aggettivi)::your / seu
+nessuno (aggettivi)::nobody / ninguém
+alcuno (aggettivi)::any / qualquer
+italiano (aggettivi)::italian / italiano
+ultimo (aggettivi)::last / último
+vecchio (aggettivi)::old / velho
+piccolo (aggettivi)::small / pequeno
+troppo (aggettivi)::too much / demais
+tale (aggettivi)::such / tal
+giovane (aggettivi)::young / jovem
+alto (aggettivi)::high / alto
+vostro (aggettivi)::your / seu
+diverso (aggettivi)::different / diferente
+meglio (aggettivi)::better / melhor
+lungo (aggettivi)::long / longo
+povero (aggettivi)::poor / pobre
+maggiore (aggettivi)::greater / maior
+mezzo (aggettivi)::half / meio
+secondo (aggettivi)::second / segundo
+lontano (aggettivi)::far / longe
+vicino (aggettivi)::close / perto, vizinho
+possibile (aggettivi)::possible / possível
+caro (aggettivi)::dear, expensive / caro
+pieno (aggettivi)::full / completo
+nero (aggettivi)::black / preto
+particolare (aggettivi)::particular / particular
+bianco (aggettivi)::white / branco
+forte (aggettivi)::strong / forte
+politico (aggettivi)::politic / político
+attuale (aggettivi)::current / atual
+latino (aggettivi)::latin / latino
+impossibile (aggettivi)::impossible / impossível
+sereno (aggettivi)::serene / sereno
+puro (aggettivi)::pure / puro
+normale (aggettivi)::normal / normal
+perfetto (aggettivi)::perfect / perfeito
+piano (aggettivi)::slow / devagar
+caratteristico (aggettivi)::characteristic / característica
+russo (aggettivi)::russian / russo
+continuo (aggettivi)::continuous / contínuo
+stupido (aggettivi)::stupid / estúpido
+estremo (aggettivi)::extreme / extremo
+grigio (aggettivi)::grey / cinza
+reale (aggettivi)::real / real
+interessante (aggettivi)::interesting / interessante
+medesimo (aggettivi)::same / mesmo
+religioso (aggettivi)::religious / religioso
+ampio (aggettivi)::large / amplo, grande
+biondo (aggettivi)::blond / loiro
+ufficiale (aggettivi)::official / oficial
+attento (aggettivi)::careful / atencioso, cuidadoso
+enorme (aggettivi)::huge / enorme
+sottile (aggettivi)::thin / fino
+triste (aggettivi)::sad / triste
+minimo (aggettivi)::minimum / mínimo
+privato (aggettivi)::private / privado
+rapido (aggettivi)::rapid / rápido
+quarto (aggettivi)::fourth / quarto
+diretto (aggettivi)::direct / direto
+nobile (aggettivi)::noble / nobre
+parecchio (aggettivi)::quite a lot of / alguns
+pericoloso (aggettivi)::dangerous / perigoso
+giallo (aggettivi)::yellow / amarelo
+pazzo (aggettivi)::crazy / louco
+sacro (aggettivi)::sacred / sagrado
+comodo (aggettivi)::comfortable / confortável, cômodo
+elettrico (aggettivi)::electric / elétrico
+assoluto (aggettivi)::absolute / absoluto
+cristiano (aggettivi)::christian / cristão
+antico (aggettivi)::ancient / antigo, velho, ancião
+rosso (aggettivi)::red / vermelho
+chiaro (aggettivi)::clear / claro
+unico (aggettivi)::single / único
+sicuro (aggettivi)::sure / seguro
+importante (aggettivi)::important / importante
+vario (aggettivi)::varied / variado
+giusto (aggettivi)::quite right / correto
+francese (aggettivi)::french / francês
+vivo (aggettivi):: alive / vivo
+generale (aggettivi)::general / geral
+ricco (aggettivi)::rich / rico
+grosso (aggettivi)::big / grande
+necessario (aggettivi)::necessary / necessário
+libero (aggettivi)::free / livre
+nazionale (aggettivi)::national / nacional
+basso (aggettivi)::bass / baixo
+semplice (aggettivi)::simple / simples
+grave (aggettivi)::serious / sério, grave
+pubblico (aggettivi)::public / público
+comune (aggettivi)::common / comum
+freddo (aggettivi)::cold / frio
+economico (aggettivi)::cheap / barato
+felice (aggettivi)::happy / feliz
+difficile (aggettivi)::hard / difícil
+tedesco (aggettivi)::german / alemão
+breve (aggettivi)::short / curto
+pronto (aggettivi)::ready / pronto
+serio (aggettivi)::serious / sério
+presente (aggettivi)::present, attendant / presente
+migliore (aggettivi)::best / melhor
+facile (aggettivi)::easy / fácil
+terzo (aggettivi)::third / terceiro
+caldo (aggettivi)::hot / quente
+estero (aggettivi)::abroad / estrangeiro
+largo (aggettivi)::wide / largo
+pricipale (aggettivi):: main / principal
+verde (aggettivi)::green / verde
+romano (aggettivi)::roman / romano
+umano (aggettivi)::human / humano
+inutile (aggettivi)::useless / inútil
+moderno (aggettivi)::modern / moderno
+numeroso (aggettivi)::numerous / numeroso
+simile (aggettivi)::similar / similar, como
+fresco (aggettivi)::fresh / fresco
+militare (aggettivi)::military / militar
+americano (aggettivi)::american / americano
+vuoto (aggettivi)::empty / vácuo, vazio
+ciascuno (aggettivi)::each / cada
+tranquillo (aggettivi)::quiet / tranquilo
+contento (aggettivi)::happy / contente, feliz
+storico (aggettivi)::historical / histórico
+superiore (aggettivi)::higher / superior
+inglese (aggettivi)::english / inglês
+fermo (aggettivi)::stationary / estacionário
+solito (aggettivi)::usual / usual
+buio (aggettivi)::dark / escuro
+strano (aggettivi)::strange / estranho
+noto (aggettivi)::known / conhecido
+prossimo (aggettivi)::next / próximo
+profondo (aggettivi)::deep / profundo
+sociale (aggettivi)::social / social
+cattivo (aggettivi)::bad / ruim
+massimo (aggettivi)::maximum / máximo
+intero (aggettivi)::full / completo
+uguale (aggettivi)::equal / igual
+bravo (aggettivi)::good / bom
+brutto (aggettivi)::ugly / feio
+preciso (aggettivi)::accurate / preciso
+qualsiasi (aggettivi)::any / qualquer
+improvviso (aggettivi)::sudden / repentino
+famoso (aggettivi)::famous / famoso
+straniero (aggettivi)::foreigner / estrangeiro
+civile (aggettivi)::civil / civil
+internazionale (aggettivi)::international / internacional
+interno (aggettivi)::indoor / interno
+vasto (aggettivi)::extensive / extenso
+segreto (aggettivi)::secret / segredo
+greco (aggettivi)::greek / grego
+naturale (aggettivi)::natural / natural
+sinistro (aggettivi)::left / esquerda
+duro (aggettivi)::hard / difícil
+stanco (aggettivi)::tired / cansado
+azzurro (aggettivi)::blue / azul
+recente (aggettivi)::recent / recente
+notevole (aggettivi)::remarkable / notável
+cittadino (aggettivi)::citizen / cidadão
+destro (aggettivi)::right / direito
+europeo (aggettivi)::european / europeu
+zitto (aggettivi)::silent / silencioso
+medio (aggettivi)::average / média
+qualunque (aggettivi)::whatever / qualquer
+straordinario (aggettivi)::extraordinary / extraordinário
+nudo (aggettivi)::naked / nu, pelado
+futuro (aggettivi)::future / futuro
+cattolico (aggettivi)::catholic / católico
+capace (aggettivi)::to be able / capaz
+industriale (aggettivi)::industrial / industrial
+personale (aggettivi)::staff / pessoal
+centrale (aggettivi)::central / central
+tecnico (aggettivi)::technical / técnico
+dolce (aggettivi)::sweet / doce
+leggero (aggettivi)::light, shallow / leve, superficial
+morale (aggettivi)::moral / moral
+utile (aggettivi)::helpful / útil
+contrario (aggettivi)::contrary / contrário
+speciale (aggettivi)::special / especial
+peggio (aggettivi)::worse / pior
+minore (aggettivi)::minor / menor
+contadino (aggettivi):: rural, contrified / rural, caipira 
+essere (verbi)::to be / ser, estar
+avere (verbi)::to have / ter
+dire (verbi)::to say / dizer
+potere (verbi)::can / poder
+volere (verbi)::want / querer
+sapere (verbi)::know / saber
+stare (verbi)::to stay / ficar
+dovere (verbi)::must / dever
+vedere (verbi)::to see / ver
+andare (verbi)::to go / ir
+venire (verbi)::to come / vir
+dare (verbi)::give / dar
+parlare (verbi)::speak / conversa
+trovare (verbi)::to find / encontrar
+sentire (verbi)::feel / sentir
+lasciare (verbi)::to leave / deixar
+prendere (verbi)::to take / pegar
+guardare (verbi)::to watch / olhar
+mettere (verbi)::to put / pôr
+pensare (verbi)::to think / pensar
+passare (verbi)::to pass / passar
+credere (verbi)::to believe / acreditar
+portare (verbi)::bring / levar
+parere (verbi)::to appear / parecer
+tornare (verbi)::return / retorno
+sembrare (verbi)::to seem / parecer, assemelhar
+tenere (verbi)::to keep / manter
+capire (verbi)::to understand / entender
+morire (verbi)::to die / morrer
+chiamare (verbi)::to call / chamar
+conoscere (verbi)::know / conhecer, saber
+rimanere (verbi)::stay / ficar
+chiedere (verbi)::to ask / perguntar
+cercare (verbi)::search for, research / pesquisar
+entrare (verbi)::to come in / entrar
+vivere (verbi)::to live / viver
+aprire (verbi)::to open / abrir
+uscire (verbi)::go out / sair
+ricordare (verbi)::to remember / recordar, lembrar
+bisognare (verbi)::to need / necessitar
+cominciare (verbi)::begin / começar
+rispondere (verbi)::reply / responder
+aspettare (verbi)::wait / esperar
+riuscire (verbi)::to success / ter sucesso, exitar, conquistar, triunfar
+chiudere (verbi)::to close / fechar
+finire (verbi)::to end / terminar
+arrivare (verbi)::to arrive / chegar 
+scrivere (verbi)::to write / escrever
+diventare (verbi)::become / tornar-se
+restare (verbi)::to remain / ficar
+seguire (verbi)::follow / seguir
+bastare (verbi)::suffice / bastar
+perdere (verbi)::to lose / perder
+rendere (verbi)::to give back / devolver
+correre (verbi)::to run / correr
+salvare (verbi)::to save / salvar
+vestire (verbi)::to dress / vestir
+costruire (verbi)::build / construir
+camminare (verbi)::to walk / andar, caminhar
+ritrovare (verbi)::to find / encontrar
+durare (verbi)::to last / durar
+accendere (verbi)::switch on / ligar, acender
+evitare (verbi)::to avoid / evitar
+immaginare (verbi)::to imagine / imaginar
+ridurre (verbi)::reduce / reduzir
+contenere (verbi)::to contain / conter
+fissare (verbi)::fix / fixar
+costringere (verbi)::to force / forçar, obrigar
+abbandonare (verbi)::abandon / abandonar, deixar
+attendere (verbi)::to wait / esperar
+preferire (verbi)::to prefer / preferir
+scegliere (verbi)::to choose / escolher
+avvertire (verbi)::warn / advertir
+proporre (verbi)::to propose / propor
+temere (verbi)::to fear / temer, ter medo
+esprimere (verbi)::to express / expressar
+spingere (verbi)::to push / empurrar
+salutare (verbi)::to greet / saudar
+udire (verbi)::hear / ouvir
+difendere (verbi)::to defend / defender
+dirigere (verbi)::to direct / dirigir
+cantare (verbi)::to sing / cantar
+sorgere (verbi)::to rise / subir
+assicurare (verbi)::ensure / assegurar, garantir
+assumere (verbi)::to assume / assumir
+tendere (verbi)::to tend / tender
+dividere (verbi)::to divide / dividir
+scusare (verbi)::to excuse / desculpar
+mantenere (verbi)::to maintain / manter
+ritenere (verbi)::to retain / reter
+concludere (verbi)::to conclude / concluir
+saltare (verbi)::jump / saltar
+stabilire (verbi)::to establish / estabelecer
+appartenere (verbi)::to belong / pertencer
+possedere (verbi)::to possess / possuir
+risultare (verbi)::to result / resultar
+suonare (verbi)::to play, to sound / tocar, soar
+coprire (verbi)::to cover / cobrir
+insegnare (verbi)::to teach / ensinar
+affermare (verbi)::to assert / afirmar
+rivelare (verbi)::reveal / revelar
+conservare (verbi)::to preserve / conservar, preservar
+risolvere (verbi)::to solve / resolver
+concedere (verbi)::grant / conceder
+limitare (verbi)::to limit / limitar
+abitare (verbi)::to live / viver, morar, habitar
+convincere (verbi)::to convince / convencer
+comprare (verbi)::to buy / comprar
+legare (verbi)::to tie / amarrar
+sostenere (verbi)::to sustain / apoiar, sustentar
+nascere (verbi)::to be born / nascer
+presentare (verbi)::to introduce / apresentar
+trattare (verbi)::to deal / tratar
+piacere (verbi)::to like / gostar
+continuare (verbi)::to continue / continuar
+partire (verbi)::leave / deixar, partir
+servire (verbi)::to serve / servir
+giungere (verbi)::reach / alcançar
+fermare (verbi)::stop / parar
+apparire (verbi)::to appear / aparecer
+amare (verbi)::to love / amar
+esistere (verbi)::to exist / existir
+intendere (verbi)::to mean / intencionar
+salire (verbi)::to climb / subir, escalar
+mancare (verbi)::to miss / perder
+ridere (verbi)::to laugh / rir
+lavorare (verbi)::to work / trabalhar
+alzare (verbi)::raise up / levantar
+riconoscere (verbi)::to recognize / reconhecer
+sedere (verbi)::sit down / sentar
+leggere (verbi)::to read / ler
+cadere (verbi)::fall / cair
+mangiare (verbi)::to eat / comer
+dormire (verbi)::to sleep / dormir
+raggiungere (verbi)::to achieve / alcançar
+comprendere (verbi)::to understand / entender
+scendere (verbi)::to go down / descer 
+compiere (verbi)::fulfill / fazer
+toccare (verbi)::to touch / tocar
+considerare (verbi)::to consider / considerar
+muovere (verbi)::move / mudar
+stringere (verbi)::tighten / apertar, restringir
+mandare (verbi)::to send / enviar
+domandare (verbi)::ask / perguntar
+ascoltare (verbi)::to listen / ouvir
+decidere (verbi)::to decide / decidir
+ricevere (verbi)::to receive / receber
+osservare (verbi)::to observe / observar
+permettere (verbi)::to allow / permitir
+avvenire (verbi)::to occur / ocorrer
+spiegare (verbi)::explain / explicar
+raccogliere (verbi)::to collect / recolher
+ottenere (verbi)::to obtain / obter
+offrire (verbi)::to offer / oferecer
+mostrare (verbi)::to exhibit / mostrar
+accompagnare (verbi)::accompany / acompanhar
+dimenticare (verbi)::to forget / esquecer
+pregare (verbi)::to pray / rezar
+raccontare (verbi)::to tell / dizer, contar
+bere (verbi)::to drink / beber
+ritornare (verbi)::to return / retornar
+cambiare (verbi)::to change / mudar, trocar
+dimostrare (verbi)::to demonstrate / demonstrar
+sperare (verbi)::to hope, expect / ter esperança, aguardar
+sposare (verbi)::to marry / casar
+ammettere (verbi)::to admit / admitir
+fuggire (verbi)::to run away / fugir
+liberare (verbi)::to free / liberar, libertar
+riferire (verbi)::to refer / referir
+svegliare (verbi)::to wake up / acordar
+capitare (verbi)::to happen / acontecer
+posare (verbi)::to lay / colocar, pousar
+impedire (verbi)::to prevent / impedir, prevenir
+gettare (verbi)::to throw / jogar fora, se desfazer
+vendere (verbi)::to sell / vender
+distinguere (verbi)::to distinguish / distinguir
+offendere (verbi)::to offend / ofender
+rimettere (verbi)::to replace / substituir
+rompere (verbi)::break / quebrar, romper
+godere (verbi)::to enjoy / apreciar
+imporre (verbi)::to impose / impor
+significare (verbi)::to mean / significar
+desiderare (verbi)::to desire / desejar
+divertire (verbi)::amuse / divertir, entreter
+giudicare (verbi)::to judge / julgar
+produrre (verbi)::to produce / produzir
+avvicinare (verbi)::approach / aproximar
+diffondere (verbi)::spread / difundir, propagar
+ordinare (verbi)::to sort / ordenar
+invitare (verbi)::to invite / convidar
+discutere (verbi)::to discuss / discutir
+sbagliare (verbi)::make a mistake / errar
+badare (verbi)::look after / cuidar
+tagliare (verbi)::to cut / cortar
+pubblicare (verbi)::to publish / publicar
+attaccare (verbi)::attack / atacar
+imparare (verbi)::learn / aprender
+prevedere (verbi)::forecast / prever
+scappare (verbi)::to run away / escapar, fugir
+spegnere (verbi)::switch off / desligar
+annunciare (verbi)::to announce / anunciar
+baciare (verbi)::to kiss / beijar
+esporre (verbi)::to expose / expor
+attraversare (verbi)::go across / atravessar
+fornire (verbi)::to provide / fornecer
+segnare (verbi)::to mark / marcar
+superare (verbi)::overcome / superar
+rivedere (verbi)::to review / revisar
+allontanare (verbi)::to push / empurrar
+ammazzare (verbi)::kill / matar
+accogliere (verbi)::to receive / acolher
+voltare (verbi)::to turn / voltar, girar
+preoccupare (verbi)::worry / preocupar
+provocare (verbi)::to cause / provocar
+riempire (verbi)::to fill / preencher
+partecipare (verbi)::take part / participar
+piantare (verbi)::plant / plantar
+rientrare (verbi)::re-enter / reentrar
+richiedere (verbi)::request / requisitar, pedir
+nascondere (verbi)::to hide / esconder
+ripetere (verbi)::to repeat / repetir
+scoprire (verbi)::to discover / descobrir
+preparare (verbi)::prepare / preparar
+scorrere (verbi)::slide / escorregar
+rappresentare (verbi)::to represent / representar
+riprendere (verbi)::to resume / retomar
+costituire (verbi)::constitute / constituir
+incontrare (verbi)::to meet / encontrar, reunir-se
+valere (verbi)::be worth / valer
+accorgersi (verbi)::notice / aviso
+provare (verbi)::try out / tentar
+formare (verbi)::to form / formar
+uccidere (verbi)::kill / matar
+tirare (verbi)::pull / tirar, puxar
+togliere (verbi)::remove / remover
+notare (verbi)::to notice / notar
+aggiungere (verbi)::to add / adicionar
+succedere (verbi)::happen / acontecer
+pagare (verbi)::to pay / pagar
+tentare (verbi)::to attempt / tentar
+accadere (verbi)::to happen / acontecer
+creare (verbi)::create / criar
+importare (verbi)::import / importar
+pesare (verbi)::weigh / pesar
+usare (verbi)::use / usar
+accettare (verbi)::to accept / aceitar
+indicare (verbi)::indicate / indicar
+buttare (verbi)::throw / jogar fora
+battere (verbi)::beat / bater
+interessare (verbi)::to interest / interessar
+sorridere (verbi)::to smile / sorrir
+condurre (verbi)::to conduct / levar, conduzir
+disporre (verbi)::to have / ter
+unire (verbi)::to merge / unir, juntar
+aiutare (verbi)::to help / ajudar
+piangere (verbi)::to cry / chorar
+girare (verbi)::turn / girar
+levare (verbi)::to take away / tomar
+elevare (verbi)::to raise / levantar
+soffrire (verbi)::suffer / sofrer
+recare (verbi)::cause / causar, provocar
+riguardare (verbi)::concern / preocupar
+volgere (verbi)::to turn / virar, girar
+tacere (verbi)::be silent / calar, ficar em silêncio
+occorrere (verbi)::to take / tomar
+porre (verbi)::to put / colocar
+vincere (verbi)::to win / vencer
+svolgere (verbi)::perform / realizar
+studiare (verbi)::to study / estudar
+crescere (verbi)::to grow up / crescer
+divenire (verbi)::become / tornar-se
+gridare (verbi)::shout / gritar
+dichiarare (verbi)::declare / declarar
+contare (verbi)::to count / contar
+giocare (verbi)::to play / jogar
+assistere (verbi)::assist / auxiliar, assistir
+aumentare (verbi)::to increase / aumentar
+lanciare (verbi)::to launch / lançar
+determinare (verbi)::to determine / determinar
+scherzare (verbi)::to joke / brincar, contar piada
+promettere (verbi)::to promise / prometer
+scomparire (verbi)::to disappear / desaparecer
+trarre (verbi)::to take / tomar
+distruggere (verbi)::to destroy / destruir
+meritare (verbi)::to deserve / merecer
+dedicare (verbi)::devote / dedicar
+iniziare (verbi)::to start / começar
+sorprendere (verbi)::to surprise / surpreender
+trasformare (verbi)::to commute, to transform / transformar
+confessare (verbi)::to confess / confessar
+arrestare (verbi)::to stop, to arrest / parar, prender
+ringraziare (verbi)::to thank / agradecer
+riunire (verbi)::gather / reunir
+volare (verbi)::to fly / voar
+fondare (verbi)::to found / encontrar
+guidare (verbi)::to drive / dirigir, levar
+ferire (verbi)::to hurt / ferir, machucar
+opporre (verbi)::to oppose / opor
+procedere (verbi)::proceed / prosseguir
+smettere (verbi)::stop / parar
+consentire (verbi)::allow / consentir, permitir
+innamorare (verbi)::fall in love / apaixonar
+organizzare (verbi)::to organize / organizar
+rifiutare (verbi)::to reject / recusar, refutar, rejeitar
+riportare (verbi)::to report / reportar
+dipendere (verbi)::to depend / depender
+provvedere (verbi)::provide / fornecer, prover
+trascinare (verbi)::to drag / arrastar
+fumare (verbi)::to smoke / fumar
+scoppiare (verbi)::to blow up / explodir
+sognare (verbi)::to dream / sonhar
+appoggiare (verbi)::support / apoio
+armare (verbi)::to arm / munir, armar
+celebrare (verbi)::to celebrate / celebrar
+descrivere (verbi)::to describe / descrever
+resistere (verbi)::resist / resistir
+bruciare (verbi)::burn / queimar
+colpire (verbi)::hit / bater
+estendere (verbi)::extend / estender
+staccare (verbi)::remove / remover
+affrontare (verbi)::face up to / afrontar
+avanzare (verbi)::push forward / avançar
+comporre (verbi)::to compose / compor
+escludere (verbi)::to exclude / excluir
+figurare (verbi)::appear / aparecer
+insistere (verbi)::to insist / insistir
+il (varie)::the / o
+di (varie)::of / de
+e (varie)::is / e
+a (varie)::to / para
+un (varie)::a / um
+in (varie)::in / em
+che (varie)::that / que
+non (varie)::not / não
+si (varie)::yes / sim
+da (varie)::from / de
+lo (varie)::the / o
+per (varie)::for / para
+con (varie)::with / com
+ma (varie)::but / mas
+come (varie)::such as / como
+su (varie)::on / em, sobre
+mi (varie)::me / me
+anche (varie)::also / também
+o (varie)::or / ou
+io (varie)::i / eu
+se (varie)::self (pronoum), if (condition) / se (pronome/condição)
+perché (varie)::why / porque
+li (varie)::there / lá
+ci (varie)::us / nós
+ne (varie)::neither / qualquer, nenhum
+lei (varie)::she / ela
+ancora (varie)::yet / ainda
+tu (varie)::you / você
+lui (varie)::he / ele
+senza (varie)::without / sem
+bene (varie)::well / bem
+cui (varie)::which / em que
+chi (varie)::who / quem
+già (varie)::already / já
+dopo (varie)::after / depois
+uno (varie)::one / um
+noi (varie)::we / nós
+dove (varie)::where / onde
+qui (varie)::here / aqui
+no (varie)::no / não
+allora (varie)::then / então
+tra (varie)::between / entre
+vi (varie)::you / você
+ora (varie)::now / agora
+fra (varie)::between / entre
+prima (varie)::before / primeiro
+forse (varie)::perhaps / talvez
+sì (varie)::yup / sim
+sotto (varie)::under / abaixo
+voi (varie)::you / você
+fino (varie)::till / até
+oggi (varie)::today / hoje
+quasi (varie)::almost / quase
+pure (varie)::also / também
+egli (varie)::he / ele
+mentre (varie)::while / enquanto
+contro (varie)::versus / contra
+invece (varie)::instead / em vez
+esso (varie)::it / ele
+là (varie)::there / lá
+però (varie)::however / contudo
+né (varie)::neither / nem
+subito (varie)::immediately / imediatamente
+verso (varie)::to / para
+ciò (varie)::it / ele
+ecco (varie)::here / aqui
+fuori (varie)::out / fora
+meno (varie)::less / menos
+adesso (varie)::now / agora
+niente (varie)::nothing / nada
+cioè (varie)::that is / que é
+male (varie)::bad / ruim, mal
+nulla (varie)::nothing / nada
+quindi (varie)::thus, therefore / então, portanto
+dunque (varie)::therefore / portanto
+appena (varie)::as soon as / há pouco
+insieme (varie)::together / juntos
+dentro (varie)::inside / dentro
+durante (varie)::during / durante
+almeno (varie)::at least / pelo menos
+secondo (varie)::second / segundo
+anzi (varie)::rather / mais
+oramai (varie)::now / agora
+oltre (varie)::over / sobre
+intorno (varie)::around / volta
+sopra (varie)::over it / sobre
+dietro (varie)::behind / atrás
+davanti (varie)::front / frente
+soltanto (varie)::only / unicamente
+infatti (varie)::indeed / na verdade
+qualcosa (varie)::something / algo
+spesso (varie)::often / freqüentemente
+accordo (varie)::agreement / acordo
+ieri (varie)::yesterday / ontem
+davvero (varie)::really / realmente
+lì (varie)::there / lá
+qualcuno (varie)::someone / alguém
+avanti (varie)::forward / avante, para a frente
+assai (varie)::very / muito
+presto (varie)::soon / em breve
+qua (varie)::here / aqui
+domani (varie)::tomorrow / amanhã
+circa (varie)::about / sobre
+giù (varie)::down / para baixo
+soprattutto (varie)::mostly / acima de tudo
+nemmeno (varie)::not even / nem sequer
+grazie (varie)::thank you / obrigado
+tuttavia (varie)::however / contudo
+appunto (varie)::just / há pouco
+neppure (varie)::neither / nem
+veramente (varie)::really / realmente
+tardi (varie)::late / tarde
+insomma (varie)::in conclusion / em resumo
+presso (varie)::at / em
+intanto (varie)::in the meantime / entretanto, enquanto isso
+lungo (varie)::along / juntamente, ao longo
+neanche (varie)::neither / nem
+piuttosto (varie)::rather / mais
+stasera (varie)::tonight / hoje à noite
+perciò (varie)::therefore / portanto
+naturalmente (varie)::naturally / naturalmente
+accanto (varie)::next / próximo
+eppure (varie)::but yet / e ainda
+eccetera (varie)::etc / etc
+finalmente (varie)::long last / finalmente
+infine (varie)::finally / finalmente
+poiché (varie)::as / porque
+comunque (varie)::anyway / contudo
+dinanzi (varie)::before / antes
+abbastanza (varie)::quite / suficiente
+peccato (varie)::sin / pecado
+certamente (varie)::of course / certamente, claro
+coloro (varie)::they / com eles
+attorno (varie)::about / sobre
+magari (varie)::maybe / talvez
+oppure (varie)::or / ou
+inoltre (varie)::moreover / também
+indietro (varie)::back / de volta
+addosso (varie)::on / em
+addirittura (varie)::even / mesmo
+finché (varie)::until / até
+perfino (varie)::even / mesmo
+affatto (varie)::at all / absolutamente
+stamattina (varie)::this morning / esta manhã
+completamente (varie)::completely / completamente
+probabilmente (varie)::probably / provavelmente
+chissà (varie)::who knows / quem sabe
+ognuno (varie)::each one / cada um
+entro (varie)::within / dentro
