@@ -176,6 +176,7 @@ void createcfgdir(tcfg *c); /* creates /home/user/.config/qualcard/ */
 char *filenopath(char *filepath); /* get filename with no path */
 int randnorep(int mode, int *n); /* drawn numbers from a list with no repetition */
 void changebarnet(char *s); /* change \n and \t to the real thing */
+void changecolon(char *nt); /* change char 254 back to a colon sign */
 int diffdays(int newd, int oldd); /* Difference of two dates in days. Positive if new>old, 0 if equals, negative c.c. */
 float score(float ave, int late); /* return the new score when the revision is late */
 void menudb(tcfg *c); /* read menu */
@@ -444,6 +445,8 @@ void cardfaces(char *card, char *fr, char *bk)
         {
             fprintf(stderr,"\n------------------------------------------\n");
             fprintf(stderr,"Wrong card without '::' separator.\n%s\n", card);
+            changecolon(fr); /* change char 254 back to a colon sign */
+            changecolon(bk); /* change char 254 back to a colon sign */
             return; /* not found, return all card to front and back */
         }
         colon++;
@@ -452,7 +455,18 @@ void cardfaces(char *card, char *fr, char *bk)
     }
     *(colon-1)='\0'; /* front */
     strcpy(bk, colon+1); /* back */
+    changecolon(fr); /* change char 254 back to a colon sign */
+    changecolon(bk); /* change char 254 back to a colon sign */
     return;
+}
+
+/* change char 254 back to a colon sign */
+void changecolon(char *nt)
+{
+    do
+        if((nt=strchr(nt,254)))
+            *nt=':';
+    while(nt!=NULL);
 }
 
 /* change '\n', '\t' and '\\' to the real thing */
@@ -462,13 +476,16 @@ void changebarnet(char *nt)
         if((nt=strchr(nt,'\\')))
             switch(*++nt)
             {
-                case 'n':
+                case 'n':        /* \n becomes space+\n */
                     *nt='\n';
                     goto space;
-                case 't':
+                case 't':        /* \t becomes space+\t */
                     *nt='\t';
+                    goto space;
+                case ':':        /* : becomes space + þ 254 */
+                    *nt=254;
                 space:
-                case '\\':
+                case '\\':       /* \\ becomes space+\ */
                     *(nt-1)=' ';
                     nt++;
             }
