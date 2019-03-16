@@ -15,7 +15,7 @@ Projeto de Aprendizado de temas diversos via repetição espaçada de cartões (
 * Cartões que recebem a nota zero são repetidos ao final, quantas vezes forem necessárias, até que receba nota maior. Os zeros acumulam para cálculo da nota que passa a ser uma média.
 * De posse da nota (N), uma nova média (M1) é calculada com a fórmula: M1 = (M0 + N) / 2, onde M0 é a média anterior. No primeiro ciclo, M1 = N - 23%.
 * Uma vez apresentados, os cartões são agendados para reapresentação com a seguinte escala:
-    - (H) Média == 0.00   -> reapresentar hoje ao final
+    - (H) Nota  == 0.00   -> reapresentar hoje ao final
     - (G) Média <= 0.60   -> reagendar para  1 dia
     - (F) Média <= 1.35   -> reagendar para  2 dias
     - (E) Média <= 2.20   -> reagendar para  3 dias
