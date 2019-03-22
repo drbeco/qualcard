@@ -1,0 +1,27 @@
+CTRL+C :: Interrupts the current foreground process running in the terminal. Sends a SIGINT, a signal that most process would honor. Some may ignore it. If so, try CTRL+\
+CTRL+\ :: Quits the current foreground process running in the terminal. Sends a SIGQUIT, a strong signal that most process would honor. If not, you may need to use SIGKILL.
+CTRL+L :: Repaint the screen. Usefull after a "write" message. Works at terminal and also inside vim.
+CTRL+S :: Usually this stops the screen to show text. You can resume with CTRL+Q. But at Hydra server, this is used to do a reverse search at your bash history for a command. Hit CTRL+C or ESC to stop. Hit right arrow to accept and edit. Hit ENTER to run the command.
+CTRL+R :: This is the RECALL last command matching the characters you provide. It will search the bash history for a command. Keep pressing to keep looking. Hit CTRL+C, ESC or CTRL+G to cancel. Hit right arrow or any cursor movement to edit the line. Hit ENTER or CTRL+O to run the command.
+CTRL+A :: Or Home key, go to the begin of the line.
+CTRL+E :: or End key, go to the end of the line.
+CTRL+XX :: Go to the begin of the line, but remember where you are! Press again and you are back to the last cursor position. Very useful.
+ALT+D :: Delete the word after the cursor.
+ALT+T :: Swap the current word with the previous word.
+CTRL+T :: Swap the last two characteres. Ever typed sl instead of ls?
+CTRL+SHIFT+_ :: Undo your last line edition.
+CTRL+W :: Delete the word before the cursor. Adds the word to the clipboard.
+CTRL+K :: Cut the part of the line after the cursor, adding it to the clipboard.
+CTRL+U :: Cut the part of the line before the cursor, adding it to the clipboard.
+CTRL+Y :: Past the last thing you added to the clipboard back to the line. Stands for "yank"
+ALT+U :: Capitalize (upper case) every character in the word under the cursor to the end.
+ALT+L :: Uncapitalize (lower case) every character in the word under the cursor to the end.
+ALT+C :: Capitalize (upper case) the first letter under the cursos, and uncapitalize (lower case) the rest of the word.
+TAB :: Press once and it will auto-complete the word you started typing. If there is some ambiguity, it will do nothing; then you press twice and it will show you all the options that can be used. Type a little bit more and use TAB again to get out of the ambiguity.
+UP ARROW :: Also CTRL+P, go to the previous command in your bash history.
+DOWN ARROW :: Or CTRL+N, go to the next command in your bash history.
+ALT+R :: Perform a reverse search with the last command you edited, without changes.
+set -o vi :: Set the vi input mode for editing the linux command line. This will work for only the section. If you want to make it permanent, read and find the correct line to uncomment on ~/.inputrc file.
+set -o emacs :: Set the emacs input mode for editing the linux command line. This is the default.
+CTRL+LEFT ARROW :: Jumps one word to the left.
+CTRL+RIGHT ARROW :: Jumps one word to the right.
