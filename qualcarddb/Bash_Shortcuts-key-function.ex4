@@ -13,7 +13,7 @@ CTRL+SHIFT+_ :: Undo your last line edition.
 CTRL+W :: Delete the word before the cursor. Adds the word to the clipboard.
 CTRL+K :: Cut the part of the line after the cursor, adding it to the clipboard.
 CTRL+U :: Cut the part of the line before the cursor, adding it to the clipboard.
-CTRL+Y :: Past the last thing you added to the clipboard back to the line. Stands for "yank"
+CTRL+Y :: Paste the last thing you added to the clipboard back to the line. Stands for "yank"
 ALT+U :: Capitalize (upper case) every character in the word under the cursor to the end.
 ALT+L :: Uncapitalize (lower case) every character in the word under the cursor to the end.
 ALT+C :: Capitalize (upper case) the first letter under the cursos, and uncapitalize (lower case) the rest of the word.
@@ -25,3 +25,4 @@ set -o vi :: Set the vi input mode for editing the linux command line. This will
 set -o emacs :: Set the emacs input mode for editing the linux command line. This is the default.
 CTRL+LEFT ARROW :: Jumps one word to the left.
 CTRL+RIGHT ARROW :: Jumps one word to the right.
+ALT+. :: Get the last argument of the previous line.
