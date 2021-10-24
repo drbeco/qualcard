@@ -359,7 +359,7 @@ int main(int argc, char *argv[])
 
             do
             {
-                printf("Your self-evaluation (from 0 to 5) is: ");
+                printf("Your self-evaluation (from 0 to 5, default 1) is: ");
                 /* scanf("%d%*c", &opt); /1* discard the '\n'. Better use fgets() *1/ */
                 fgets(sopt, SOPT, stdin);
                 if((p=strchr(sopt, '\n'))) *p='\0';
@@ -1246,7 +1246,7 @@ void readdbfiles(tcfg *c)
                     fprintf(stderr, "Ignoring file with too big name: %s\n", fullname);
                     continue;
                 }
-                if(!strcmp(dot, ".ex4")) /* achou db */
+                if(!strcmp(dot, EXTDB)) /* achou db */
                 {
                     c->dbfsize++;
                     c->dbfiles=(char **)reallocordie(c->dbfiles, sizeof(char *)*(c->dbfsize));

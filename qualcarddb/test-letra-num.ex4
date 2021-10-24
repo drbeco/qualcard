@@ -6,17 +6,12 @@
 \\6 q::\\a
 quest\::quest::answer\::answer 7
 quest:\:quest::answer::answer 8
-2a:1::aa\naa2 \t2
-\::3a:2::\t3 \t3
-d:4::\::n3 \t4
-\::e:5\:n::3 \t5
-f:6\n3: aa:aa\t6
-g\::733:aa7
-h:::aa8\n3 \t8
-:i:9::aa\n3 \t9
-j:10::aa\n3\t10
-k::11\n11\t11\t\::
-l:12\n\::12\t12\n::
-a\na\ta::13\noutr\\na\tlinha\taqui\nnao
-a\tb\tb::14\t\tta\\bar...\\\nlinha\\ndoisfim\
-a\tc\tc::15\n\t29\\nlinha ou nao?\nsim!:w
+9a:1::aa\naa2 \t2
+\::10a:2::\t10\t3
+d:11::\::n3 \t4
+\::e:12\:n::3 \t5
+f:13\n13: aa:aa\t6 carta sem verso repete
+g\::14:aa14
+h:::aa15\n3 \t15
+k::18\n18\t18\t\::
+a\tb\tb::21\t\tta\\bar...\\\nlinha\\nquebra linha\
