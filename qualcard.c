@@ -513,6 +513,7 @@ char *filenopath(char *filepath)
     static char filename[STRSIZE];
     char *bar;
 
+    strncpy(filename, filepath, STRSIZE);
     if((bar=strrchr(filepath, '/'))) /* find the last / */
     {
         bar++; /* next char starts the filename */
