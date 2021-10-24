@@ -10,8 +10,8 @@ quest:\:quest::answer::answer 8
 \::10a:2::\t10\t3
 d:11::\::n3 \t4
 \::e:12\:n::3 \t5
-f:13\n13: aa:aa\t6 carta sem verso repete
-g\::14:aa14
-h:::aa15\n3 \t15
+f:13\n13: aa:aa\t6 carta sem verso repete /* teste comentario */
+g\::14:aa14/* teste comentario */
+h:::aa15\n3 \t15/* teste comentario */
 k::18\n18\t18\t\::
 a\tb\tb::21\t\tta\\bar...\\\nlinha\\nquebra linha\

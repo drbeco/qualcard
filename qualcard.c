@@ -514,13 +514,15 @@ char *filenopath(char *filepath)
     char *bar;
 
     if((bar=strrchr(filepath, '/'))) /* find the last / */
-        bar++; /* next char starts the filename */
-    else /* no bar? that's odd... */
     {
-        fprintf(stderr, "Filename %s must be an absolute path.\n", filepath);
-        exit(EXIT_FAILURE);
+        bar++; /* next char starts the filename */
+        strncpy(filename, bar, STRSIZE);
     }
-    strncpy(filename, bar, STRSIZE);
+    /* else /1* no bar? that's odd... *1/ */
+    /* { */
+        /* fprintf(stderr, "Filename %s must be an absolute path.\n", filepath); */
+        /* exit(EXIT_FAILURE); */
+    /* } */
     return filename;
 }
 
@@ -984,7 +986,7 @@ void qualcard_init(tcfg *cfg)
         printf("\n");
     }
 
-    if(readlink("/proc/self/exe", binpath, PATHSIZE) == -1)
+    if(readlink("/proc/self/exe", binpath, PATHSIZE) == -1) /* /usr/local/bin/qualcard */
     {
         perror("readlink");
         printf("I can't find the binary path\n");
@@ -1008,9 +1010,10 @@ void qualcard_init(tcfg *cfg)
 
     if(verb>2)
     {
+        printf("Binary path: %s\n", binpath);
         printf("Database path: %s/\n", cfg->dbpath);
-        printf("Config path for writing: %s\n", cfg->cfgrealpath);
-        printf("Config path for reading: %s\n", cfg->cfguserpath);
+        printf("Config path for writing: %s/\n", cfg->cfgrealpath);
+        printf("Config path for reading: %s/\n", cfg->cfguserpath);
     }
 
     readdbfiles(cfg); /* update dbfiles[] vector from dbpath and cfgrealpath */
@@ -1428,10 +1431,10 @@ void help(void)
     printf("\t-v,  --verbose\n\t\tSet verbose level (cumulative).\n");
     printf("\t-q,  --quiet\n\t\tReduces verbose level (also cumulative).\n");
     printf("\t-s,  --status\n\t\tShow how many cards needs review in each database.\n");
+    printf("\t-i,  --invert\n\t\tInvert presentation order (show first the back, then the front of the card).\n");
     printf("\t-u username,  --user username\n\t\tUse the username's profile. If not given, defaults to the -p username or the username from the system.\n");
     printf("\t-p username,  --path username\n\t\tSet the username used for the config path (it is mandatory to use together with -s).\n");
-    printf("\t-d file.ex4,  --database file.ex4\n\t\tUse the given database to practice.\n\t\tThe file must have a '.ex4' extension and starts with '/' (absolute path)\n\t\tand its name is in the form 'theme-question-answer.ex4', where:\n\t\t\t* theme: the theme of the study.\n\t\t\t* question: the first side of the card.\n\t\t\t* answer: the back side of the card.\n");
-    printf("\t-i,  --invert\n\t\tInvert presentation order (show first the back, then the front of the card).\n");
+    printf("\t-d file.ex4,  --database file.ex4\n\t\tUse the given database to practice.\n\t\tThe file must have a '.ex4' extension\n\t\tand its name is in the form 'theme-front-verse.ex4', where:\n\t\t\t* theme: the theme of the study.\n\t\t\t* front: the first side of the card, ex. question.\n\t\t\t* verse: the back side of the card, ex. answer.\n");
     /* add more options here */
     printf("\nExit status:\n\t0 if ok.\n\t1 some error occurred.\n");
     printf("\nTodo:\n\tLong options not implemented yet.\n");
