@@ -116,7 +116,8 @@
 
 /* limits */
 #define STRSIZE 1500 /**< String buffer size */
-#define PATHSIZE 256 /**< Maximum $PATH size */
+#define SOPT 4 /* opt string '99\n\0' */
+#define PATHSIZE 1600 /**< Maximum $PATH size */
 #define DTSIZE 9 /**< String with yyyymmdd */
 #define PEREXEC 10 /**< How many cards presented per round (execution) */
 #define NEWEXEC 1 /**< Minimum number of new cards presented per round */
@@ -220,6 +221,8 @@ float getactime(FILE *fp); /* read time if exists. points to first card stat */
  */
 int main(int argc, char *argv[])
 {
+    char sopt[SOPT]; /* string opt */
+    char *p; /* strchr remove \n from sopt */
     int opt; /* return from getopt() and user options */
     tcfg c={0}; /* struct to configuration variables */
     int i; /* index, auxiliary */
@@ -264,16 +267,16 @@ int main(int argc, char *argv[])
                 SUMMA=1;
                 break;
             case 'u': /* username */
-                strcpy(c.fileuser, optarg);
+                strncpy(c.fileuser, optarg, STRSIZE);
                 break;
             case 'p': /* username for other account (path) */
-                strcpy(c.pathuser, optarg);
+                strncpy(c.pathuser, optarg, STRSIZE);
                 break;
             case 'i': /* invert */
                 c.invert=1;
                 break;
             case 'd': /* database */
-                strcpy(c.dbasef, optarg);
+                strncpy(c.dbasef, optarg, STRSIZE);
                 break;
             case '?':  /* wrong option, exit */
             default:
@@ -357,7 +360,15 @@ int main(int argc, char *argv[])
             do
             {
                 printf("Your self-evaluation (from 0 to 5) is: ");
-                scanf("%d%*c", &opt); /* discard the '\n'. Better use fgets() */
+                /* scanf("%d%*c", &opt); /1* discard the '\n'. Better use fgets() *1/ */
+                fgets(sopt, SOPT, stdin);
+                if((p=strchr(sopt, '\n'))) *p='\0';
+                if(sopt[0]=='\0') /* playing <enter> means evaluating to 1 */
+                {
+                  opt=1;
+                  break;
+                }
+                opt=strtol(sopt, NULL, 10);
             } while(opt<0 || opt>5);
             if(!opt)
             {
@@ -434,9 +445,9 @@ void cardfaces(char *card, char *fr, char *bk)
 {
     char *colon;
 
-    strcpy(fr, card);
+    strncpy(fr, card, STRSIZE);
     changebarnet(fr);
-    strcpy(bk, fr); /* default in case of problem: back == front */
+    strncpy(bk, fr, STRSIZE); /* default in case of problem: back == front */
     colon=fr;
     while(1)
     {
@@ -454,7 +465,7 @@ void cardfaces(char *card, char *fr, char *bk)
             break;
     }
     *(colon-1)='\0'; /* front */
-    strcpy(bk, colon+1); /* back */
+    strncpy(bk, colon+1, STRSIZE); /* back */
     changecolon(fr); /* change char 254 back to a colon sign */
     changecolon(bk); /* change char 254 back to a colon sign */
     return;
@@ -484,6 +495,7 @@ void changebarnet(char *nt)
                     goto space;
                 case ':':        /* : becomes space + þ 254 */
                     *nt=254;
+                    goto space;
                 space:
                 case '\\':       /* \\ becomes space+\ */
                     *(nt-1)=' ';
@@ -502,10 +514,10 @@ char *filenopath(char *filepath)
         bar++; /* next char starts the filename */
     else /* no bar? that's odd... */
     {
-        printf("Filename %s must be an absolute path.\n", filepath);
+        fprintf(stderr, "Filename %s must be an absolute path.\n", filepath);
         exit(EXIT_FAILURE);
     }
-    strcpy(filename, bar);
+    strncpy(filename, bar, STRSIZE);
     return filename;
 }
 
@@ -586,7 +598,7 @@ int dbsize(char *dbname)
 
     if(!(fp=fopen(dbname,"r")))
     {
-        printf("Fail to open database %s.\n", dbname);
+        fprintf(stderr, "Fail to open database %s.\n", dbname);
         exit(EXIT_FAILURE);
     }
 
@@ -786,7 +798,12 @@ void summary(tcfg c)
         qtd=dbsize(c.dbfiles[i]);
 
         dbc=dbcore(c.dbfiles[i]);
-        sprintf(summaryf, "%s/%s-%s%s", c.cfguserpath, c.fileuser, dbc, EXTCF);
+        if(strlen(c.cfguserpath)+strlen(c.fileuser)+strlen(dbc)+strlen(EXTCF)>=PATHSIZE)
+        {
+            fprintf(stderr, "Summary filename overflow\n");
+            exit(EXIT_FAILURE);
+        }
+        snprintf(summaryf, PATHSIZE, "%s/%s-%s%s", c.cfguserpath, c.fileuser, dbc, EXTCF);
 
         cfanalyses(summaryf, c.today, qtd, &view, &learn, &pct, &ave, &clate);
         pview=((float)view/(float)qtd)*100.0;
@@ -804,7 +821,7 @@ char *theme(char *file)
     char *dash;
     static char theme[STRSIZE];
 
-    strcpy(theme, file);
+    strncpy(theme, file, STRSIZE);
     if((dash=strchr(theme, '-')))
         *dash='\0';
 
@@ -878,7 +895,7 @@ void createcfgdir(tcfg *c)
 {
     char path1[PATHSIZE];
 
-    sprintf(path1, "/home/%s/.config", c->realuser);
+    snprintf(path1, PATHSIZE, "/home/%s/.config", c->realuser);
     if(0 != access(path1, F_OK))
     {
         if(ENOENT == errno) /* does not exist */
@@ -939,20 +956,20 @@ void qualcard_init(tcfg *cfg)
 
     cfg->tstart=time(NULL);
     timeptr=localtime(&cfg->tstart);
-    sprintf(stoday, "%04d%02d%02d", 1900 + timeptr->tm_year, 1 + timeptr->tm_mon, timeptr->tm_mday);
+    snprintf(stoday, DTSIZE, "%04d%02d%02d", 1900 + timeptr->tm_year, 1 + timeptr->tm_mon, timeptr->tm_mday);
     cfg->today=(int)strtol(stoday, NULL, 10);
 
     srand((unsigned)time(&cfg->tstart)); /* new unknow seed */
 
-    strcpy(cfg->realuser, getenv("USER"));
+    strncpy(cfg->realuser, getenv("USER"), STRSIZE);
     if(cfg->pathuser[0]=='\0')
-        strcpy(cfg->pathuser, cfg->realuser);
+        strncpy(cfg->pathuser, cfg->realuser, STRSIZE);
 
     if(cfg->fileuser[0]=='\0')
     {
         if(strcmp(cfg->realuser, cfg->pathuser) && verb>1)
             printf("Assuming -u %s. See -h for help.\n", cfg->pathuser);
-        strcpy(cfg->fileuser, cfg->pathuser);
+        strncpy(cfg->fileuser, cfg->pathuser, STRSIZE);
     }
 
     if(verb>0)
@@ -970,9 +987,19 @@ void qualcard_init(tcfg *cfg)
         printf("I can't find the binary path\n");
         exit(EXIT_FAILURE);
     }
-    sprintf(cfg->dbpath, "%sdb", binpath); /* /usr/local/bin/qualcarddb/ */
-    sprintf(cfg->cfgrealpath, "/home/%s/.config/qualcard", cfg->realuser);
-    sprintf(cfg->cfguserpath, "/home/%s/.config/qualcard", cfg->pathuser);
+    if(strlen(binpath)>=PATHSIZE-2)
+    {
+        fprintf(stderr, "Binary path filename overflow\n");
+        exit(EXIT_FAILURE);
+    }
+    snprintf(cfg->dbpath, PATHSIZE-2, "%sdb", binpath); /* /usr/local/bin/qualcarddb/ */
+    if(strlen(cfg->realuser)>=PATHSIZE-23 || strlen(cfg->pathuser)>=PATHSIZE-23)
+    {
+        fprintf(stderr, "Real/User path filename overflow\n");
+        exit(EXIT_FAILURE);
+    }
+    snprintf(cfg->cfgrealpath, PATHSIZE, "/home/%s/.config/qualcard", cfg->realuser);
+    snprintf(cfg->cfguserpath, PATHSIZE, "/home/%s/.config/qualcard", cfg->pathuser);
 
     createcfgdir(cfg); /* /home/realuser/.config/qualcard/ */
 
@@ -1018,7 +1045,7 @@ void menudb(tcfg *cfg)
             }
         }while(dbnum<1 || dbnum>cfg->dbfsize);
         dbnum--;
-        strcpy(cfg->dbasef, cfg->dbfiles[dbnum]); /* dbasef set */
+        strncpy(cfg->dbasef, cfg->dbfiles[dbnum], STRSIZE); /* dbasef set */
     }
     cfg->QTDCARD=dbsize(cfg->dbasef);
     if(cfg->QTDCARD<10)
@@ -1028,7 +1055,12 @@ void menudb(tcfg *cfg)
     }
 
     dbc=dbcore(cfg->dbasef);
-    sprintf(cfg->configwf, "%s/%s-%s%s", cfg->cfgrealpath, cfg->fileuser, dbc, EXTCF);
+    if(strlen(cfg->cfgrealpath)+strlen(cfg->fileuser)+strlen(dbc)+strlen(EXTCF)>=STRSIZE)
+    {
+        fprintf(stderr, "Configwf filename overflow\n");
+        exit(EXIT_FAILURE);
+    }
+    snprintf(cfg->configwf, STRSIZE, "%s/%s-%s%s", cfg->cfgrealpath, cfg->fileuser, dbc, EXTCF);
     if(verb>2)
         printf("Configuration file: %s\n", cfg->configwf);
 
@@ -1041,7 +1073,7 @@ char *dbcore(char *s)
     static char dbc[PATHSIZE];
     char *dot;
 
-    strcpy(dbc, filenopath(s));
+    strncpy(dbc, filenopath(s), PATHSIZE);
     if((dot=strrchr(dbc, '.'))) /* find the dot */
         *dot='\0'; /* delete from dot on */
     return dbc;
@@ -1084,7 +1116,7 @@ int newdate(int oldd, int days)
 
     tt = mktime(&date);
     date = *gmtime(&tt);
-    sprintf(snewd, "%04d%02d%02d",date.tm_year+1900,date.tm_mon+1,date.tm_mday);
+    snprintf(snewd, DTSIZE, "%04d%02d%02d",date.tm_year+1900,date.tm_mon+1,date.tm_mday);
     oldd=(int)strtol(snewd, NULL, 10);
     return oldd;
 }
@@ -1102,7 +1134,7 @@ char *prettydate(int oldd)
     oldd -= mes*100;
     dia = oldd;
 
-    sprintf(dd, "%02d-%s-%04d", dia, months[mes-1], ano);
+    snprintf(dd, 12, "%02d-%s-%04d", dia, months[mes-1], ano);
     return dd;
 }
 
