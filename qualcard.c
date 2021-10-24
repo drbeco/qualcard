@@ -796,7 +796,9 @@ void summary(tcfg c)
     if(!SUMMA)
         printf("|  N ");
 
-    printf("| %-*s | %6s | %5s| %13s | %13s | %5s | %5s |\n", maxlen, "Database", "Comp.%", "Total", "Viewed (%)", "Learned (%)", "Review", "Score");
+    /* |  N | Database                   | Comp.% | Total|    Viewed (%) |   Learned (%) | Review | Score | */
+
+    printf("| %-*s | %6s |%6s | %13s | %13s | %5s | %5s |\n", maxlen, "Database", "Comp.%", "Total", "Viewed (%)", "Learned (%)", "Review", "Score");
 
     for(i=0; i<c.dbfsize; i++) /* database file list */
     {
@@ -815,7 +817,7 @@ void summary(tcfg c)
         plearn=((float)learn/(float)qtd)*100.0;
         if(!SUMMA)
             printf("| %2d ", i+1);
-        printf("| %-*s | %5.1f%% | %4d | %4d (%5.1f%%) | %4d (%5.1f%%) | %6d | %5.1f |\n", maxlen, theme(filenopath(c.dbfiles[i])), pct, qtd, view, pview, learn, plearn, clate, ave);
+        printf("| %-*s | %5.1f%% | %5d | %4d (%5.1f%%) | %4d (%5.1f%%) | %6d | %5.1f |\n", maxlen, theme(filenopath(c.dbfiles[i])), pct, qtd, view, pview, learn, plearn, clate, ave);
     }
     return;
 }
