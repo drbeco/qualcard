@@ -931,11 +931,11 @@ void createcfgdir(tcfg *c)
  */
 void qualcard_init(tcfg *cfg)
 {
-    struct tm *timeptr; 
+    IFDEBUG("qualcard_init()");
+
+    struct tm *timeptr;
     char stoday[DTSIZE];
     char binpath[PATHSIZE]={0};
-
-    IFDEBUG("qualcard_init()");
 
     cfg->tstart=time(NULL);
     timeptr=localtime(&cfg->tstart);
