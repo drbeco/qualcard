@@ -362,13 +362,13 @@ int main(int argc, char *argv[])
 
             do
             {
-                printf("Your self-evaluation (from 0 to 5, default 1) is: ");
+                printf("Your self-evaluation (from 0 to 5, default 0 = repeat) is: ");
                 /* scanf("%d%*c", &opt); /1* discard the '\n'. Better use fgets() *1/ */
                 fgets(sopt, SOPT, stdin);
                 if((p=strchr(sopt, '\n'))) *p='\0';
-                if(sopt[0]=='\0') /* playing <enter> means evaluating to 1 */
+                if(sopt[0]=='\0') /* pressing <enter> means evaluating to 0 */
                 {
-                  opt=1;
+                  opt=0;
                   break;
                 }
                 opt=strtol(sopt, NULL, 10);
