@@ -127,6 +127,7 @@
 
 static int verb = 0; /**< verbose level, global within the file */
 static int SUMMA = 0; /**< print summary only and exit */
+static int DBNUM = 0; /**< pick a database by number from command line */
 
 typedef struct scfg /* configuration data struct */
 {
@@ -237,18 +238,19 @@ int main(int argc, char *argv[])
     IFDEBUG("Starting optarg loop...\n");
 
     /* getopt() configured options:
-     *        -h            help
-     *        -c            copyright & version
-     *        -v            verbose++
-     *        -q            quiet (verbose--)
-     *        -s            status of reviews
-     *        -u username   set the player name (default: whoami)
-     *        -p username   set the username for config path (together with -s only)
-     *        -d database   set the database to use (default: ask)
-     *        -i            invert presentation order (first the back, then the front of the card)
+     *        -h                help
+     *        -c                copyright & version
+     *        -v                verbose++
+     *        -q                quiet (verbose--)
+     *        -s                status of reviews
+     *        -u username       set the player name (default: whoami)
+     *        -p username       set the username for config path (together with -s only)
+     *        -d database       set the database to use (default: ask)
+     *        -n N              pick a database number N from command line
+     *        -i                invert presentation order (first the back, then the front of the card)
      */
     opterr = 0;
-    while((opt = getopt(argc, argv, "hcvqsp:u:d:i")) != EOF)
+    while((opt = getopt(argc, argv, "hcvqsp:u:d:in:")) != EOF)
         switch(opt)
         {
             case 'h': /* help and exit */
@@ -278,6 +280,15 @@ int main(int argc, char *argv[])
             case 'd': /* database */
                 strncpy(c.dbasef, optarg, STRSIZE);
                 break;
+            case 'n': /* database number */
+                DBNUM = strtol(optarg, NULL, 10);
+                if(DBNUM == 0)
+                {
+                    help();
+                    printf("\nError: wrong database number on arg -n N\n");
+                    /* exit(EXIT_FAILURE); */
+                }
+                break;
             case '?':  /* wrong option, exit */
             default:
                 printf("Type\n\t$man %s\nor\n\t$%s -h\nfor help.\n\n", argv[0], argv[0]);
@@ -303,6 +314,17 @@ int main(int argc, char *argv[])
     }
 
     qualcard_init(&c); /* initialization function */
+
+    if(DBNUM != 0)
+    {
+        if(verb > 1)
+            printf("Used option: -n %d\n", DBNUM);
+        if(DBNUM < 1 || DBNUM > c.dbfsize)
+        {
+            printf("Database %d not found!\n", DBNUM);
+            exit(EXIT_FAILURE);
+        }
+    }
 
     summary(c); /* how many cards to review */
 
@@ -798,15 +820,13 @@ void summary(tcfg c)
             maxlen = len;
     maxlen++; /* 15 or more */
 
-    /* if(!SUMMA) */
-    printf("|  N ");
-
     /* |  N | Database                   | Comp.% | Total|    Viewed (%) |   Learned (%) | Review | Score | */
-
-    printf("| %-*s | %6s |%6s | %13s | %13s | %5s | %5s |\n", maxlen, "Database", "Comp.%", "Total", "Viewed (%)", "Learned (%)", "Review", "Score");
+    printf("|  N | %-*s | %6s |%6s | %13s | %13s | %5s | %5s |\n", maxlen, "Database", "Comp.%", "Total", "Viewed (%)", "Learned (%)", "Review", "Score");
 
     for(i = 0; i < c.dbfsize; i++) /* database file list */
     {
+        if(DBNUM && DBNUM-1 != i)
+            continue;
         qtd = dbsize(c.dbfiles[i]);
 
         dbc = dbcore(c.dbfiles[i]);
@@ -820,9 +840,8 @@ void summary(tcfg c)
         cfanalyses(summaryf, c.today, qtd, &view, &learn, &pct, &ave, &clate);
         pview = ((float)view / (float)qtd) * 100.0;
         plearn = ((float)learn / (float)qtd) * 100.0;
-        /* if(!SUMMA) */
-        printf("| %2d ", i + 1);
-        printf("| %-*s | %5.1f%% | %5d | %4d (%5.1f%%) | %4d (%5.1f%%) | %6d | %5.1f |\n", maxlen, theme(filenopath(c.dbfiles[i])), pct, qtd, view, pview, learn, plearn, clate, ave);
+
+        printf("| %2d | %-*s | %5.1f%% | %5d | %4d (%5.1f%%) | %4d (%5.1f%%) | %6d | %5.1f |\n", i + 1, maxlen, theme(filenopath(c.dbfiles[i])), pct, qtd, view, pview, learn, plearn, clate, ave);
     }
     return;
 }
@@ -1054,10 +1073,15 @@ void menudb(tcfg *cfg)
             if(cfg->dbfsize > 1)
             {
                 printf("Choose a database: ");
-                scanf("%d%*c", &dbnum); /* ignore '\n' */
+                if(DBNUM != 0)
+                {
+                    dbnum = DBNUM; /* from command line */
+                    printf("%d\n", DBNUM);
+                }
+                else
+                    scanf("%d%*c", &dbnum); /* ignore '\n' */
             }
-        }
-        while(dbnum < 1 || dbnum > cfg->dbfsize);
+        } while(dbnum < 1 || dbnum > cfg->dbfsize);
         dbnum--;
         strncpy(cfg->dbasef, cfg->dbfiles[dbnum], STRSIZE); /* dbasef set */
     }
@@ -1243,7 +1267,7 @@ void readdbfiles(tcfg *c)
     char fullname[PATHSIZE];
 
     c->dbfiles = NULL; /* risk of memory leak here: this line isn't needed */
-    c->dbfsize = 0;
+    c->dbfsize = 0; /* number of database files on dbfiles[] vector */
 
     do
     {
@@ -1446,6 +1470,7 @@ void help(void)
     printf("\t-i,  --invert\n\t\tInvert presentation order (show first the back, then the front of the card).\n");
     printf("\t-u username,  --user username\n\t\tUse the username's profile. If not given, defaults to the -p username or the username from the system.\n");
     printf("\t-p username,  --path username\n\t\tSet the username used for the config path (it is mandatory to use together with -s).\n");
+    printf("\t-n N, --number N\n\t\tPick a database number to start right away.\n");
     printf("\t-d file.ex4,  --database file.ex4\n\t\tUse the given database to practice.\n\t\tThe file must have a '.ex4' extension\n\t\tand its name is in the form 'theme-front-verse.ex4', where:\n\t\t\t* theme: the theme of the study.\n\t\t\t* front: the first side of the card, ex. question.\n\t\t\t* verse: the back side of the card, ex. answer.\n");
     /* add more options here */
     printf("\nExit status:\n\t0 if ok.\n\t1 some error occurred.\n");
