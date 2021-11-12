@@ -794,8 +794,8 @@ void summary(tcfg c)
             maxlen=len;
     maxlen++; /* 15 or more */
 
-    if(!SUMMA)
-        printf("|  N ");
+    /* if(!SUMMA) */
+    printf("|  N ");
 
     /* |  N | Database                   | Comp.% | Total|    Viewed (%) |   Learned (%) | Review | Score | */
 
@@ -816,8 +816,8 @@ void summary(tcfg c)
         cfanalyses(summaryf, c.today, qtd, &view, &learn, &pct, &ave, &clate);
         pview=((float)view/(float)qtd)*100.0;
         plearn=((float)learn/(float)qtd)*100.0;
-        if(!SUMMA)
-            printf("| %2d ", i+1);
+        /* if(!SUMMA) */
+        printf("| %2d ", i+1);
         printf("| %-*s | %5.1f%% | %5d | %4d (%5.1f%%) | %4d (%5.1f%%) | %6d | %5.1f |\n", maxlen, theme(filenopath(c.dbfiles[i])), pct, qtd, view, pview, learn, plearn, clate, ave);
     }
     return;
@@ -1467,7 +1467,8 @@ void copyr(void)
 
 /**  @} */
 /* End of GroupUnique */
+
 /* ---------------------------------------------------------------------- */
-/* vi: set ai et ts=2 sw=2 tw=0 wm=0 fo=croql : C config for Vim modeline */
-/* Template by Dr. Beco <rcb at beco dot cc> Version 20150619.231433      */
+/* vi: set ai et ts=4 sw=4 tw=0 wm=0 fo=croql : C config for Vim modeline */
+/* Template by Dr. Beco <rcb at beco dot cc> Version 20160612.142044      */
 
