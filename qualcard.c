@@ -125,8 +125,8 @@
 /* ---------------------------------------------------------------------- */
 /* globals */
 
-static int verb=0; /**< verbose level, global within the file */
-static int SUMMA=0; /**< print summary only and exit */
+static int verb = 0; /**< verbose level, global within the file */
+static int SUMMA = 0; /**< print summary only and exit */
 
 typedef struct scfg /* configuration data struct */
 {
@@ -188,7 +188,7 @@ float getactime(FILE *fp); /* read time if exists. points to first card stat */
 /* ---------------------------------------------------------------------- */
 /* @ingroup GroupUnique */
 /**
- * @brief Main function, loops the cards, save and exit 
+ * @brief Main function, loops the cards, save and exit
  * @details Ladies and Gentleman... It's tiiiime!
  * Fightiiiiing at the blue corner,
  * he, who has compiled more C code than any other adversary in the history,
@@ -224,13 +224,13 @@ int main(int argc, char *argv[])
     char sopt[SOPT]; /* string opt */
     char *p; /* strchr remove \n from sopt */
     int opt; /* return from getopt() and user options */
-    tcfg c={0}; /* struct to configuration variables */
+    tcfg c = {0}; /* struct to configuration variables */
     int i; /* index, auxiliary */
     int newd; /* new date after adding up day's equivalent score */
     int futd; /* future revision date after presenting today */
     int tencards[10][2]; /* ten cards, index in memory (-1 if new), line in file */
-    int again=1; /* while some card score presented is still zero */
-    int repet[10]={0}; /* which card repeated how many times */
+    int again = 1; /* while some card score presented is still zero */
+    int repet[10] = {0}; /* which card repeated how many times */
     float sco, oldsco; /* the score to a card */
     char cardfr[STRSIZE], cardbk[STRSIZE]; /* card front and back */
 
@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
                 verb--;
                 break;
             case 's': /* summary */
-                SUMMA=1;
+                SUMMA = 1;
                 break;
             case 'u': /* username */
                 strncpy(c.fileuser, optarg, STRSIZE);
@@ -273,7 +273,7 @@ int main(int argc, char *argv[])
                 strncpy(c.pathuser, optarg, STRSIZE);
                 break;
             case 'i': /* invert */
-                c.invert=1;
+                c.invert = 1;
                 break;
             case 'd': /* database */
                 strncpy(c.dbasef, optarg, STRSIZE);
@@ -284,22 +284,22 @@ int main(int argc, char *argv[])
                 return EXIT_FAILURE;
         }
 
-    if(verb>=0)
+    if(verb >= 0)
     {
         printf("QualCard v.%s - Spaced Repetition", VERSION);
-        if(verb>0)
+        if(verb > 0)
             printf(", by Dr. Beco");
         printf("\n");
     }
 
-    if(verb>1)
+    if(verb > 1)
         printf("Verbose level set at: %d\n", verb);
 
-    if(c.pathuser[0]!='\0' && SUMMA!=1)
+    if(c.pathuser[0] != '\0' && SUMMA != 1)
     {
-        if(verb>1)
+        if(verb > 1)
             printf("Option -p must be used with -s. Setting -s forcefully. Use -h for help.\n");
-        SUMMA=1;
+        SUMMA = 1;
     }
 
     qualcard_init(&c); /* initialization function */
@@ -314,7 +314,7 @@ int main(int argc, char *argv[])
      */
     menudb(&c);
 
-    if(verb>2)
+    if(verb > 2)
     {
         printf("\nDataBase file: %s (%d cards)\n", filenopath(c.dbasef), c.QTDCARD);
         printf("History  file: %s\n", filenopath(c.configwf));
@@ -326,24 +326,24 @@ int main(int argc, char *argv[])
     printf("\n");
     while(again)
     {
-        again=0;
-        for(i=0; i<10; i++)
+        again = 0;
+        for(i = 0; i < 10; i++)
         {
-            if(tencards[i][TMEM]==-2) /* already presented and ok */
+            if(tencards[i][TMEM] == -2) /* already presented and ok */
                 continue;
             getcard(c.dbasef, tencards[i][TFIL], cardfr, cardbk);
 
             printf("-----------------------------------------------------------\n");
-            if(-1==tencards[i][TMEM]) /* new card? */
+            if(-1 == tencards[i][TMEM]) /* new card? */
             {
-                printf("Card %d (new card for today)\n\n", tencards[i][TFIL]+1);
-                oldsco=0.0;
+                printf("Card %d (new card for today)\n\n", tencards[i][TFIL] + 1);
+                oldsco = 0.0;
             }
             else
             {
-                oldsco=c.cfave[tencards[i][TMEM]];
-                newd=newdate(c.cfdate[tencards[i][TMEM]], ave2day(oldsco));
-                printf("Card %d (revision date %s)\n\n", tencards[i][TFIL]+1, prettydate(newd));
+                oldsco = c.cfave[tencards[i][TMEM]];
+                newd = newdate(c.cfdate[tencards[i][TMEM]], ave2day(oldsco));
+                printf("Card %d (revision date %s)\n\n", tencards[i][TFIL] + 1, prettydate(newd));
             }
 
             if(c.invert)
@@ -353,7 +353,8 @@ int main(int argc, char *argv[])
 
 
             printf("---------------Press <ENTER> to turn the card--------------\n");
-            do opt=getchar(); while(opt!='\n');
+            do opt = getchar();
+            while(opt != '\n');
 
             if(c.invert)
                 printf("%s\n\n", cardfr);
@@ -365,31 +366,32 @@ int main(int argc, char *argv[])
                 printf("Your self-evaluation (from 0 to 5, default 0 = repeat) is: ");
                 /* scanf("%d%*c", &opt); /1* discard the '\n'. Better use fgets() *1/ */
                 fgets(sopt, SOPT, stdin);
-                if((p=strchr(sopt, '\n'))) *p='\0';
-                if(sopt[0]=='\0') /* pressing <enter> means evaluating to 0 */
+                if((p = strchr(sopt, '\n'))) * p = '\0';
+                if(sopt[0] == '\0') /* pressing <enter> means evaluating to 0 */
                 {
-                  opt=0;
-                  break;
+                    opt = 0;
+                    break;
                 }
-                opt=strtol(sopt, NULL, 10);
-            } while(opt<0 || opt>5);
+                opt = strtol(sopt, NULL, 10);
+            }
+            while(opt < 0 || opt > 5);
             if(!opt)
             {
                 repet[i]++;
-                again=1;
+                again = 1;
             }
             else
             {
                 if(repet[i])
-                    sco=(float)opt/((float)repet[i]+1.0);
+                    sco = (float)opt / ((float)repet[i] + 1.0);
                 else
-                    sco=(float)opt;
+                    sco = (float)opt;
                 save2memo(&c, tencards[i][TMEM], tencards[i][TFIL], sco);
-                if(tencards[i][TMEM]==-1)
-                    tencards[i][TMEM]=c.cfsize-1;
-                futd=newdate(c.today, ave2day(c.cfave[tencards[i][TMEM]]));
+                if(tencards[i][TMEM] == -1)
+                    tencards[i][TMEM] = c.cfsize - 1;
+                futd = newdate(c.today, ave2day(c.cfave[tencards[i][TMEM]]));
                 printf("Old score: %.1f, new score: %.1f, revision set to %s\n", oldsco, c.cfave[tencards[i][TMEM]], prettydate(futd));
-                tencards[i][TMEM]=-2; /* presented and ok */
+                tencards[i][TMEM] = -2; /* presented and ok */
             }
         } /* for i < 10 cards */
     } /* while(again) */
@@ -406,21 +408,21 @@ int main(int argc, char *argv[])
 /* save new or update old card */
 void save2memo(tcfg *c, int i, int card, float scor)
 {
-    if(-1==i) /* no index implies new memory block */
+    if(-1 == i) /* no index implies new memory block */
     {
         c->cfsize++;
-        c->cfcard=(int *)reallocordie(c->cfcard, sizeof(int)*c->cfsize);
-        c->cfdate=(int *)reallocordie(c->cfdate, sizeof(int)*c->cfsize);
-        c->cfave=(float *)reallocordie(c->cfave, sizeof(float)*c->cfsize);
-        c->cfcard[c->cfsize-1]=card;
-        c->cfdate[c->cfsize-1]=c->today;
-        c->cfave[c->cfsize-1]=scor/1.3; /* first score -23.07% */
+        c->cfcard = (int *)reallocordie(c->cfcard, sizeof(int) * c->cfsize);
+        c->cfdate = (int *)reallocordie(c->cfdate, sizeof(int) * c->cfsize);
+        c->cfave = (float *)reallocordie(c->cfave, sizeof(float) * c->cfsize);
+        c->cfcard[c->cfsize - 1] = card;
+        c->cfdate[c->cfsize - 1] = c->today;
+        c->cfave[c->cfsize - 1] = scor / 1.3; /* first score -23.07% */
         return;
     }
 
     assert(c->cfcard[i] == card); /* if c->cfcard[i] != card; then error; */
     c->cfdate[i] = c->today;
-    c->cfave[i] = (c->cfave[i] + scor)/2.0;
+    c->cfave[i] = (c->cfave[i] + scor) / 2.0;
     return;
 }
 
@@ -430,10 +432,10 @@ void save2file(tcfg c)
     int i;
     FILE *fp;
 
-    if((fp=fopen(c.configwf, "w"))!=NULL) /* create from scratch */
+    if((fp = fopen(c.configwf, "w")) != NULL) /* create from scratch */
     {
         fprintf(fp, "%f\n", c.session); /* accumulated time */
-        for(i=0; i<c.cfsize; i++)
+        for(i = 0; i < c.cfsize; i++)
             fprintf(fp, "%5d %8d %6.4f\n", c.cfcard[i], c.cfdate[i], c.cfave[i]);
 
         fclose(fp);
@@ -451,24 +453,24 @@ void cardfaces(char *card, char *fr, char *bk)
     strncpy(fr, card, STRSIZE);
     changebarnet(fr);
     strncpy(bk, fr, STRSIZE); /* default in case of problem: back == front */
-    colon=fr;
+    colon = fr;
     while(1)
     {
-        colon=strchr(colon, ':');
+        colon = strchr(colon, ':');
         if(!colon)
         {
-            fprintf(stderr,"\n------------------------------------------\n");
-            fprintf(stderr,"Wrong card without '::' separator.\n%s\n", card);
+            fprintf(stderr, "\n------------------------------------------\n");
+            fprintf(stderr, "Wrong card without '::' separator.\n%s\n", card);
             changecolon(fr); /* change char 254 back to a colon sign */
             changecolon(bk); /* change char 254 back to a colon sign */
             return; /* not found, return all card to front and back */
         }
         colon++;
-        if(*colon==':') /* found :: */
+        if(*colon == ':') /* found :: */
             break;
     }
-    *(colon-1)='\0'; /* front */
-    strncpy(bk, colon+1, STRSIZE); /* back */
+    *(colon - 1) = '\0'; /* front */
+    strncpy(bk, colon + 1, STRSIZE); /* back */
     changecolon(fr); /* change char 254 back to a colon sign */
     changecolon(bk); /* change char 254 back to a colon sign */
     return;
@@ -478,33 +480,33 @@ void cardfaces(char *card, char *fr, char *bk)
 void changecolon(char *nt)
 {
     do
-        if((nt=strchr(nt,254)))
-            *nt=':';
-    while(nt!=NULL);
+        if((nt = strchr(nt, 254)))
+            * nt = ':';
+    while(nt != NULL);
 }
 
 /* change '\n', '\t' and '\\' to the real thing */
 void changebarnet(char *nt)
 {
     do
-        if((nt=strchr(nt,'\\')))
+        if((nt = strchr(nt, '\\')))
             switch(*++nt)
             {
                 case 'n':        /* \n becomes space+\n */
-                    *nt='\n';
+                    *nt = '\n';
                     goto space;
                 case 't':        /* \t becomes space+\t */
-                    *nt='\t';
+                    *nt = '\t';
                     goto space;
                 case ':':        /* : becomes space + þ 254 */
-                    *nt=254;
+                    *nt = 254;
                     goto space;
-                space:
+space:
                 case '\\':       /* \\ becomes space+\ */
-                    *(nt-1)=' ';
+                    *(nt - 1) = ' ';
                     nt++;
             }
-    while(nt!=NULL);
+    while(nt != NULL);
 }
 
 /* get filename with no path */
@@ -514,15 +516,15 @@ char *filenopath(char *filepath)
     char *bar;
 
     strncpy(filename, filepath, STRSIZE);
-    if((bar=strrchr(filepath, '/'))) /* find the last / */
+    if((bar = strrchr(filepath, '/'))) /* find the last / */
     {
         bar++; /* next char starts the filename */
         strncpy(filename, bar, STRSIZE);
     }
     /* else /1* no bar? that's odd... *1/ */
     /* { */
-        /* fprintf(stderr, "Filename %s must be an absolute path.\n", filepath); */
-        /* exit(EXIT_FAILURE); */
+    /* fprintf(stderr, "Filename %s must be an absolute path.\n", filepath); */
+    /* exit(EXIT_FAILURE); */
     /* } */
     return filename;
 }
@@ -533,30 +535,30 @@ void sortmemo(tcfg *c)
     int i, j, iux;
     int ki, kj;
     float fux;
-    if(c->cfsize<2)
+    if(c->cfsize < 2)
         return;
 
-    for(i=0; i<c->cfsize-1; i++)
-        for(j=i+1; j<c->cfsize; j++)
+    for(i = 0; i < c->cfsize - 1; i++)
+        for(j = i + 1; j < c->cfsize; j++)
         {
-            ki=newdate(c->cfdate[i], ave2day(c->cfave[i]));
-            kj=newdate(c->cfdate[j], ave2day(c->cfave[j]));
-            if(ki>=kj) /* ki is after, invert */
+            ki = newdate(c->cfdate[i], ave2day(c->cfave[i]));
+            kj = newdate(c->cfdate[j], ave2day(c->cfave[j]));
+            if(ki >= kj) /* ki is after, invert */
             {
-                if(ki==kj && c->cfave[i]<=c->cfave[j]) /* 1st score is lower, do not swap */
+                if(ki == kj && c->cfave[i] <= c->cfave[j]) /* 1st score is lower, do not swap */
                     continue;
                 /* swap cards number */
-                iux=c->cfcard[i];
-                c->cfcard[i]=c->cfcard[j];
-                c->cfcard[j]=iux;
+                iux = c->cfcard[i];
+                c->cfcard[i] = c->cfcard[j];
+                c->cfcard[j] = iux;
                 /* swap cards presented date */
-                iux=c->cfdate[i];
-                c->cfdate[i]=c->cfdate[j];
-                c->cfdate[j]=iux;
+                iux = c->cfdate[i];
+                c->cfdate[i] = c->cfdate[j];
+                c->cfdate[j] = iux;
                 /* swap cards average */
-                fux=c->cfave[i];
-                c->cfave[i]=c->cfave[j];
-                c->cfave[j]=fux;
+                fux = c->cfave[i];
+                c->cfave[i] = c->cfave[j];
+                c->cfave[j] = fux;
             }
         }
 }
@@ -566,31 +568,32 @@ void select10cards(tcfg *c, int tencards[10][2])
 {
     int i, j;
 
-    for(i=0; i<10; i++) /* zeroing */
-        tencards[i][TMEM]=tencards[i][TFIL]=-2; /* end of cards */
+    for(i = 0; i < 10; i++) /* zeroing */
+        tencards[i][TMEM] = tencards[i][TFIL] = -2; /* end of cards */
 
     sortmemo(c); /* sort cfcard, cfdate and cfave, by date+days(ave) */
-    for(i=0; i<9 && i<c->cfsize; i++) /* nine olds if possible */
+    for(i = 0; i < 9 && i < c->cfsize; i++) /* nine olds if possible */
     {
         if(newdate(c->cfdate[i], ave2day(c->cfave[i])) > c->today) /* just until today */
             break;
-        tencards[i][TMEM]=i; /* take the first nine or less */
-        tencards[i][TFIL]=c->cfcard[i]; /* file line */
+        tencards[i][TMEM] = i; /* take the first nine or less */
+        tencards[i][TFIL] = c->cfcard[i]; /* file line */
     }
-    for(j=i; j<10; j++)
+    for(j = i; j < 10; j++)
     {
         /* new not in memory nor in tencards already */
-        if((tencards[j][TFIL]=newcard(*c, tencards))==-2)
+        if((tencards[j][TFIL] = newcard(*c, tencards)) == -2)
             break; /* there is not enough */
-        tencards[j][TMEM]=-1; /* not in memory, but valid new card from file */
+        tencards[j][TMEM] = -1; /* not in memory, but valid new card from file */
     }
-    if(j<10) /* still need, lets see cards for tomorrow */
+    if(j < 10) /* still need, lets see cards for tomorrow */
     {
-        while(i<c->cfsize && j<10)
+        while(i < c->cfsize && j < 10)
         {
-            tencards[j][TMEM]=i; /* take the next waiting in history */
-            tencards[j][TFIL]=c->cfcard[i]; /* file line */
-            i++; j++;
+            tencards[j][TMEM] = i; /* take the next waiting in history */
+            tencards[j][TFIL] = c->cfcard[i]; /* file line */
+            i++;
+            j++;
         }
     }
 }
@@ -599,10 +602,10 @@ void select10cards(tcfg *c, int tencards[10][2])
 int dbsize(char *dbname)
 {
     char line[STRSIZE];
-    int qtdl=0;
+    int qtdl = 0;
     FILE *fp;
 
-    if(!(fp=fopen(dbname,"r")))
+    if(!(fp = fopen(dbname, "r")))
     {
         fprintf(stderr, "Fail to open database %s.\n", dbname);
         exit(EXIT_FAILURE);
@@ -612,7 +615,8 @@ int dbsize(char *dbname)
     {
         fgets(line, STRSIZE, fp);
         qtdl++;
-    }while(!feof(fp));
+    }
+    while(!feof(fp));
     fclose(fp);
     return --qtdl;
 }
@@ -645,18 +649,18 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
     int late; /* days late */
     float ave; /* average of a single card written in disk */
     FILE *fp;
-    int alla=1; /* all cards are A */
+    int alla = 1; /* all cards are A */
 
-    *view=0; /* number of cards viewed from the total */
-    *learn=0; /* number of cards with score greater than SCOREA */
-    *pct=0.0; /* percentage of completeness decays with time */
-    *addscore=0.0; /* just the scores of cards seen */
-    *ncardl=0; /* number of cards late that need review */
+    *view = 0; /* number of cards viewed from the total */
+    *learn = 0; /* number of cards with score greater than SCOREA */
+    *pct = 0.0; /* percentage of completeness decays with time */
+    *addscore = 0.0; /* just the scores of cards seen */
+    *ncardl = 0; /* number of cards late that need review */
 
-    if(!(fp=fopen(sumfile,"r"))) /* temporary configwf in a loop */
+    if(!(fp = fopen(sumfile, "r"))) /* temporary configwf in a loop */
         return;
 
-    ave=getactime(fp); /* ignore accumulated time if it exists */
+    ave = getactime(fp); /* ignore accumulated time if it exists */
 
     while(3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave))
     {
@@ -665,13 +669,13 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
         if(ave >= SCOREB)
             (*learn)++;
         if(ave < SCOREA)
-            alla=0; /* not all cards are A */
+            alla = 0; /* not all cards are A */
 
-        revd=newdate(date, ave2day(ave));
-        late=0;
-        if(today - revd>=0) /* late or due today */
+        revd = newdate(date, ave2day(ave));
+        late = 0;
+        if(today - revd >= 0) /* late or due today */
         {
-            late=diffdays(today, revd);
+            late = diffdays(today, revd);
             (*ncardl)++;
         }
         *pct += score(ave, late); /* late is positive or zero */
@@ -679,17 +683,17 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
     fclose(fp);
 
     *pct /= ((float)qtd);
-    if(*pct>SCOREA && alla) /* it is not impossible to achieve 100% */
-        *pct=5.0;
+    if(*pct > SCOREA && alla) /* it is not impossible to achieve 100% */
+        *pct = 5.0;
     *pct *= 20.0; /* 0%..100% */
 
-    if(*view==0)
+    if(*view == 0)
         *addscore = 0.0;
     else
-        *addscore /= ((float)*view); /* average of scores you've got so far */
+        *addscore /= ((float) * view); /* average of scores you've got so far */
 
-    if(*addscore>SCOREA && alla) /* it is not impossible to achieve 5.0 */
-        *addscore=5.0;
+    if(*addscore > SCOREA && alla) /* it is not impossible to achieve 5.0 */
+        *addscore = 5.0;
 
     return;
 }
@@ -697,11 +701,11 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
 /* return the new score when the revision is late */
 float score(float ave, int late)
 {
-    if(late==1 && ave>SCOREA) /* don't let one day spoil the fun */
-        return SCOREA+0.01;
-    ave -= ((float)late/3.5);
-    if(ave<0.0)
-        ave=0.0;
+    if(late == 1 && ave > SCOREA) /* don't let one day spoil the fun */
+        return SCOREA + 0.01;
+    ave -= ((float)late / 3.5);
+    if(ave < 0.0)
+        ave = 0.0;
     return ave;
 }
 
@@ -712,19 +716,19 @@ void sessiontime(tcfg *c)
     time_t ttnow;
     int h0, m0, s0, h1, m1, s1;
 
-    ttnow=time(NULL);
+    ttnow = time(NULL);
 
-    fsec=difftime(ttnow,c->tstart); /* this session's duration in s */
+    fsec = difftime(ttnow, c->tstart); /* this session's duration in s */
 
-    c->session+=fsec; /* all sessions */
+    c->session += fsec; /* all sessions */
 
-    h0=(int)fsec/3600;
-    m0=(int)(((fsec/3600.0)-((int)fsec/3600))*60.0);
-    s0=(int)(((fsec/60.0)-((int)(h0*60+m0)))*60.0);
+    h0 = (int)fsec / 3600;
+    m0 = (int)(((fsec / 3600.0) - ((int)fsec / 3600)) * 60.0);
+    s0 = (int)(((fsec / 60.0) - ((int)(h0 * 60 + m0))) * 60.0);
 
-    h1=(int)c->session/3600;
-    m1=(int)(((c->session/3600.0)-((int)c->session/3600))*60.0);
-    s1=(int)(((c->session/60.0)-((int)(h1*60+m1)))*60.0);
+    h1 = (int)c->session / 3600;
+    m1 = (int)(((c->session / 3600.0) - ((int)c->session / 3600)) * 60.0);
+    s1 = (int)(((c->session / 60.0) - ((int)(h1 * 60 + m1))) * 60.0);
 
     /* printf("end=%f, start=%f, diff=%f\n", (double)ttnow, (double)c->tstart, fsec); */
 
@@ -738,30 +742,30 @@ int diffdays(int newd, int oldd)
     int ano, mes, dia;//, aux;
     float fsec; /* seconds */
     time_t ttnew, ttold; /* epochs */
-    struct tm tmnew={0}, tmold={0}; /* date fields */
+    struct tm tmnew = {0}, tmold = {0}; /* date fields */
 
-    ano = oldd/10000;
-    oldd -= ano*10000;
-    mes = oldd/100;
-    oldd -= mes*100;
+    ano = oldd / 10000;
+    oldd -= ano * 10000;
+    mes = oldd / 100;
+    oldd -= mes * 100;
     dia = oldd;
-    tmold.tm_year = ano-1900;
-    tmold.tm_mon = mes-1;
+    tmold.tm_year = ano - 1900;
+    tmold.tm_mon = mes - 1;
     tmold.tm_mday = dia;
     ttold = mktime(&tmold);
 
-    ano = newd/10000;
-    newd -= ano*10000;
-    mes = newd/100;
-    newd -= mes*100;
+    ano = newd / 10000;
+    newd -= ano * 10000;
+    mes = newd / 100;
+    newd -= mes * 100;
     dia = newd;
-    tmnew.tm_year = ano-1900;
-    tmnew.tm_mon = mes-1;
+    tmnew.tm_year = ano - 1900;
+    tmnew.tm_mon = mes - 1;
     tmnew.tm_mday = dia;
     ttnew = mktime(&tmnew);
 
-    fsec=difftime(ttnew,ttold); /* difference in seconds */
-    dia = fsec/86400.0; /* difference in days */
+    fsec = difftime(ttnew, ttold); /* difference in seconds */
+    dia = fsec / 86400.0; /* difference in days */
 
     return dia;
 }
@@ -780,18 +784,18 @@ int diffdays(int newd, int oldd)
  */
 void summary(tcfg c)
 {
-    int i, view=0, learn=0, qtd=0;
+    int i, view = 0, learn = 0, qtd = 0;
     char *dbc;
     float pview, plearn; /* percentages */
     float ave; /* average 0...5 of cards you've seen in a database */
     float pct; /* percentage of your achievements, decay with time */
     int clate; /* number of cards late */
-    int maxlen=14, len;
+    int maxlen = 14, len;
     char summaryf[PATHSIZE];
 
-    for(i=0; i<c.dbfsize; i++) /* database file list */
-        if((len=strlen(theme(filenopath(c.dbfiles[i]))))>maxlen)
-            maxlen=len;
+    for(i = 0; i < c.dbfsize; i++) /* database file list */
+        if((len = strlen(theme(filenopath(c.dbfiles[i])))) > maxlen)
+            maxlen = len;
     maxlen++; /* 15 or more */
 
     /* if(!SUMMA) */
@@ -801,12 +805,12 @@ void summary(tcfg c)
 
     printf("| %-*s | %6s |%6s | %13s | %13s | %5s | %5s |\n", maxlen, "Database", "Comp.%", "Total", "Viewed (%)", "Learned (%)", "Review", "Score");
 
-    for(i=0; i<c.dbfsize; i++) /* database file list */
+    for(i = 0; i < c.dbfsize; i++) /* database file list */
     {
-        qtd=dbsize(c.dbfiles[i]);
+        qtd = dbsize(c.dbfiles[i]);
 
-        dbc=dbcore(c.dbfiles[i]);
-        if(strlen(c.cfguserpath)+strlen(c.fileuser)+strlen(dbc)+strlen(EXTCF)>=PATHSIZE)
+        dbc = dbcore(c.dbfiles[i]);
+        if(strlen(c.cfguserpath) + strlen(c.fileuser) + strlen(dbc) + strlen(EXTCF) >= PATHSIZE)
         {
             fprintf(stderr, "Summary filename overflow\n");
             exit(EXIT_FAILURE);
@@ -814,10 +818,10 @@ void summary(tcfg c)
         snprintf(summaryf, PATHSIZE, "%s/%s-%s%s", c.cfguserpath, c.fileuser, dbc, EXTCF);
 
         cfanalyses(summaryf, c.today, qtd, &view, &learn, &pct, &ave, &clate);
-        pview=((float)view/(float)qtd)*100.0;
-        plearn=((float)learn/(float)qtd)*100.0;
+        pview = ((float)view / (float)qtd) * 100.0;
+        plearn = ((float)learn / (float)qtd) * 100.0;
         /* if(!SUMMA) */
-        printf("| %2d ", i+1);
+        printf("| %2d ", i + 1);
         printf("| %-*s | %5.1f%% | %5d | %4d (%5.1f%%) | %4d (%5.1f%%) | %6d | %5.1f |\n", maxlen, theme(filenopath(c.dbfiles[i])), pct, qtd, view, pview, learn, plearn, clate, ave);
     }
     return;
@@ -830,8 +834,8 @@ char *theme(char *file)
     static char theme[STRSIZE];
 
     strncpy(theme, file, STRSIZE);
-    if((dash=strchr(theme, '-')))
-        *dash='\0';
+    if((dash = strchr(theme, '-')))
+        * dash = '\0';
 
     return theme;
 }
@@ -843,15 +847,15 @@ int newcard(tcfg c, int tencards[10][2])
 
     randnorep(FILLBASKET, &c.QTDCARD); /* fill */
 
-    for(i=0; i<10; i++) /* remove from tencards */
-        if(tencards[i][TFIL]!=-2)
+    for(i = 0; i < 10; i++) /* remove from tencards */
+        if(tencards[i][TFIL] != -2)
             randnorep(REMOVEBASKET, &tencards[i][TFIL]);
 
-    for(i=0; i<c.cfsize; i++) /* remove from history */
+    for(i = 0; i < c.cfsize; i++) /* remove from history */
         randnorep(REMOVEBASKET, &c.cfcard[i]);
 
-    if(randnorep(DRAWBASKET, &l)!=BASKETOK)
-        l=-2;
+    if(randnorep(DRAWBASKET, &l) != BASKETOK)
+        l = -2;
 
     return l;
 }
@@ -863,13 +867,13 @@ void getcard(char *dbfile, int cardnum, char *cardfr, char *cardbk)
     FILE *fp;
     int i;
 
-    if(!(fp=fopen(dbfile,"r")))
+    if(!(fp = fopen(dbfile, "r")))
     {
         printf("Fail to open database %s.\n", dbfile);
         exit(EXIT_FAILURE);
     }
 
-    for(i=0; i<=cardnum; i++)
+    for(i = 0; i <= cardnum; i++)
         fgets(card, STRSIZE, fp);
     fclose(fp);
 
@@ -893,7 +897,7 @@ double randmm(double min, double max)
 
     s = rand();
     s /= ((float)RAND_MAX);
-    s *= (max-min);
+    s *= (max - min);
     s += min;
     return s;
 }
@@ -908,7 +912,7 @@ void createcfgdir(tcfg *c)
     {
         if(ENOENT == errno) /* does not exist */
         {
-            if(mkdir(path1, S_IRWXU|S_IRGRP|S_IXGRP) != 0) /* cannot create */
+            if(mkdir(path1, S_IRWXU | S_IRGRP | S_IXGRP) != 0) /* cannot create */
             {
                 printf("cannot create directory %s. I can't save your progress.\n", path1);
                 exit(EXIT_FAILURE);
@@ -926,7 +930,7 @@ void createcfgdir(tcfg *c)
     {
         if(ENOENT == errno) /* does not exist */
         {
-            if(mkdir(c->cfgrealpath, S_IRWXU|S_IRGRP|S_IXGRP) == 0) /* successifully created */
+            if(mkdir(c->cfgrealpath, S_IRWXU | S_IRGRP | S_IXGRP) == 0) /* successifully created */
                 return;
             printf("cannot create directory %s. I can't save your progress.\n", c->cfgrealpath);
             exit(EXIT_FAILURE);
@@ -960,31 +964,31 @@ void qualcard_init(tcfg *cfg)
 
     struct tm *timeptr;
     char stoday[DTSIZE];
-    char binpath[PATHSIZE]={0};
+    char binpath[PATHSIZE] = {0};
 
-    cfg->tstart=time(NULL);
-    timeptr=localtime(&cfg->tstart);
+    cfg->tstart = time(NULL);
+    timeptr = localtime(&cfg->tstart);
     snprintf(stoday, DTSIZE, "%04d%02d%02d", 1900 + timeptr->tm_year, 1 + timeptr->tm_mon, timeptr->tm_mday);
-    cfg->today=(int)strtol(stoday, NULL, 10);
+    cfg->today = (int)strtol(stoday, NULL, 10);
 
     srand((unsigned)time(&cfg->tstart)); /* new unknow seed */
 
     strncpy(cfg->realuser, getenv("USER"), STRSIZE);
-    if(cfg->pathuser[0]=='\0')
+    if(cfg->pathuser[0] == '\0')
         strncpy(cfg->pathuser, cfg->realuser, STRSIZE);
 
-    if(cfg->fileuser[0]=='\0')
+    if(cfg->fileuser[0] == '\0')
     {
-        if(strcmp(cfg->realuser, cfg->pathuser) && verb>1)
+        if(strcmp(cfg->realuser, cfg->pathuser) && verb > 1)
             printf("Assuming -u %s. See -h for help.\n", cfg->pathuser);
         strncpy(cfg->fileuser, cfg->pathuser, STRSIZE);
     }
 
-    if(verb>0)
+    if(verb > 0)
     {
         printf("Hello %s, ", cfg->fileuser);
         printf("today is %s. ", prettydate(cfg->today));
-        if(verb>1)
+        if(verb > 1)
             printf("Welcome back!");
         printf("\n");
     }
@@ -995,13 +999,13 @@ void qualcard_init(tcfg *cfg)
         printf("I can't find the binary path\n");
         exit(EXIT_FAILURE);
     }
-    if(strlen(binpath)>=PATHSIZE-2)
+    if(strlen(binpath) >= PATHSIZE - 2)
     {
         fprintf(stderr, "Binary path filename overflow\n");
         exit(EXIT_FAILURE);
     }
-    snprintf(cfg->dbpath, PATHSIZE-2, "%sdb", binpath); /* /usr/local/bin/qualcarddb/ */
-    if(strlen(cfg->realuser)>=PATHSIZE-23 || strlen(cfg->pathuser)>=PATHSIZE-23)
+    snprintf(cfg->dbpath, PATHSIZE - 2, "%sdb", binpath); /* /usr/local/bin/qualcarddb/ */
+    if(strlen(cfg->realuser) >= PATHSIZE - 23 || strlen(cfg->pathuser) >= PATHSIZE - 23)
     {
         fprintf(stderr, "Real/User path filename overflow\n");
         exit(EXIT_FAILURE);
@@ -1011,7 +1015,7 @@ void qualcard_init(tcfg *cfg)
 
     createcfgdir(cfg); /* /home/realuser/.config/qualcard/ */
 
-    if(verb>2)
+    if(verb > 2)
     {
         printf("Binary path: %s\n", binpath);
         printf("Database path: %s/\n", cfg->dbpath);
@@ -1035,42 +1039,43 @@ void menudb(tcfg *cfg)
     int i, dbnum;
     char *dbc;
 
-    if(cfg->dbasef[0]=='\0')
+    if(cfg->dbasef[0] == '\0')
     {
         do
         {
-            if(verb>1)
+            if(verb > 1)
             {
                 printf("Databases found:\n");
-                for(i=0; i<cfg->dbfsize; i++)
-                    printf("(%d) %s\n", i+1, cfg->dbfiles[i]);
+                for(i = 0; i < cfg->dbfsize; i++)
+                    printf("(%d) %s\n", i + 1, cfg->dbfiles[i]);
             }
 
-            dbnum=1; /* default */
-            if(cfg->dbfsize>1)
+            dbnum = 1; /* default */
+            if(cfg->dbfsize > 1)
             {
                 printf("Choose a database: ");
                 scanf("%d%*c", &dbnum); /* ignore '\n' */
             }
-        }while(dbnum<1 || dbnum>cfg->dbfsize);
+        }
+        while(dbnum < 1 || dbnum > cfg->dbfsize);
         dbnum--;
         strncpy(cfg->dbasef, cfg->dbfiles[dbnum], STRSIZE); /* dbasef set */
     }
-    cfg->QTDCARD=dbsize(cfg->dbasef);
-    if(cfg->QTDCARD<10)
+    cfg->QTDCARD = dbsize(cfg->dbasef);
+    if(cfg->QTDCARD < 10)
     {
         printf("Error in database %s.\nMust have at least 10 questions:answers (lines).\n", cfg->dbasef);
         exit(EXIT_FAILURE);
     }
 
-    dbc=dbcore(cfg->dbasef);
-    if(strlen(cfg->cfgrealpath)+strlen(cfg->fileuser)+strlen(dbc)+strlen(EXTCF)>=STRSIZE)
+    dbc = dbcore(cfg->dbasef);
+    if(strlen(cfg->cfgrealpath) + strlen(cfg->fileuser) + strlen(dbc) + strlen(EXTCF) >= STRSIZE)
     {
         fprintf(stderr, "Configwf filename overflow\n");
         exit(EXIT_FAILURE);
     }
     snprintf(cfg->configwf, STRSIZE, "%s/%s-%s%s", cfg->cfgrealpath, cfg->fileuser, dbc, EXTCF);
-    if(verb>2)
+    if(verb > 2)
         printf("Configuration file: %s\n", cfg->configwf);
 
     return;
@@ -1083,25 +1088,25 @@ char *dbcore(char *s)
     char *dot;
 
     strncpy(dbc, filenopath(s), PATHSIZE);
-    if((dot=strrchr(dbc, '.'))) /* find the dot */
-        *dot='\0'; /* delete from dot on */
+    if((dot = strrchr(dbc, '.'))) /* find the dot */
+        *dot = '\0'; /* delete from dot on */
     return dbc;
 }
 
 /* given an average, return how many days */
 int ave2day(float ave)
 {
-    if(ave<=SCOREF) /* G: review tomorrow */
+    if(ave <= SCOREF) /* G: review tomorrow */
         return 1;
-    if(ave<=SCOREE) /* F: review in 2 days */
+    if(ave <= SCOREE) /* F: review in 2 days */
         return 2;
-    if(ave<=SCORED) /* E: review in 3 days */
+    if(ave <= SCORED) /* E: review in 3 days */
         return 3;
-    if(ave<=SCOREC) /* D: review in 5 days */
+    if(ave <= SCOREC) /* D: review in 5 days */
         return 5;
-    if(ave<=SCOREB) /* C: review in 7 days */
+    if(ave <= SCOREB) /* C: review in 7 days */
         return 7;
-    if(ave<=SCOREA) /* B: review in 9 days */
+    if(ave <= SCOREA) /* B: review in 9 days */
         return 9;
     return 11; /* A: review in 11 days */
 }
@@ -1111,39 +1116,39 @@ int newdate(int oldd, int days)
 {
     int ano, mes, dia;
     time_t tt; /* epochs */
-    struct tm date={0}; /* date fields */
+    struct tm date = {0}; /* date fields */
     char snewd[DTSIZE];
 
-    ano = oldd/10000;
-    oldd -= ano*10000;
-    mes = oldd/100;
-    oldd -= mes*100;
+    ano = oldd / 10000;
+    oldd -= ano * 10000;
+    mes = oldd / 100;
+    oldd -= mes * 100;
     dia = oldd;
-    date.tm_year = ano-1900;
-    date.tm_mon = mes-1;
+    date.tm_year = ano - 1900;
+    date.tm_mon = mes - 1;
     date.tm_mday = dia + days; /* add the number of days */
 
     tt = mktime(&date);
     date = *gmtime(&tt);
-    snprintf(snewd, DTSIZE, "%04d%02d%02d",date.tm_year+1900,date.tm_mon+1,date.tm_mday);
-    oldd=(int)strtol(snewd, NULL, 10);
+    snprintf(snewd, DTSIZE, "%04d%02d%02d", date.tm_year + 1900, date.tm_mon + 1, date.tm_mday);
+    oldd = (int)strtol(snewd, NULL, 10);
     return oldd;
 }
 
 /* return date in a pretty format */
 char *prettydate(int oldd)
 {
-    static char* months[] = {"Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dec" };
+    static char *months[] = {"Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dec" };
     static char dd[12];
     int ano, mes, dia;
 
-    ano = oldd/10000;
-    oldd -= ano*10000;
-    mes = oldd/100;
-    oldd -= mes*100;
+    ano = oldd / 10000;
+    oldd -= ano * 10000;
+    mes = oldd / 100;
+    oldd -= mes * 100;
     dia = oldd;
 
-    snprintf(dd, 12, "%02d-%s-%04d", dia, months[mes-1], ano);
+    snprintf(dd, 12, "%02d-%s-%04d", dia, months[mes - 1], ano);
     return dd;
 }
 
@@ -1151,7 +1156,7 @@ char *prettydate(int oldd)
 void *reallocordie(void *ptr, size_t sz)
 {
     void *tmp;
-    if((tmp=realloc(ptr, sz))==NULL)
+    if((tmp = realloc(ptr, sz)) == NULL)
     {
         printf("out of memory\n");
         exit(EXIT_FAILURE);
@@ -1167,27 +1172,27 @@ void readcfg(tcfg *c)
     float ave;
     FILE *fp;
 
-    c->cfcard=c->cfdate=NULL;
-    c->cfave=NULL;
-    c->cfsize=0;
-    if((fp=fopen(c->configwf, "r"))!=NULL) /* we've got a file! */
+    c->cfcard = c->cfdate = NULL;
+    c->cfave = NULL;
+    c->cfsize = 0;
+    if((fp = fopen(c->configwf, "r")) != NULL) /* we've got a file! */
     {
-        c->session=getactime(fp);
-        for(i=0; 3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave); i++)
+        c->session = getactime(fp);
+        for(i = 0; 3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave); i++)
         {
-            c->cfcard=(int *)reallocordie(c->cfcard, sizeof(int)*(i+1));
-            c->cfdate=(int *)reallocordie(c->cfdate, sizeof(int)*(i+1));
-            c->cfave=(float *)reallocordie(c->cfave, sizeof(float)*(i+1));
-            c->cfcard[i]=card;
-            c->cfdate[i]=date;
-            c->cfave[i]=ave;
+            c->cfcard = (int *)reallocordie(c->cfcard, sizeof(int) * (i + 1));
+            c->cfdate = (int *)reallocordie(c->cfdate, sizeof(int) * (i + 1));
+            c->cfave = (float *)reallocordie(c->cfave, sizeof(float) * (i + 1));
+            c->cfcard[i] = card;
+            c->cfdate[i] = date;
+            c->cfave[i] = ave;
             c->cfsize++;
         }
         fclose(fp);
         return;
     }
 
-    if(verb>=0)
+    if(verb >= 0)
         printf("No previous history. Starting new study.\n");
     return;
 }
@@ -1232,25 +1237,25 @@ void readdbfiles(tcfg *c)
 {
     DIR *dp;
     struct dirent *ep;
-    char *dot=NULL;
+    char *dot = NULL;
     int len;
-    int dois=1;
+    int dois = 1;
     char fullname[PATHSIZE];
 
-    c->dbfiles=NULL; /* risk of memory leak here: this line isn't needed */
-    c->dbfsize=0;
+    c->dbfiles = NULL; /* risk of memory leak here: this line isn't needed */
+    c->dbfsize = 0;
 
     do
     {
-        dp = opendir(dois?c->dbpath:c->cfgrealpath);
+        dp = opendir(dois ? c->dbpath : c->cfgrealpath);
         if(dp != NULL)
         {
-            while((ep=readdir(dp))) /* while there is a file, get it */
+            while((ep = readdir(dp))) /* while there is a file, get it */
             {
-                if(!(dot=strrchr(ep->d_name, '.'))) /* grab extension */
+                if(!(dot = strrchr(ep->d_name, '.'))) /* grab extension */
                     continue;
-                len=snprintf(fullname, PATHSIZE, "%s/%s", (dois?c->dbpath:c->cfgrealpath), ep->d_name);
-                if(len>=PATHSIZE)
+                len = snprintf(fullname, PATHSIZE, "%s/%s", (dois ? c->dbpath : c->cfgrealpath), ep->d_name);
+                if(len >= PATHSIZE)
                 {
                     fprintf(stderr, "Ignoring file with too big name: %s\n", fullname);
                     continue;
@@ -1258,21 +1263,22 @@ void readdbfiles(tcfg *c)
                 if(!strcmp(dot, EXTDB)) /* achou db */
                 {
                     c->dbfsize++;
-                    c->dbfiles=(char **)reallocordie(c->dbfiles, sizeof(char *)*(c->dbfsize));
-                    c->dbfiles[c->dbfsize-1] = NULL;
-                    c->dbfiles[c->dbfsize-1] = (char *)reallocordie(c->dbfiles[c->dbfsize-1], sizeof(char)*(len+1));
-                    strncpy(c->dbfiles[c->dbfsize-1], fullname, len+1);
+                    c->dbfiles = (char **)reallocordie(c->dbfiles, sizeof(char *) * (c->dbfsize));
+                    c->dbfiles[c->dbfsize - 1] = NULL;
+                    c->dbfiles[c->dbfsize - 1] = (char *)reallocordie(c->dbfiles[c->dbfsize - 1], sizeof(char) * (len + 1));
+                    strncpy(c->dbfiles[c->dbfsize - 1], fullname, len + 1);
                 }
             }
             closedir(dp);
         }
         else
         {
-            fprintf(stderr, "Error: %s\n", (dois?c->dbpath:c->cfgrealpath));
-            perror ("Couldn't open the directory");
+            fprintf(stderr, "Error: %s\n", (dois ? c->dbpath : c->cfgrealpath));
+            perror("Couldn't open the directory");
         }
         dois--;
-    }while(dois>=0);
+    }
+    while(dois >= 0);
 
     return;
 }
@@ -1302,7 +1308,7 @@ int randnorep(int mode, int *n)
 
     if(mode == FILLBASKET) /* fills the basket */
     {
-        if(*n<1)
+        if(*n < 1)
             return BASKETERROR;
         /* deleting the old basket */
         lant = lcab->prox;
@@ -1330,85 +1336,88 @@ int randnorep(int mode, int *n)
 
         return BASKETOK;
     }
-    else if(mode == DRAWBASKET) /* Draw a number */
-    {
-        if(listqtd == 0)
-            return BASKETEMPTY; /* empty basket */
-        sort = randmm(0, listqtd);
-        ln = lcab;
-        lant = NULL;
-        for(j = 0; j < sort; j++)
+    else
+        if(mode == DRAWBASKET) /* Draw a number */
         {
-            lant = ln;
-            ln = ln->prox;
-        }
-        *n = ln->num;         /* number drawn */
-        listqtd--;
+            if(listqtd == 0)
+                return BASKETEMPTY; /* empty basket */
+            sort = randmm(0, listqtd);
+            ln = lcab;
+            lant = NULL;
+            for(j = 0; j < sort; j++)
+            {
+                lant = ln;
+                ln = ln->prox;
+            }
+            *n = ln->num;         /* number drawn */
+            listqtd--;
 
-        if(listqtd <= 0)        /* if no more, dont need to delete head */
-            return BASKETOK;
+            if(listqtd <= 0)        /* if no more, dont need to delete head */
+                return BASKETOK;
 
-        if(lant != NULL)        /* not the head */
-            lant->prox = ln->prox;
-        else                    /* it is the head */
-        {
-            lcab = lcab->prox;
-            lista = lcab;
-        }
-        free(ln);
+            if(lant != NULL)        /* not the head */
+                lant->prox = ln->prox;
+            else                    /* it is the head */
+            {
+                lcab = lcab->prox;
+                lista = lcab;
+            }
+            free(ln);
 
-        return BASKETOK;
-    }
-    else if(mode == LISTBASKET)    /* LISTBASKET  */
-    {
-        /* Example: for(a=randnorep(LISTBASKET); a!=BASKETLISTED; a=randnorep(LISTBASKET)) ( */
-        if(listqtd == 0)
-            return BASKETLISTED;    /* listed because empty basket */
-        if(lista == NULL)
-        {
-            lista = lcab;
-            return BASKETLISTED;    /* basket listed */
-        }
-        while(lista != NULL)
-        {
-            *n = lista->num;
-            lista = lista->prox;
             return BASKETOK;
         }
-    }
-    else if(mode == REMOVEBASKET) /* Remove a specific item */
-    {
-        if(listqtd == 0)
-            return BASKETEMPTY; /* empty basket */
-        sort = *n;
-        ln = lcab;
-        lant = NULL;
-        while(ln!=NULL)
-        {
-            if(ln->num==sort) /* number remove */
-                break;
-            lant = ln;
-            ln = ln->prox;
-        }
-        if(ln==NULL) /* number not found */
-            return BASKETERROR;
+        else
+            if(mode == LISTBASKET)    /* LISTBASKET  */
+            {
+                /* Example: for(a=randnorep(LISTBASKET); a!=BASKETLISTED; a=randnorep(LISTBASKET)) ( */
+                if(listqtd == 0)
+                    return BASKETLISTED;    /* listed because empty basket */
+                if(lista == NULL)
+                {
+                    lista = lcab;
+                    return BASKETLISTED;    /* basket listed */
+                }
+                while(lista != NULL)
+                {
+                    *n = lista->num;
+                    lista = lista->prox;
+                    return BASKETOK;
+                }
+            }
+            else
+                if(mode == REMOVEBASKET) /* Remove a specific item */
+                {
+                    if(listqtd == 0)
+                        return BASKETEMPTY; /* empty basket */
+                    sort = *n;
+                    ln = lcab;
+                    lant = NULL;
+                    while(ln != NULL)
+                    {
+                        if(ln->num == sort) /* number remove */
+                            break;
+                        lant = ln;
+                        ln = ln->prox;
+                    }
+                    if(ln == NULL) /* number not found */
+                        return BASKETERROR;
 
-        listqtd--;
+                    listqtd--;
 
-        if(listqtd <= 0)        /* if no more, dont need to delete head */
-            return BASKETOK;
+                    if(listqtd <= 0)        /* if no more, dont need to delete head */
+                        return BASKETOK;
 
-        if(lant != NULL)        /* not the head */
-            lant->prox = ln->prox;
-        else                    /* it is the head */
-        {
-            lcab = lcab->prox;
-            lista = lcab;
-        }
-        free(ln);
+                    if(lant != NULL)        /* not the head */
+                        lant->prox = ln->prox;
+                    else                    /* it is the head */
+                    {
+                        lcab = lcab->prox;
+                        lista = lcab;
+                    }
+                    free(ln);
 
-        return BASKETOK;
-    }
+                    return BASKETOK;
+                }
     return BASKETERROR; /* unknow mode */
 }
 
@@ -1461,8 +1470,8 @@ void copyr(void)
     IFDEBUG("copyr()");
     printf("%s - Version %s\n", "QualCard", VERSION);
     printf("\nCopyright (C) %d %s <%s>, GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>. This  is  free  software:  you are free to change and redistribute it. There is NO WARRANTY, to the extent permitted by law. USE IT AS IT IS. The author takes no responsability to any damage this software may inflige in your data.\n\n", 2016, "Ruben Carlo Benante", "rcb@beco.cc");
-    if(verb>3) printf("copyr(): Verbose: %d\n", verb); /* -vvvv */
-        exit(EXIT_FAILURE);
+    if(verb > 3) printf("copyr(): Verbose: %d\n", verb); /* -vvvv */
+    exit(EXIT_FAILURE);
 }
 
 /**  @} */
