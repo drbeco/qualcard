@@ -78,6 +78,7 @@
 #include <unistd.h> /* UNIX standard function */
 #include <sys/stat.h> /* File status and information */
 #include <errno.h> /* Error number codes errno */
+#include <math.h> /* Math functions */
 
 /* ---------------------------------------------------------------------- */
 /* definitions */
@@ -574,8 +575,8 @@ void sortmemo(tcfg *c)
     for(i = 0; i < c->cfsize - 1; i++)
         for(j = i + 1; j < c->cfsize; j++)
         {
-            ki = newdate(c->cfdate[i], ave2day(c->cfave[i]));
-            kj = newdate(c->cfdate[j], ave2day(c->cfave[j]));
+            ki = newdate(c->cfdate[i], ave2day(c->cfave[i])) + round(c->cfave[i]);
+            kj = newdate(c->cfdate[j], ave2day(c->cfave[j])) + round(c->cfave[j]);
             troca=0;
             if(gequal)
             {
