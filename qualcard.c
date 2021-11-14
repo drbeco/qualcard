@@ -146,7 +146,7 @@ typedef struct scfg /* configuration data struct */
     char realuser[STRSIZE]; /* user name of the account */
     char dbasef[STRSIZE], configwf[STRSIZE]; /* current filenames: database and configuration */
     int *cfcard, *cfdate; /* card num, last date */
-    float *cfave; /* card average */
+    double *cfave; /* card average */
     int cfsize; /* size of config file */
     char **dbfiles; /* char dbfiles[number of files][string lenght];*/
     int dbfsize; /* first dimension / lines */
@@ -161,7 +161,7 @@ void copyr(void); /* print version and copyright information */
 void qualcard_init(tcfg *cfg); /* global initialization function */
 void summary(tcfg c); /* how many cards to review */
 double randmm(double min, double max); /* drawn a number from [min, max[ */
-int ave2day(float ave); /* given an average, return how many days */
+int ave2day(double ave); /* given an average, return how many days */
 int newdate(int oldd, int days); /* add days to a date */
 char *prettydate(int somedate); /* return date in a pretty format */
 void readcfg(tcfg *c); /* read config file */
@@ -173,17 +173,17 @@ void select10cards(tcfg *c, int tencards[10][2]); /* select 10 cards (old or new
 void sortmemo(tcfg *c); /* prioritary (old) comes first (selection sort) */
 void getcard(char *dbfile, int cardnum, char *cardfr, char *cardbk); /* given a card number, get it from file */
 void cardfaces(char *card, char *fr, char *bk); /* get card faces front/back */
-void save2memo(tcfg *c, int i, int card, float scor); /* save new or update old card */
+void save2memo(tcfg *c, int i, int card, double scor); /* save new or update old card */
 void save2file(tcfg c); /* save updated cards in memory to config file */
 int dbsize(char *dbname); /* database size */
-void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float *pct, float *addscore, int *ncardl); /* analyses a history file */
+void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, double *pct, double *addscore, int *ncardl); /* analyses a history file */
 void createcfgdir(tcfg *c); /* creates /home/user/.config/qualcard/ */
 char *filenopath(char *filepath); /* get filename with no path */
 int randnorep(int mode, int *n); /* drawn numbers from a list with no repetition */
 void changebarnet(char *s); /* change \n and \t to the real thing */
 void changecolon(char *nt); /* change char 254 back to a colon sign */
 int diffdays(int newd, int oldd); /* Difference of two dates in days. Positive if new>old, 0 if equals, negative c.c. */
-float score(float ave, int late); /* return the new score when the revision is late */
+double score(double ave, int late); /* return the new score when the revision is late */
 void menudb(tcfg *c); /* read menu */
 char *dbcore(char *s); /* grab the core name of the file */
 void sessiontime(tcfg *c); /* calculates duration of this session and accumulated time */
@@ -235,7 +235,7 @@ int main(int argc, char *argv[])
     int tencards[10][2]; /* ten cards, index in memory (-1 if new), line in file */
     int again = 1; /* while some card score presented is still zero */
     int repet[10] = {0}; /* which card repeated how many times */
-    float sco, oldsco; /* the score to a card */
+    double sco, oldsco; /* the score to a card */
     char cardfr[STRSIZE], cardbk[STRSIZE]; /* card front and back */
 
     IFDEBUG("Starting optarg loop...\n");
@@ -408,9 +408,9 @@ int main(int argc, char *argv[])
             else
             {
                 if(repet[i])
-                    sco = (float)opt / ((float)repet[i] + 1.0);
+                    sco = (double)opt / ((double)repet[i] + 1.0);
                 else
-                    sco = (float)opt;
+                    sco = (double)opt;
                 save2memo(&c, tencards[i][TMEM], tencards[i][TFIL], sco);
                 if(tencards[i][TMEM] == TVAL)
                     tencards[i][TMEM] = c.cfsize - 1;
@@ -431,14 +431,14 @@ int main(int argc, char *argv[])
 }
 
 /* save new or update old card */
-void save2memo(tcfg *c, int i, int card, float scor)
+void save2memo(tcfg *c, int i, int card, double scor)
 {
     if(-1 == i) /* no index implies new memory block */
     {
         c->cfsize++;
         c->cfcard = (int *)reallocordie(c->cfcard, sizeof(int) * c->cfsize);
         c->cfdate = (int *)reallocordie(c->cfdate, sizeof(int) * c->cfsize);
-        c->cfave = (float *)reallocordie(c->cfave, sizeof(float) * c->cfsize);
+        c->cfave = (double *)reallocordie(c->cfave, sizeof(double) * c->cfsize);
         c->cfcard[c->cfsize - 1] = card;
         c->cfdate[c->cfsize - 1] = c->today;
         c->cfave[c->cfsize - 1] = scor / 1.3; /* first score -23.07% */
@@ -454,7 +454,7 @@ void save2memo(tcfg *c, int i, int card, float scor)
 /* save updated cards in memory to config file */
 /* file format:
  *          session time (double)
- *          card number (int) card last date (int) card grade average (float)
+ *          card number (int) card last date (int) card grade average (double)
  *          ...
  */
 void save2file(tcfg c)
@@ -563,11 +563,7 @@ char *filenopath(char *filepath)
 void sortmemo(tcfg *c)
 {
     int i, j, iux;
-    int ki, kj;
-    float fux;
-    int gequal, troca;
-
-    gequal = rand()%2; /* true: >=, false: > */
+    double ki, kj, fux;
 
     if(c->cfsize < 2)
         return;
@@ -575,24 +571,12 @@ void sortmemo(tcfg *c)
     for(i = 0; i < c->cfsize - 1; i++)
         for(j = i + 1; j < c->cfsize; j++)
         {
-            ki = newdate(c->cfdate[i], ave2day(c->cfave[i])) + round(c->cfave[i]);
-            kj = newdate(c->cfdate[j], ave2day(c->cfave[j])) + round(c->cfave[j]);
-            troca=0;
-            if(gequal)
+            ki = newdate(c->cfdate[i], ave2day(c->cfave[i])) + c->cfave[i]/10.0;
+            kj = newdate(c->cfdate[j], ave2day(c->cfave[j])) + c->cfave[j]/10.0;
+            if(ki > kj) /* ki is after, invert */
             {
-                if(ki >= kj) /* ki is after, invert */
-                    troca=1;
-            }
-            else
-            {
-                if(ki > kj) /* ki is after, invert */
-                    troca=1;
-            }
-
-            if(troca) /* ki is after, invert */
-            {
-                if(ki == kj && c->cfave[i] <= c->cfave[j]) /* 1st score is lower, do not swap */
-                    continue;
+                /* if(ki == kj && c->cfave[i] <= c->cfave[j]) /1* 1st score is lower, do not swap *1/ */
+                    /* continue; */
                 /* swap cards number */
                 iux = c->cfcard[i];
                 c->cfcard[i] = c->cfcard[j];
@@ -671,12 +655,12 @@ int dbsize(char *dbname)
 double getactime(FILE *fp)
 {
     int card, date;
-    float ave;
+    double ave;
     double ac=0.0;
     errno=0;
 
     fseek(fp, 0, 0);
-    if(3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave))
+    if(3 == fscanf(fp, "%d %d %lf\n", &card, &date, &ave))
     {
         fseek(fp, 0, 0);
         errno=ENODATA;
@@ -694,11 +678,11 @@ double getactime(FILE *fp)
 }
 
 /* history analises */
-void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float *pct, float *addscore, int *ncardl)
+void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, double *pct, double *addscore, int *ncardl)
 {
     int card, date, revd; /* card number, card date last seen, card review date */
     int late; /* days late */
-    float ave; /* average of a single card written in disk */
+    double ave; /* average of a single card written in disk */
     FILE *fp;
     int alla = 1; /* all cards are A */
 
@@ -713,7 +697,7 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
 
     ave = getactime(fp); /* ignore accumulated time if it exists */
 
-    while(3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave))
+    while(3 == fscanf(fp, "%d %d %lf\n", &card, &date, &ave))
     {
         (*view)++;
         *addscore += ave;
@@ -733,7 +717,7 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
     }
     fclose(fp);
 
-    *pct /= ((float)qtd);
+    *pct /= ((double)qtd);
     if(*pct > SCOREA && alla) /* it is not impossible to achieve 100% */
         *pct = 5.0;
     *pct *= 20.0; /* 0%..100% */
@@ -741,7 +725,7 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
     if(*view == 0)
         *addscore = 0.0;
     else
-        *addscore /= ((float) * view); /* average of scores you've got so far */
+        *addscore /= ((double) * view); /* average of scores you've got so far */
 
     if(*addscore > SCOREA && alla) /* it is not impossible to achieve 5.0 */
         *addscore = 5.0;
@@ -750,11 +734,11 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, float 
 }
 
 /* return the new score when the revision is late */
-float score(float ave, int late)
+double score(double ave, int late)
 {
     if(late == 1 && ave > SCOREA) /* don't let one day spoil the fun */
         return SCOREA + 0.01;
-    ave -= ((float)late / 3.5);
+    ave -= ((double)late / 3.5);
     if(ave < 0.0)
         ave = 0.0;
     return ave;
@@ -791,7 +775,7 @@ void sessiontime(tcfg *c)
 int diffdays(int newd, int oldd)
 {
     int ano, mes, dia;//, aux;
-    float fsec; /* seconds */
+    double fsec; /* seconds */
     time_t ttnew, ttold; /* epochs */
     struct tm tmnew = {0}, tmold = {0}; /* date fields */
 
@@ -837,9 +821,9 @@ void summary(tcfg c)
 {
     int i, view = 0, learn = 0, qtd = 0;
     char *dbc;
-    float pview, plearn; /* percentages */
-    float ave; /* average 0...5 of cards you've seen in a database */
-    float pct; /* percentage of your achievements, decay with time */
+    double pview, plearn; /* percentages */
+    double ave; /* average 0...5 of cards you've seen in a database */
+    double pct; /* percentage of your achievements, decay with time */
     int clate; /* number of cards late */
     int maxlen = 14, len;
     char summaryf[PATHSIZE];
@@ -867,8 +851,8 @@ void summary(tcfg c)
         snprintf(summaryf, PATHSIZE, "%s/%s-%s%s", c.cfguserpath, c.fileuser, dbc, EXTCF);
 
         cfanalyses(summaryf, c.today, qtd, &view, &learn, &pct, &ave, &clate);
-        pview = ((float)view / (float)qtd) * 100.0;
-        plearn = ((float)learn / (float)qtd) * 100.0;
+        pview = ((double)view / (double)qtd) * 100.0;
+        plearn = ((double)learn / (double)qtd) * 100.0;
 
         printf("| %2d | %-*s | %5.1f%% | %5d | %4d (%5.1f%%) | %4d (%5.1f%%) | %6d | %5.1f |\n", i + 1, maxlen, theme(filenopath(c.dbfiles[i])), pct, qtd, view, pview, learn, plearn, clate, ave);
     }
@@ -931,7 +915,7 @@ void getcard(char *dbfile, int cardnum, char *cardfr, char *cardbk)
 }
 
 /**
- * @brief Drawn a float number in the given interval [min, max[
+ * @brief Drawn a double number in the given interval [min, max[
  * @param[in] min Lower number of the interval (closed, inclusive)
  * @param[in] max Maximum number of the interval (open, exclusive)
  * @param[out] sorteio The number drawn and returned
@@ -944,7 +928,7 @@ double randmm(double min, double max)
     double s;
 
     s = rand();
-    s /= ((float)RAND_MAX);
+    s /= ((double)RAND_MAX);
     s *= (max - min);
     s += min;
     return s;
@@ -1147,7 +1131,7 @@ char *dbcore(char *s)
 }
 
 /* given an average, return how many days */
-int ave2day(float ave)
+int ave2day(double ave)
 {
     if(ave <= SCOREF) /* G: review tomorrow */
         return 1;
@@ -1222,7 +1206,7 @@ void readcfg(tcfg *c)
 {
     int i;
     int card, date;
-    float ave;
+    double ave;
     FILE *fp;
 
     c->cfcard = c->cfdate = NULL;
@@ -1231,11 +1215,11 @@ void readcfg(tcfg *c)
     if((fp = fopen(c->configwf, "r")) != NULL) /* we've got a file! */
     {
         c->session = getactime(fp);
-        for(i = 0; 3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave); i++)
+        for(i = 0; 3 == fscanf(fp, "%d %d %lf\n", &card, &date, &ave); i++)
         {
             c->cfcard = (int *)reallocordie(c->cfcard, sizeof(int) * (i + 1));
             c->cfdate = (int *)reallocordie(c->cfdate, sizeof(int) * (i + 1));
-            c->cfave = (float *)reallocordie(c->cfave, sizeof(float) * (i + 1));
+            c->cfave = (double *)reallocordie(c->cfave, sizeof(double) * (i + 1));
             c->cfcard[i] = card;
             c->cfdate[i] = date;
             c->cfave[i] = ave;
