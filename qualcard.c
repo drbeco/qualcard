@@ -566,6 +566,8 @@ void sortmemo(tcfg *c)
     float fux;
     int gequal, troca;
 
+    gequal = rand()%2; /* true: >=, false: > */
+
     if(c->cfsize < 2)
         return;
 
@@ -574,7 +576,6 @@ void sortmemo(tcfg *c)
         {
             ki = newdate(c->cfdate[i], ave2day(c->cfave[i]));
             kj = newdate(c->cfdate[j], ave2day(c->cfave[j]));
-            gequal = rand()%2; /* true: >=, false: > */
             troca=0;
             if(gequal)
             {
