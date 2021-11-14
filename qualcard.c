@@ -1,10 +1,10 @@
 /***************************************************************************
- *   qualcard.c                                                Version 1.5 *
+ *   qualcard.c                                                Version 1.7 *
  *                                                                         *
  *   Learn cards by Spaced Repetition Method.                              *
  *   This program helps you learn from a set of cards with questions       *
  *   and answers.                                                          *
- *   Copyright (C) 2016         by Ruben Carlo Benante                     *
+ *   Copyright (C) 2016-2022+   by Ruben Carlo Benante                     *
  ***************************************************************************
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -134,7 +134,7 @@ typedef struct scfg /* configuration data struct */
     int QTDCARD; /* database size */
     int today; /* yyyymmdd */
     time_t tstart; /* start time (s) of this session */
-    float session; /* duration of all session (s) */
+    double session; /* duration of all session (s) */
     char dbpath[PATHSIZE]; /* path to commom database */
     char cfgrealpath[PATHSIZE]; /* path to own config directory (history and databases), read and write */
     char cfguserpath[PATHSIZE]; /* path to some user config directory (just for read) */
@@ -184,7 +184,7 @@ float score(float ave, int late); /* return the new score when the revision is l
 void menudb(tcfg *c); /* read menu */
 char *dbcore(char *s); /* grab the core name of the file */
 void sessiontime(tcfg *c); /* calculates duration of this session and accumulated time */
-float getactime(FILE *fp); /* read time if exists. points to first card stat */
+double getactime(FILE *fp); /* read time if exists. points to first card stat */
 
 /* ---------------------------------------------------------------------- */
 /* @ingroup GroupUnique */
@@ -449,6 +449,11 @@ void save2memo(tcfg *c, int i, int card, float scor)
 }
 
 /* save updated cards in memory to config file */
+/* file format:
+ *          session time (double)
+ *          card number (int) card last date (int) card grade average (float)
+ *          ...
+ */
 void save2file(tcfg c)
 {
     int i;
@@ -456,7 +461,7 @@ void save2file(tcfg c)
 
     if((fp = fopen(c.configwf, "w")) != NULL) /* create from scratch */
     {
-        fprintf(fp, "%f\n", c.session); /* accumulated time */
+        fprintf(fp, "%lf\n", c.session); /* accumulated time */
         for(i = 0; i < c.cfsize; i++)
             fprintf(fp, "%5d %8d %6.4f\n", c.cfcard[i], c.cfdate[i], c.cfave[i]);
 
@@ -644,21 +649,26 @@ int dbsize(char *dbname)
 }
 
 /* read time if exists. points to first card stat */
-float getactime(FILE *fp)
+double getactime(FILE *fp)
 {
     int card, date;
-    float ac;
+    float ave;
+    double ac=0.0;
+    errno=0;
 
     fseek(fp, 0, 0);
-    if(3 == fscanf(fp, "%d %d %f\n", &card, &date, &ac))
+    if(3 == fscanf(fp, "%d %d %f\n", &card, &date, &ave))
     {
         fseek(fp, 0, 0);
+        errno=ENODATA;
         return 0.0; /* old file format, no accumulated time */
     }
 
-    if(1 == fscanf(fp, "%f\n", &ac)) /* read first line of accumulated time */
+    fseek(fp, 0, 0);
+    if(1 == fscanf(fp, "%lf\n", &ac)) /* read first line of accumulated time */
         return ac; /* let it point to the second line and return */
 
+    errno=EPROTO;
     perror("some strange error\n");
     fseek(fp, 0, 0);
     return 0.0; /* no accumulated time */
@@ -734,15 +744,15 @@ float score(float ave, int late)
 /* calculates duration of this session and accumulated time */
 void sessiontime(tcfg *c)
 {
-    float fsec; /* seconds */
+    double fsec; /* seconds */
     time_t ttnow;
     int h0, m0, s0, h1, m1, s1;
 
     ttnow = time(NULL);
 
-    fsec = difftime(ttnow, c->tstart); /* this session's duration in s */
+    fsec = difftime(ttnow, c->tstart); /* this session's duration in seconds */
 
-    c->session += fsec; /* all sessions */
+    c->session += fsec; /* all sessions in seconds */
 
     h0 = (int)fsec / 3600;
     m0 = (int)(((fsec / 3600.0) - ((int)fsec / 3600)) * 60.0);
@@ -752,7 +762,7 @@ void sessiontime(tcfg *c)
     m1 = (int)(((c->session / 3600.0) - ((int)c->session / 3600)) * 60.0);
     s1 = (int)(((c->session / 60.0) - ((int)(h1 * 60 + m1))) * 60.0);
 
-    /* printf("end=%f, start=%f, diff=%f\n", (double)ttnow, (double)c->tstart, fsec); */
+    /* printf("end=%.2lf, start=%.2lf, diff=%.2lf, sessionn=%.2lf\n", (double)ttnow, (double)c->tstart, fsec, c->session); */
 
     printf("This session: %02d:%02d:%02d. Accumulated time: %02d:%02d:%02d\n", h0, m0, s0, h1, m1, s1);
     return;
