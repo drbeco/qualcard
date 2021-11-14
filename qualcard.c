@@ -385,7 +385,7 @@ int main(int argc, char *argv[])
 
             do
             {
-                printf("Your self-evaluation (from 0 to 5, default 0 = repeat) is: ");
+                printf("Your self-evaluation (from 0 to 5, default 0) is: ");
                 /* scanf("%d%*c", &opt); /1* discard the '\n'. Better use fgets() *1/ */
                 fgets(sopt, SOPT, stdin);
                 if((p = strchr(sopt, '\n'))) * p = '\0';
@@ -422,7 +422,7 @@ int main(int argc, char *argv[])
     sessiontime(&c); /* calculates duration of this session and accumulated time */
     save2file(c);
 
-    printf("\nLive as if you were to die tomorrow. Learn as if you were to live forever. (Mahatma Gandhi)\n");
+    printf("\nLive as if you were to die tomorrow.\nLearn as if you were to live forever.  (Mahatma Gandhi)\n");
     printf("Thank you for using QualCard version %s.\n\n", VERSION);
     return EXIT_SUCCESS;
 }
