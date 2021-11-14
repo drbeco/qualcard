@@ -93,12 +93,14 @@
 #define SCOREF 0.60
 #define TMEM 0 /**< tencards memory index */
 #define TFIL 1 /**< tencards file index (card number) */
+#define TEND -2 /**< tencards end of list */
+#define TVAL -1 /* not in memory, but valid new card from file */
 
 /* randnorep() input: mode */
-#define DRAWBASKET   -1 /**< MODE set randnorep() to draw */
-#define LISTBASKET   -2 /**< MODE set randnorep() to list */
-#define REMOVEBASKET -3 /**< MODE set randnorep() to remove */
-#define FILLBASKET   -4 /**< MODE set randnorep() to fill basket */
+#define DRAWBASKET   -1 /**< MODE set randnorep() to draw a item from the basket */
+#define LISTBASKET   -2 /**< MODE set randnorep() to list itens in the basket */
+#define REMOVEBASKET -3 /**< MODE set randnorep() to remove a specific item from basket */
+#define FILLBASKET   -4 /**< MODE set randnorep() to fill basket with new numbers */
 /* randnorep() output: error codes returned */
 #define BASKETOK      0 /**< randnorep() return code for no error */
 #define BASKETEMPTY  -1 /**< randnorep() return code for empty list */
@@ -351,12 +353,12 @@ int main(int argc, char *argv[])
         again = 0;
         for(i = 0; i < 10; i++)
         {
-            if(tencards[i][TMEM] == -2) /* already presented and ok */
+            if(tencards[i][TMEM] == TEND) /* already presented and ok */
                 continue;
             getcard(c.dbasef, tencards[i][TFIL], cardfr, cardbk);
 
             printf("-----------------------------------------------------------\n");
-            if(-1 == tencards[i][TMEM]) /* new card? */
+            if(TVAL == tencards[i][TMEM]) /* new card? */
             {
                 printf("Card %d (new card for today)\n\n", tencards[i][TFIL] + 1);
                 oldsco = 0.0;
@@ -409,11 +411,11 @@ int main(int argc, char *argv[])
                 else
                     sco = (float)opt;
                 save2memo(&c, tencards[i][TMEM], tencards[i][TFIL], sco);
-                if(tencards[i][TMEM] == -1)
+                if(tencards[i][TMEM] == TVAL)
                     tencards[i][TMEM] = c.cfsize - 1;
                 futd = newdate(c.today, ave2day(c.cfave[tencards[i][TMEM]]));
                 printf("Old score: %.1f, new score: %.1f, revision set to %s\n", oldsco, c.cfave[tencards[i][TMEM]], prettydate(futd));
-                tencards[i][TMEM] = -2; /* presented and ok */
+                tencards[i][TMEM] = TEND; /* presented and ok */
             }
         } /* for i < 10 cards */
     } /* while(again) */
@@ -562,6 +564,10 @@ void sortmemo(tcfg *c)
     int i, j, iux;
     int ki, kj;
     float fux;
+    int gequal, troca;
+
+    gequal = rand()%2; /* true: >=, false: > */
+
     if(c->cfsize < 2)
         return;
 
@@ -570,7 +576,19 @@ void sortmemo(tcfg *c)
         {
             ki = newdate(c->cfdate[i], ave2day(c->cfave[i]));
             kj = newdate(c->cfdate[j], ave2day(c->cfave[j]));
-            if(ki >= kj) /* ki is after, invert */
+            troca=0;
+            if(gequal)
+            {
+                if(ki >= kj) /* ki is after, invert */
+                    troca=1;
+            }
+            else
+            {
+                if(ki > kj) /* ki is after, invert */
+                    troca=1;
+            }
+
+            if(troca) /* ki is after, invert */
             {
                 if(ki == kj && c->cfave[i] <= c->cfave[j]) /* 1st score is lower, do not swap */
                     continue;
@@ -596,7 +614,7 @@ void select10cards(tcfg *c, int tencards[10][2])
     int i, j;
 
     for(i = 0; i < 10; i++) /* zeroing */
-        tencards[i][TMEM] = tencards[i][TFIL] = -2; /* end of cards */
+        tencards[i][TMEM] = tencards[i][TFIL] = TEND; /* end of cards */
 
     sortmemo(c); /* sort cfcard, cfdate and cfave, by date+days(ave) */
     for(i = 0; i < 9 && i < c->cfsize; i++) /* nine olds if possible */
@@ -609,9 +627,9 @@ void select10cards(tcfg *c, int tencards[10][2])
     for(j = i; j < 10; j++)
     {
         /* new not in memory nor in tencards already */
-        if((tencards[j][TFIL] = newcard(*c, tencards)) == -2)
+        if((tencards[j][TFIL] = newcard(*c, tencards)) == TEND)
             break; /* there is not enough */
-        tencards[j][TMEM] = -1; /* not in memory, but valid new card from file */
+        tencards[j][TMEM] = TVAL; /* not in memory, but valid new card from file */
     }
     if(j < 10) /* still need, lets see cards for tomorrow */
     {
@@ -876,15 +894,15 @@ int newcard(tcfg c, int tencards[10][2])
 
     randnorep(FILLBASKET, &c.QTDCARD); /* fill */
 
-    for(i = 0; i < 10; i++) /* remove from tencards */
-        if(tencards[i][TFIL] != -2)
+    for(i = 0; i < 10; i++) /* remove from basket all in memory tencards */
+        if(tencards[i][TFIL] != TEND)
             randnorep(REMOVEBASKET, &tencards[i][TFIL]);
 
-    for(i = 0; i < c.cfsize; i++) /* remove from history */
+    for(i = 0; i < c.cfsize; i++) /* remove from basket all in file history */
         randnorep(REMOVEBASKET, &c.cfcard[i]);
 
     if(randnorep(DRAWBASKET, &l) != BASKETOK)
-        l = -2;
+        l = TEND;
 
     return l;
 }
