@@ -1017,7 +1017,7 @@ void qualcard_init(tcfg *cfg)
     snprintf(stoday, DTSIZE, "%04d%02d%02d", 1900 + timeptr->tm_year, 1 + timeptr->tm_mon, timeptr->tm_mday);
     cfg->today = (int)strtol(stoday, NULL, 10);
 
-    srand((unsigned)time(&cfg->tstart)); /* new unknow seed */
+    srand((unsigned)time(NULL)); /* new unknow seed */
 
     strncpy(cfg->realuser, getenv("USER"), STRSIZE);
     if(cfg->pathuser[0] == '\0')
