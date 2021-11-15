@@ -391,7 +391,8 @@ int main(int argc, char *argv[])
 
             do
             {
-                printf("Your self-evaluation (from 0 to 5, default 0) is: ");
+                /* printf("Your self-evaluation (from 0 to 5, default 0) is: "); */
+                printf("Current score: %.1f  Self-evaluation ([0] ... 5): ", oldsco);
                 /* scanf("%d%*c", &opt); /1* discard the '\n'. Better use fgets() *1/ */
                 fgets(sopt, SOPT, stdin);
                 if((p = strchr(sopt, '\n'))) * p = '\0';
@@ -418,7 +419,8 @@ int main(int argc, char *argv[])
                 if(tencards[i][TMEM] == TVAL)
                     tencards[i][TMEM] = c.cfsize - 1;
                 futd = newdate(c.today, ave2day(c.cfave[tencards[i][TMEM]]));
-                printf("Old score: %.1f, new score: %.1f, revision set to %s\n", oldsco, c.cfave[tencards[i][TMEM]], prettydate(futd));
+                /* printf("Old score: %.1f, new score: %.1f, revision set to %s\n", oldsco, c.cfave[tencards[i][TMEM]], prettydate(futd)); */
+                printf("New score: %.1f  Revision set to %s\n", c.cfave[tencards[i][TMEM]], prettydate(futd));
                 tencards[i][TMEM] = TEND; /* presented and ok */
             }
         } /* for i < 10 cards */
