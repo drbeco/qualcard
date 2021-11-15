@@ -870,7 +870,7 @@ void summary(tcfg c)
             getcard(c.dbasef, i, cardfr, cardbk);
             sstrip(cardfr);
             sstrip(cardbk);
-            printf("Card: %4d   Revision: %s   Score: %.4lf   Brief: %.9s :: %.9s\n", c.cfcard[i], prettydate(newdate(c.cfdate[i], ave2day(c.cfave[i]))), c.cfave[i], cardfr, cardbk);
+            printf("Card: %4d   Revision: %s   Score: %.4lf   Brief: %.9s :: %.9s\n", c.cfcard[i]+1, prettydate(newdate(c.cfdate[i], ave2day(c.cfave[i]))), c.cfave[i], cardfr, cardbk);
         }
     }
     return;
