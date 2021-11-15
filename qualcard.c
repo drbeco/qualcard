@@ -865,12 +865,13 @@ void summary(tcfg c)
         printf("List of cards, revision and scores:\n");
         menudb(&c);
         readcfg(&c);
-        for(i = 0; i < c.cfsize; i++) /* database file list */
+        for(i = 0; i < c.cfsize; i++) /* entries in history file cf4 */
         {
-            getcard(c.dbasef, i, cardfr, cardbk);
+            getcard(c.dbasef, c.cfcard[i], cardfr, cardbk);
             sstrip(cardfr);
             sstrip(cardbk);
-            printf("Card: %4d   Revision: %s   Score: %.4lf   Brief: %.9s :: %.9s\n", c.cfcard[i]+1, prettydate(newdate(c.cfdate[i], ave2day(c.cfave[i]))), c.cfave[i], cardfr, cardbk);
+            /* printf("debug revisao %d score: %lf --", c.cfdate[i], c.cfave[i]); */
+            printf("Card: %4d   Revision: %s   Score: %.4lf   Brief: %.9s :: %.9s\n", c.cfcard[i]+1, prettydate(newdate(c.cfdate[c.cfcard[i]], ave2day(c.cfave[i]))), c.cfave[i], cardfr, cardbk);
         }
     }
     return;
