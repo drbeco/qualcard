@@ -188,6 +188,7 @@ void menudb(tcfg *c); /* read menu */
 char *dbcore(char *s); /* grab the core name of the file */
 void sessiontime(tcfg *c); /* calculates duration of this session and accumulated time */
 double getactime(FILE *fp); /* read time if exists. points to first card stat */
+void sstrip(char *s); /* remove \n \t and double spaces from string */
 
 /* ---------------------------------------------------------------------- */
 /* @ingroup GroupUnique */
@@ -830,7 +831,6 @@ void summary(tcfg c)
     int maxlen = 14, len;
     char summaryf[PATHSIZE];
     char cardfr[STRSIZE], cardbk[STRSIZE]; /* card front and back */
-    char *p; /* remove \n \t */
 
     for(i = 0; i < c.dbfsize; i++) /* database file list */
         if((len = strlen(theme(filenopath(c.dbfiles[i])))) > maxlen)
@@ -868,19 +868,45 @@ void summary(tcfg c)
         for(i = 0; i < c.cfsize; i++) /* database file list */
         {
             getcard(c.dbasef, i, cardfr, cardbk);
-            while((p = strchr(cardfr, '\n')))
-                *p = ' ';
-            while((p = strchr(cardbk, '\n')))
-                *p = ' ';
-            while((p = strchr(cardfr, '\t')))
-                *p = ' ';
-            while((p = strchr(cardbk, '\t')))
-                *p = ' ';
-
-            printf("Card %3d : Revision %12s : Score %8.4lf : Card (%.10s  ::  %.10s)\n", c.cfcard[i], prettydate(c.cfdate[i]), c.cfave[i], cardfr, cardbk);
+            sstrip(cardfr);
+            sstrip(cardbk);
+            printf("Card: %4d   Revision: %s   Score: %.4lf   Brief: %.9s :: %.9s\n", c.cfcard[i], prettydate(newdate(c.cfdate[i], ave2day(c.cfave[i]))), c.cfave[i], cardfr, cardbk);
         }
     }
     return;
+}
+
+/* remove \n \t and double spaces from string */
+void sstrip(char *s)
+{
+    char *p;
+    int fr=1; /* flag remove */
+
+    if(strlen(s)<2)
+        return;
+    while((p = strchr(s, '\n')))
+        *p = ' ';
+    while((p = strchr(s, '\t')))
+        *p = ' ';
+    while(fr)
+    {
+        fr = 0;
+        p=s;
+        while(*p)
+        {
+            if(*p==' ' && *(p+1)==' ')
+            {
+                fr = 1;
+                break;
+            }
+            p++;
+        }
+        while(*p)
+        {
+            *p = *(p+1);
+            p++;
+        }
+    }
 }
 
 /* take the theme out of a file name */
