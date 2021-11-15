@@ -130,7 +130,7 @@
 
 static int verb = 0; /**< verbose level, global within the file */
 static int SUMMA = 0; /**< print summary only and exit */
-static int DBNUM = 0; /**< pick a database by number from command line */
+static int DBNUM = 0; /**< pick a database (ex4) by number from command line */
 
 typedef struct scfg /* configuration data struct */
 {
@@ -142,14 +142,14 @@ typedef struct scfg /* configuration data struct */
     char cfgrealpath[PATHSIZE]; /* path to own config directory (history and databases), read and write */
     char cfguserpath[PATHSIZE]; /* path to some user config directory (just for read) */
     char pathuser[STRSIZE]; /* pathuser/.config another user name account for read only */
-    char fileuser[STRSIZE]; /* fileuser-theme-question-answer user name current practicing */
+    char fileuser[STRSIZE]; /* fileuser-theme-question-answer.cf4 history file for username currently practicing */
     char realuser[STRSIZE]; /* user name of the account */
-    char dbasef[STRSIZE], configwf[STRSIZE]; /* current filenames: database and configuration */
+    char dbasef[STRSIZE], configwf[STRSIZE]; /* current filenames: database (ex4) and configuration (cf4) */
     int *cfcard, *cfdate; /* card num, last date */
     double *cfave; /* card average */
-    int cfsize; /* size of config file */
-    char **dbfiles; /* char dbfiles[number of files][string lenght];*/
-    int dbfsize; /* first dimension / lines */
+    int cfsize; /* size of config file, number of cards */
+    char **dbfiles; /* char dbfiles[number of ex4 files][string lenght of the biggest];*/
+    int dbfsize; /* number of database ex4 files */
     int invert; /* if true, print first the back, then the front of the card */
 } tcfg; /* configuration data type */
 
@@ -175,7 +175,7 @@ void getcard(char *dbfile, int cardnum, char *cardfr, char *cardbk); /* given a 
 void cardfaces(char *card, char *fr, char *bk); /* get card faces front/back */
 void save2memo(tcfg *c, int i, int card, double scor); /* save new or update old card */
 void save2file(tcfg c); /* save updated cards in memory to config file */
-int dbsize(char *dbname); /* database size */
+int dbsize(char *dbname); /* database ex4 size */
 void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, double *pct, double *addscore, int *ncardl); /* analyses a history file */
 void createcfgdir(tcfg *c); /* creates /home/user/.config/qualcard/ */
 char *filenopath(char *filepath); /* get filename with no path */
@@ -241,16 +241,18 @@ int main(int argc, char *argv[])
     IFDEBUG("Starting optarg loop...\n");
 
     /* getopt() configured options:
-     *        -h                help
-     *        -c                copyright & version
-     *        -v                verbose++
-     *        -q                quiet (verbose--)
-     *        -s                status of reviews
-     *        -u username       set the player name (default: whoami)
-     *        -p username       set the username for config path (together with -s only)
-     *        -d database       set the database to use (default: ask)
-     *        -n N              pick a database number N from command line
-     *        -i                invert presentation order (first the back, then the front of the card)
+     *        -h                Help.
+     *        -c                Copyright & version.
+     *        -v                Increase verbose.
+     *        -q                Quiet, decrease verbose.
+     *        -s                Status of all database reviews. Together with -n N shows only the
+     *                              status of a single chosen database.
+     *        -u username       Set the player name (default: whoami).
+     *        -p username       Set the username for config path (together with -s only).
+     *        -d database       Set the database to use (default: ask).
+     *        -n N              Pick a database number N from command line. With -s, print status of
+     *                              that specific database.
+     *        -i                Invert presentation order (first the back, then the front of the card).
      */
     opterr = 0;
     while((opt = getopt(argc, argv, "hcvqsp:u:d:in:")) != EOF)
@@ -452,7 +454,7 @@ void save2memo(tcfg *c, int i, int card, double scor)
 }
 
 /* save updated cards in memory to config file */
-/* file format:
+/* file format cf4:
  *          session time (double)
  *          card number (int) card last date (int) card grade average (double)
  *          ...
@@ -628,7 +630,7 @@ void select10cards(tcfg *c, int tencards[10][2])
     }
 }
 
-/* database size */
+/* database ex4 size */
 int dbsize(char *dbname)
 {
     char line[STRSIZE];
@@ -827,6 +829,8 @@ void summary(tcfg c)
     int clate; /* number of cards late */
     int maxlen = 14, len;
     char summaryf[PATHSIZE];
+    char cardfr[STRSIZE], cardbk[STRSIZE]; /* card front and back */
+    char *p; /* remove \n \t */
 
     for(i = 0; i < c.dbfsize; i++) /* database file list */
         if((len = strlen(theme(filenopath(c.dbfiles[i])))) > maxlen)
@@ -856,6 +860,26 @@ void summary(tcfg c)
 
         printf("| %2d | %-*s | %5.1f%% | %5d | %4d (%5.1f%%) | %4d (%5.1f%%) | %6d | %5.1f |\n", i + 1, maxlen, theme(filenopath(c.dbfiles[i])), pct, qtd, view, pview, learn, plearn, clate, ave);
     }
+    if(SUMMA && DBNUM)
+    {
+        printf("List of cards, revision and scores:\n");
+        menudb(&c);
+        readcfg(&c);
+        for(i = 0; i < c.cfsize; i++) /* database file list */
+        {
+            getcard(c.dbasef, i, cardfr, cardbk);
+            while((p = strchr(cardfr, '\n')))
+                *p = ' ';
+            while((p = strchr(cardbk, '\n')))
+                *p = ' ';
+            while((p = strchr(cardfr, '\t')))
+                *p = ' ';
+            while((p = strchr(cardbk, '\t')))
+                *p = ' ';
+
+            printf("Card %3d : Revision %12s : Score %8.4lf : Card (%.10s  ::  %.10s)\n", c.cfcard[i], prettydate(c.cfdate[i]), c.cfave[i], cardfr, cardbk);
+        }
+    }
     return;
 }
 
@@ -883,7 +907,7 @@ int newcard(tcfg c, int tencards[10][2])
         if(tencards[i][TFIL] != TEND)
             randnorep(REMOVEBASKET, &tencards[i][TFIL]);
 
-    for(i = 0; i < c.cfsize; i++) /* remove from basket all in file history */
+    for(i = 0; i < c.cfsize; i++) /* remove from basket all in file history cf4 */
         randnorep(REMOVEBASKET, &c.cfcard[i]);
 
     if(randnorep(DRAWBASKET, &l) != BASKETOK)
@@ -1106,6 +1130,7 @@ void menudb(tcfg *cfg)
     }
 
     dbc = dbcore(cfg->dbasef);
+    /* ~/.config/qualcard/user-theme-front-verse.cf4 */
     if(strlen(cfg->cfgrealpath) + strlen(cfg->fileuser) + strlen(dbc) + strlen(EXTCF) >= STRSIZE)
     {
         fprintf(stderr, "Configwf filename overflow\n");
@@ -1211,7 +1236,7 @@ void readcfg(tcfg *c)
 
     c->cfcard = c->cfdate = NULL;
     c->cfave = NULL;
-    c->cfsize = 0;
+    c->cfsize = 0; /* number of cards in config file */
     if((fp = fopen(c->configwf, "r")) != NULL) /* we've got a file! */
     {
         c->session = getactime(fp);
@@ -1276,7 +1301,7 @@ void readdbfiles(tcfg *c)
     struct dirent *ep;
     char *dot = NULL;
     int len;
-    int dois = 1;
+    int dois = 1; /* run twice, one for standard db path and other for config path */
     char fullname[PATHSIZE];
 
     c->dbfiles = NULL; /* risk of memory leak here: this line isn't needed */
@@ -1469,6 +1494,7 @@ int randnorep(int mode, int *n)
  * @date 2016-04-09
  *
  */
+
 void help(void)
 {
     IFDEBUG("help()");
@@ -1479,11 +1505,11 @@ void help(void)
     printf("\t-c,  --version\n\t\tShow version and copyright information.\n");
     printf("\t-v,  --verbose\n\t\tSet verbose level (cumulative).\n");
     printf("\t-q,  --quiet\n\t\tReduces verbose level (also cumulative).\n");
-    printf("\t-s,  --status\n\t\tShow how many cards needs review in each database.\n");
+    printf("\t-s,  --status\n\t\tShows how many cards in need of a review in each database. Together with -n N, shows only the status of a single chosen database.\n");
     printf("\t-i,  --invert\n\t\tInvert presentation order (show first the back, then the front of the card).\n");
     printf("\t-u username,  --user username\n\t\tUse the username's profile. If not given, defaults to the -p username or the username from the system.\n");
     printf("\t-p username,  --path username\n\t\tSet the username used for the config path (it is mandatory to use together with -s).\n");
-    printf("\t-n N, --number N\n\t\tPick a database number to start right away.\n");
+    printf("\t-n N, --number N\n\t\tPick a database number to start right away. With -s, prints the status of only a specific database.\n");
     printf("\t-d file.ex4,  --database file.ex4\n\t\tUse the given database to practice.\n\t\tThe file must have a '.ex4' extension\n\t\tand its name is in the form 'theme-front-verse.ex4', where:\n\t\t\t* theme: the theme of the study.\n\t\t\t* front: the first side of the card, ex. question.\n\t\t\t* verse: the back side of the card, ex. answer.\n");
     /* add more options here */
     printf("\nExit status:\n\t0 if ok.\n\t1 some error occurred.\n");
