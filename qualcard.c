@@ -85,7 +85,8 @@
 
 /* #define BUILD (20160409.000957) / * * < Build Version Number */
 #define EXTDB ".ex4" /**< Database extension: theme-question-answer.ex4 (example: english-word-definition.ex4) */
-#define EXTCF ".cf4" /**< Configuration file extension: user-qualcard.cf4 */
+#define EXTCF ".cf4" /**< History file extension: user-qualcard.cf4 */
+#define CFGINI "qualcard.ini" /*<< Configuration file */
 #define SCOREA 4.92
 #define SCOREB 3.90
 #define SCOREC 3.05
@@ -119,6 +120,7 @@
 
 /* limits */
 #define STRSIZE 1500 /**< String buffer size */
+#define STROPT 100 /**< String size for options INI */
 #define SOPT 4 /* opt string '99\n\0' */
 #define PATHSIZE 1600 /**< Maximum $PATH size */
 #define DTSIZE 9 /**< String with yyyymmdd */
@@ -138,9 +140,9 @@ typedef struct scfg /* configuration data struct */
     int today; /* yyyymmdd */
     time_t tstart; /* start time (s) of this session */
     double session; /* duration of all session (s) */
-    char dbpath[PATHSIZE]; /* path to commom database */
-    char cfgrealpath[PATHSIZE]; /* path to own config directory (history and databases), read and write */
-    char cfguserpath[PATHSIZE]; /* path to some user config directory (just for read) */
+    char dbpath[PATHSIZE]; /* path to commom database directory */
+    char cfgrealpath[PATHSIZE]; /* path to own config directory with config (ini), history (cf4) and databases (ex4), read and write */
+    char cfguserpath[PATHSIZE]; /* path to some other user config directory (just for read) */
     char pathuser[STRSIZE]; /* pathuser/.config another user name account for read only */
     char fileuser[STRSIZE]; /* fileuser-theme-question-answer.cf4 history file for username currently practicing */
     char realuser[STRSIZE]; /* user name of the account */
@@ -151,6 +153,7 @@ typedef struct scfg /* configuration data struct */
     char **dbfiles; /* char dbfiles[number of ex4 files][string lenght of the biggest];*/
     int dbfsize; /* number of database ex4 files */
     int invert; /* if true, print first the back, then the front of the card */
+    int option[2]; /* [0]:order=[0:sort, 1:random], [1]:score=[0:after, 1:before] */
 } tcfg; /* configuration data type */
 
 /* ---------------------------------------------------------------------- */
@@ -189,6 +192,8 @@ char *dbcore(char *s); /* grab the core name of the file */
 void sessiontime(tcfg *c); /* calculates duration of this session and accumulated time */
 double getactime(FILE *fp); /* read time if exists. points to first card stat */
 void sstrip(char *s); /* remove \n \t and double spaces from string */
+void setoption(int optini[2], char *optarg); /* read option from command line and update vector of options in memory */
+void cmpoption(int coption[2], int optini[2]); /* compare command line options with INI file and save if necessary */
 
 /* ---------------------------------------------------------------------- */
 /* @ingroup GroupUnique */
@@ -238,6 +243,7 @@ int main(int argc, char *argv[])
     int repet[10] = {0}; /* which card repeated how many times */
     double sco, oldsco; /* the score to a card */
     char cardfr[STRSIZE], cardbk[STRSIZE]; /* card front and back */
+    int optini[2] = {0}; /* options in memory to compare to INI file */
 
     IFDEBUG("Starting optarg loop...\n");
 
@@ -254,9 +260,14 @@ int main(int argc, char *argv[])
      *        -n N              Pick a database number N from command line. With -s, print status of
      *                              that specific database.
      *        -i                Invert presentation order (first the back, then the front of the card).
+     *
+     *        -e OPTION=VALUE   Set OPTION. Options are: order=[sort|random], score=[before|after]
+     *                          Example: qualcard -e order=sort -e score=after
+     *                          Options are saved into ~/.config/qualcard/qualcard.ini
+              int option[2];   [0]:order=[0:sort, 1:random], [1]:score=[0:after, 1:before] BUG
      */
     opterr = 0;
-    while((opt = getopt(argc, argv, "hcvqsp:u:d:in:")) != EOF)
+    while((opt = getopt(argc, argv, "hcvqsp:u:d:in:e:")) != EOF)
         switch(opt)
         {
             case 'h': /* help and exit */
@@ -295,6 +306,9 @@ int main(int argc, char *argv[])
                     /* exit(EXIT_FAILURE); */
                 }
                 break;
+            case 'e': /* options -e order=sort/random -e score=after/before */
+                setoption(optini, optarg); /* read option from command line and update vector of options in memory */
+                break;
             case '?':  /* wrong option, exit */
             default:
                 printf("Type\n\t$man %s\nor\n\t$%s -h\nfor help.\n\n", argv[0], argv[0]);
@@ -320,6 +334,7 @@ int main(int argc, char *argv[])
     }
 
     qualcard_init(&c); /* initialization function */
+    cmpoption(c.option, optini); /* compare command line options with INI file and save if necessary */
 
     if(DBNUM != 0)
     {
@@ -480,6 +495,54 @@ void save2file(tcfg c)
     return;
 }
 
+/* read option from command line and update vector of options in memory */
+/* options -e order=sort/random -e score=after/before */
+void setoption(int optini[2], char *optarg)
+{
+    char *p=NULL;
+    char option[STROPT];
+    char value[STROPT];
+    int o=-1, v=-1; /* option and value indexes */
+
+    strncpy(option, optarg, STROPT);
+    if((p = strchr(option, '=')==NULL))
+        return;
+    *p='\0';
+
+    if(!strncmp(option, "order", STROPT))
+        o=0;
+    if(!strncmp(option, "score", STROPT))
+        o=1;
+    if(o==-1)
+        return;
+
+    strncpy(value, *(p+1), STROPT);
+    if(o==0)
+    {
+        if(!strncmp(value, "sort", STROPT))
+            v=0;
+        if(!strncmp(value, "random", STROPT))
+            v=1;
+    }
+    if(o==1)
+    {
+        if(!strncmp(value, "after", STROPT))
+            v=0;
+        if(!strncmp(value, "before", STROPT))
+            v=1;
+    }
+    if(v==-1)
+        return;
+    optini[o]=v;
+    return;
+}
+
+/* compare command line options with INI file and save if necessary */
+void cmpoption(int coption[2], int optini[2])
+{
+    ;
+}
+
 /* get card faces */
 void cardfaces(char *card, char *fr, char *bk)
 {
@@ -633,7 +696,7 @@ void select10cards(tcfg *c, int tencards[10][2])
     }
 }
 
-/* database ex4 size */
+/* database ex4 size, number of lines = QTDCARD */
 int dbsize(char *dbname)
 {
     char line[STRSIZE];
