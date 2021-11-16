@@ -265,7 +265,6 @@ int main(int argc, char *argv[])
      *        -e OPTION=VALUE   Set OPTION. Options are: order=[sort|random], score=[before|after]
      *                          Example: qualcard -e order=sort -e score=after
      *                          Options are saved into ~/.config/qualcard/qualcard.ini
-              int option[2];   [0]:order=[0:sort, 1:random], [1]:score=[0:after, 1:before] BUG
      */
     opterr = 0;
     while((opt = getopt(argc, argv, "hcvqsp:u:d:in:e:")) != EOF)
@@ -407,8 +406,10 @@ int main(int argc, char *argv[])
 
             do
             {
-                /* printf("Your self-evaluation (from 0 to 5, default 0) is: "); */
-                printf("Current score: %.1f  Self-evaluation ([0] ... 5): ", oldsco);
+                if(c.option[1]==0) /* INI score=after */
+                    printf("Your self-evaluation (from 0 to 5, default 0) is: ");
+                else /* INI score=before */
+                    printf("Current score: %.1f  Self-evaluation ([0] ... 5): ", oldsco);
                 /* scanf("%d%*c", &opt); /1* discard the '\n'. Better use fgets() *1/ */
                 fgets(sopt, SOPT, stdin);
                 if((p = strchr(sopt, '\n'))) * p = '\0';
@@ -435,8 +436,10 @@ int main(int argc, char *argv[])
                 if(tencards[i][TMEM] == TVAL)
                     tencards[i][TMEM] = c.cfsize - 1;
                 futd = newdate(c.today, ave2day(c.cfave[tencards[i][TMEM]]));
-                /* printf("Old score: %.1f, new score: %.1f, revision set to %s\n", oldsco, c.cfave[tencards[i][TMEM]], prettydate(futd)); */
-                printf("New score: %.1f  Revision set to %s\n", c.cfave[tencards[i][TMEM]], prettydate(futd));
+                if(c.option[1]==0) /* INI score=after */
+                    printf("Old score: %.1f, new score: %.1f, revision set to %s\n", oldsco, c.cfave[tencards[i][TMEM]], prettydate(futd));
+                else /* INI score=before */
+                    printf("New score: %.1f  Revision set to %s\n", c.cfave[tencards[i][TMEM]], prettydate(futd));
                 tencards[i][TMEM] = TEND; /* presented and ok */
             }
         } /* for i < 10 cards */
@@ -1684,8 +1687,10 @@ void help(void)
     printf("\t-n N, --number N\n\t\tPick a database number to start right away. With -s, prints the status of only a specific database.\n");
     printf("\t-d file.ex4,  --database file.ex4\n\t\tUse the given database to practice.\n\t\tThe file must have a '.ex4' extension\n\t\tand its name is in the form 'theme-front-verse.ex4', where:\n\t\t\t* theme: the theme of the study.\n\t\t\t* front: the first side of the card, ex. question.\n\t\t\t* verse: the back side of the card, ex. answer.\n");
     /* add more options here */
+    printf("\t-n N, --number N\n\t\tPick a database number to start right away. With -s, prints the status of only a specific database.\n");
+    printf("\t-e OPTION=VALUE\n\t\t Set OPTION. Options are: order=[sort|random], score=[before|after]\n\t\t Example: qualcard -e order=sort -e score=after\n\t\t Options are saved into ~/.config/qualcard/qualcard.ini\n");
     printf("\nExit status:\n\t0 if ok.\n\t1 some error occurred.\n");
-    printf("\nTodo:\n\tLong options not implemented yet.\n");
+    printf("\nTodo:\n\tLong options not implemented yet.\n\tsort=random not implemented yet.\n");
     printf("\nAuthor:\n\tWritten by %s <%s>\n\n", "Ruben Carlo Benante", "rcb@beco.cc");
     exit(EXIT_FAILURE);
 }
