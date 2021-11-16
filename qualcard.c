@@ -193,7 +193,8 @@ void sessiontime(tcfg *c); /* calculates duration of this session and accumulate
 double getactime(FILE *fp); /* read time if exists. points to first card stat */
 void sstrip(char *s); /* remove \n \t and double spaces from string */
 void setoption(int optini[2], char *optarg); /* read option from command line and update vector of options in memory */
-void cmpoption(int coption[2], int optini[2]); /* compare command line options with INI file and save if necessary */
+void readini(tcfg *c); /* read INI file options */
+void cmpoption(tcfg *c, int mopt[2]); /* compare command line options with INI file and save if necessary */
 
 /* ---------------------------------------------------------------------- */
 /* @ingroup GroupUnique */
@@ -243,7 +244,7 @@ int main(int argc, char *argv[])
     int repet[10] = {0}; /* which card repeated how many times */
     double sco, oldsco; /* the score to a card */
     char cardfr[STRSIZE], cardbk[STRSIZE]; /* card front and back */
-    int optini[2] = {0}; /* options in memory to compare to INI file */
+    int memopt[2] = {-1, -1}; /* options in memory to compare to INI file */
 
     IFDEBUG("Starting optarg loop...\n");
 
@@ -307,7 +308,7 @@ int main(int argc, char *argv[])
                 }
                 break;
             case 'e': /* options -e order=sort/random -e score=after/before */
-                setoption(optini, optarg); /* read option from command line and update vector of options in memory */
+                setoption(memopt, optarg); /* read option from command line and update vector of options in memory */
                 break;
             case '?':  /* wrong option, exit */
             default:
@@ -334,7 +335,7 @@ int main(int argc, char *argv[])
     }
 
     qualcard_init(&c); /* initialization function */
-    cmpoption(c.option, optini); /* compare command line options with INI file and save if necessary */
+    cmpoption(&c, memopt); /* compare command line options with INI file and save if necessary */
 
     if(DBNUM != 0)
     {
@@ -363,7 +364,7 @@ int main(int argc, char *argv[])
         printf("History  file: %s\n", filenopath(c.configwf));
     }
 
-    readcfg(&c);
+    readcfg(&c); /* read card stats from chosen dbfile */
     select10cards(&c, tencards);
 
     printf("\n");
@@ -495,17 +496,20 @@ void save2file(tcfg c)
     return;
 }
 
-/* read option from command line and update vector of options in memory */
+/* read option from string and update vector of options */
 /* options -e order=sort/random -e score=after/before */
-void setoption(int optini[2], char *optarg)
+void setoption(int vopt[2], char *sopt)
 {
     char *p = NULL;
     char option[STROPT];
     char value[STROPT];
     int o = -1, v = -1; /* option and value indexes */
 
-    strncpy(option, optarg, STROPT);
-    if((p = strchr(option, '=') == NULL))
+    strncpy(option, sopt, STROPT);
+    /* printf("setoption option='%s'\n", option); */
+    if((p = strchr(option, '\n')) != NULL)
+        * p = '\0';
+    if((p = strchr(option, '=')) == NULL)
         return;
     *p = '\0';
 
@@ -516,7 +520,8 @@ void setoption(int optini[2], char *optarg)
     if(o == -1)
         return;
 
-    strncpy(value, *(p + 1), STROPT);
+    strncpy(value, p + 1, STROPT);
+    /* printf("setoption value='%s'\n", value); */
     if(o == 0)
     {
         if(!strncmp(value, "sort", STROPT))
@@ -533,14 +538,65 @@ void setoption(int optini[2], char *optarg)
     }
     if(v == -1)
         return;
-    optini[o] = v;
+
+    vopt[o] = v;
     return;
 }
 
 /* compare command line options with INI file and save if necessary */
-void cmpoption(int coption[2], int optini[2])
+void cmpoption(tcfg *c, int mopt[2])
 {
-    ;
+    int o;
+    int fs = 0; /* flag save is necessary */
+    char filename[STRSIZE];
+    FILE *fp;
+
+    for(o = 0; o < 2; o++)
+    {
+        if(mopt[o] == -1)
+            continue;
+        if(c->option[o] == mopt[o])
+            continue;
+        fs = 1;
+        c->option[o] = mopt[o];
+    }
+
+    if(verb > 1)
+    {
+        printf("INI option order=%s\n", c->option[0] ? "random" : "sort");
+        printf("INI option score=%s\n", c->option[1] ? "before" : "after");
+    }
+
+    if(fs) /* saving ini file */
+    {
+        snprintf(filename, STRSIZE, "%s/%s", c->cfgrealpath, CFGINI);
+        if((fp = fopen(filename, "w")) != NULL) /* lets save a ini file! */
+        {
+            fprintf(fp, "# Qualcard Initialization File\n");
+            fprintf(fp, "# 2021-11-15 (C) by Ruben Carlo Benante\n");
+            fprintf(fp, "#\n");
+            fprintf(fp, "# Usage:\n");
+            fprintf(fp, "# option=value\n");
+            fprintf(fp, "#\n");
+            fprintf(fp, "# Options available:\n");
+            fprintf(fp, "#\n");
+            fprintf(fp, "# order=[sort|random]\n");
+            fprintf(fp, "#       sort   : select cards on due date (default)\n");
+            fprintf(fp, "#       random : select random cards to practice\n");
+            fprintf(fp, "#\n");
+            fprintf(fp, "# score=[after|before]\n");
+            fprintf(fp, "#       after  : show old score only after asking your self-evaluation (default)\n");
+            fprintf(fp, "#       before : show score before asking your self-evaluation\n");
+            fprintf(fp, "\n");
+            fprintf(fp, "order=%s\n", c->option[0] ? "random" : "sort");
+            fprintf(fp, "score=%s\n", c->option[1] ? "before" : "after");
+            fprintf(fp, "\n");
+
+            fclose(fp);
+        }
+        else
+            fprintf(stderr, "Can't save INI file.\n");
+    }
 }
 
 /* get card faces */
@@ -1178,6 +1234,7 @@ void qualcard_init(tcfg *cfg)
         exit(EXIT_FAILURE);
     }
 
+    readini(cfg); /* read INI file options */
     return;
 }
 
@@ -1319,7 +1376,29 @@ void *reallocordie(void *ptr, size_t sz)
     return tmp;
 }
 
-/* read config file to memory */
+/* ---------------------------------------------------------------------- */
+/* read INI file options */
+void readini(tcfg *c)
+{
+    FILE *fp;
+    char line[STROPT];
+    char filename[STRSIZE];
+
+    /* printf("(1) readini option[0] = %d option[1] = %d\n", c->option[0], c->option[1]); */
+    snprintf(filename, STRSIZE, "%s/%s", c->cfgrealpath, CFGINI);
+    if((fp = fopen(filename, "r")) != NULL) /* we've got a ini file! */
+    {
+        while(fgets(line, STROPT, fp))
+            setoption(c->option, line);
+        fclose(fp);
+    }
+    /* printf("(2) readini option[0] = %d option[1] = %d\n", c->option[0], c->option[1]); */
+    return;
+}
+
+
+/* ---------------------------------------------------------------------- */
+/* read history cf4 file to memory */
 void readcfg(tcfg *c)
 {
     int i;
