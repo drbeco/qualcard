@@ -499,41 +499,41 @@ void save2file(tcfg c)
 /* options -e order=sort/random -e score=after/before */
 void setoption(int optini[2], char *optarg)
 {
-    char *p=NULL;
+    char *p = NULL;
     char option[STROPT];
     char value[STROPT];
-    int o=-1, v=-1; /* option and value indexes */
+    int o = -1, v = -1; /* option and value indexes */
 
     strncpy(option, optarg, STROPT);
-    if((p = strchr(option, '=')==NULL))
+    if((p = strchr(option, '=') == NULL))
         return;
-    *p='\0';
+    *p = '\0';
 
     if(!strncmp(option, "order", STROPT))
-        o=0;
+        o = 0;
     if(!strncmp(option, "score", STROPT))
-        o=1;
-    if(o==-1)
+        o = 1;
+    if(o == -1)
         return;
 
-    strncpy(value, *(p+1), STROPT);
-    if(o==0)
+    strncpy(value, *(p + 1), STROPT);
+    if(o == 0)
     {
         if(!strncmp(value, "sort", STROPT))
-            v=0;
+            v = 0;
         if(!strncmp(value, "random", STROPT))
-            v=1;
+            v = 1;
     }
-    if(o==1)
+    if(o == 1)
     {
         if(!strncmp(value, "after", STROPT))
-            v=0;
+            v = 0;
         if(!strncmp(value, "before", STROPT))
-            v=1;
+            v = 1;
     }
-    if(v==-1)
+    if(v == -1)
         return;
-    optini[o]=v;
+    optini[o] = v;
     return;
 }
 
@@ -639,12 +639,12 @@ void sortmemo(tcfg *c)
     for(i = 0; i < c->cfsize - 1; i++)
         for(j = i + 1; j < c->cfsize; j++)
         {
-            ki = newdate(c->cfdate[i], ave2day(c->cfave[i])) + c->cfave[i]/10.0;
-            kj = newdate(c->cfdate[j], ave2day(c->cfave[j])) + c->cfave[j]/10.0;
+            ki = newdate(c->cfdate[i], ave2day(c->cfave[i])) + c->cfave[i] / 10.0;
+            kj = newdate(c->cfdate[j], ave2day(c->cfave[j])) + c->cfave[j] / 10.0;
             if(ki > kj) /* ki is after, invert */
             {
                 /* if(ki == kj && c->cfave[i] <= c->cfave[j]) /1* 1st score is lower, do not swap *1/ */
-                    /* continue; */
+                /* continue; */
                 /* swap cards number */
                 iux = c->cfcard[i];
                 c->cfcard[i] = c->cfcard[j];
@@ -724,14 +724,14 @@ double getactime(FILE *fp)
 {
     int card, date;
     double ave;
-    double ac=0.0;
-    errno=0;
+    double ac = 0.0;
+    errno = 0;
 
     fseek(fp, 0, 0);
     if(3 == fscanf(fp, "%d %d %lf\n", &card, &date, &ave))
     {
         fseek(fp, 0, 0);
-        errno=ENODATA;
+        errno = ENODATA;
         return 0.0; /* old file format, no accumulated time */
     }
 
@@ -739,7 +739,7 @@ double getactime(FILE *fp)
     if(1 == fscanf(fp, "%lf\n", &ac)) /* read first line of accumulated time */
         return ac; /* let it point to the second line and return */
 
-    errno=EPROTO;
+    errno = EPROTO;
     perror("some strange error\n");
     fseek(fp, 0, 0);
     return 0.0; /* no accumulated time */
@@ -907,7 +907,7 @@ void summary(tcfg c)
 
     for(i = 0; i < c.dbfsize; i++) /* database file list */
     {
-        if(DBNUM && DBNUM-1 != i)
+        if(DBNUM && DBNUM - 1 != i)
             continue;
         qtd = dbsize(c.dbfiles[i]);
 
@@ -936,7 +936,7 @@ void summary(tcfg c)
             sstrip(cardfr);
             sstrip(cardbk);
             /* printf("debug revisao %d score: %lf --", c.cfdate[i], c.cfave[i]); */
-            printf("Card: %4d   Revision: %s   Score: %.4lf   Brief: %.9s :: %.9s\n", c.cfcard[i]+1, prettydate(newdate(c.cfdate[i], ave2day(c.cfave[i]))), c.cfave[i], cardfr, cardbk);
+            printf("Card: %4d   Revision: %s   Score: %.4lf   Brief: %.9s :: %.9s\n", c.cfcard[i] + 1, prettydate(newdate(c.cfdate[i], ave2day(c.cfave[i]))), c.cfave[i], cardfr, cardbk);
         }
     }
     return;
@@ -946,21 +946,21 @@ void summary(tcfg c)
 void sstrip(char *s)
 {
     char *p;
-    int fr=1; /* flag remove */
+    int fr = 1; /* flag remove */
 
-    if(strlen(s)<2)
+    if(strlen(s) < 2)
         return;
     while((p = strchr(s, '\n')))
-        *p = ' ';
+        * p = ' ';
     while((p = strchr(s, '\t')))
-        *p = ' ';
+        * p = ' ';
     while(fr)
     {
         fr = 0;
-        p=s;
+        p = s;
         while(*p)
         {
-            if(*p==' ' && *(p+1)==' ')
+            if(*p == ' ' && *(p + 1) == ' ')
             {
                 fr = 1;
                 break;
@@ -969,7 +969,7 @@ void sstrip(char *s)
         }
         while(*p)
         {
-            *p = *(p+1);
+            *p = *(p + 1);
             p++;
         }
     }
@@ -1210,7 +1210,8 @@ void menudb(tcfg *cfg)
                 else
                     scanf("%d%*c", &dbnum); /* ignore '\n' */
             }
-        } while(dbnum < 1 || dbnum > cfg->dbfsize);
+        }
+        while(dbnum < 1 || dbnum > cfg->dbfsize);
         dbnum--;
         strncpy(cfg->dbasef, cfg->dbfiles[dbnum], STRSIZE); /* dbasef set */
     }
