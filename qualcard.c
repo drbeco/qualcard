@@ -854,9 +854,7 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, double
         *pct = 5.0;
     *pct *= 20.0; /* 0%..100% */
 
-    if(*view == 0)
-        *addscore = 0.0;
-    else
+    if(*view > 0)
         *addscore /= ((double) * view); /* average of scores you've got so far */
 
     if(*addscore > SCOREA && alla) /* it is not impossible to achieve 5.0 */
