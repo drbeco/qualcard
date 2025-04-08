@@ -110,6 +110,11 @@
 #define BASKETERROR  -3 /**< randnorep() return code for other error */
 #define BASKETFULL   -4 /**< randnorep() return code for full basket */
 
+/* VERSION */
+#ifndef VERSION /* gcc -DDEBUG=1 */
+#define VERSION "1.7.20250408.141740" /**< VERSION comes from makefile*/
+#endif
+
 /* Debug */
 #ifndef DEBUG /* gcc -DDEBUG=1 */
 #define DEBUG 0 /**< Activate/deactivate debug mode */
