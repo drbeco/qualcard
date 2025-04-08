@@ -817,6 +817,7 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, double
     double ave; /* average of a single card written in disk */
     FILE *fp;
     int alla = 1; /* all cards are A */
+    double weight; /* accumulator for hybrid Compl.% */
 
     *view = 0; /* number of cards viewed from the total */
     *learn = 0; /* number of cards with score greater than SCOREA */
@@ -829,12 +830,19 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, double
 
     ave = getactime(fp); /* ignore accumulated time if it exists */
 
+    weight = 0.0;
     while(3 == fscanf(fp, "%d %d %lf\n", &card, &date, &ave))
     {
         (*view)++;
         *addscore += ave;
         if(ave >= SCOREB)
+        {
             (*learn)++;
+            weight += 1.0;
+        }
+        else
+            weight += ave / 5.14;
+
         if(ave < SCOREA)
             alla = 0; /* not all cards are A */
 
@@ -849,14 +857,16 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, double
     }
     fclose(fp);
 
-    *pct /= ((double)qtd);
-    if(*pct > SCOREA && alla) /* it is not impossible to achieve 100% */
-        *pct = 5.0;
-    *pct *= 20.0; /* 0%..100% */
+    /* old v1.7 */
+    /* *pct /= ((double)qtd); */
+    /* if(*pct > SCOREA && alla) /1* it is not impossible to achieve 100% *1/ */
+        /* *pct = 5.0; */
+    /* *pct *= 20.0; /1* 0%..100% *1/ */
+
+    *pct = qtd ? (weight / qtd * 100.0) : 0.0 ;
 
     if(*view > 0)
         *addscore /= ((double) * view); /* average of scores you've got so far */
-
     if(*addscore > SCOREA && alla) /* it is not impossible to achieve 5.0 */
         *addscore = 5.0;
 
