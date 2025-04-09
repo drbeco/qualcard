@@ -85,7 +85,7 @@
 
 /* #define BUILD (20160409.000957) / * * < Build Version Number */
 #define EXTDB ".ex4" /**< Database extension: theme-question-answer.ex4 (example: english-word-definition.ex4) */
-#define EXTCF ".cf4" /**< History file extension: user-qualcard.cf4 */
+#define EXTCF ".cf4" /**< History file, extension: user-qualcard.cf4 */
 #define CFGINI "qualcard.ini" /*<< Configuration file */
 #define SCOREA 4.92
 #define SCOREB 3.90
@@ -151,10 +151,10 @@ typedef struct scfg /* configuration data struct */
     char pathuser[STRSIZE]; /* pathuser/.config another user name account for read only */
     char fileuser[STRSIZE]; /* fileuser-theme-question-answer.cf4 history file for username currently practicing */
     char realuser[STRSIZE]; /* user name of the account */
-    char dbasef[STRSIZE], configwf[STRSIZE]; /* current filenames: database (ex4) and configuration (cf4) */
+    char dbasef[STRSIZE], histf[STRSIZE]; /* current filenames: database (ex4) and history (cf4) */
     int *cfcard, *cfdate; /* card num, last date */
     double *cfave; /* card average */
-    int cfsize; /* size of config file, number of cards */
+    int cfsize; /* size of history file, number of cards */
     char **dbfiles; /* char dbfiles[number of ex4 files][string lenght of the biggest];*/
     int dbfsize; /* number of database ex4 files */
     int invert; /* if true, print first the back, then the front of the card */
@@ -172,7 +172,7 @@ double randmm(double min, double max); /* drawn a number from [min, max[ */
 int ave2day(double ave); /* given an average, return how many days */
 int newdate(int oldd, int days); /* add days to a date */
 char *prettydate(int somedate); /* return date in a pretty format */
-void readcfg(tcfg *c); /* read config file */
+void readcfg(tcfg *c); /* read history file */
 void *reallocordie(void *ptr, size_t sz); /* resize the memory block of a pointer or die */
 void readdbfiles(tcfg *c); /* read files from directory and create a dynamic vector of strings */
 char *theme(char *file); /* take the theme from a database file name */
@@ -182,9 +182,9 @@ void sortmemo(tcfg *c); /* prioritary (old) comes first (selection sort) */
 void getcard(char *dbfile, int cardnum, char *cardfr, char *cardbk); /* given a card number, get it from file */
 void cardfaces(char *card, char *fr, char *bk); /* get card faces front/back */
 void save2memo(tcfg *c, int i, int card, double scor); /* save new or update old card */
-void save2file(tcfg c); /* save updated cards in memory to config file */
+void save2file(tcfg c); /* save updated cards in memory to history file */
 int dbsize(char *dbname); /* database ex4 size */
-void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, double *pct, double *addscore, int *ncardl); /* analyses a history file */
+void cfanalyses(char *histfile, int today, int qtd, int *view, int *learn, double *pct, double *addscore, int *ncardl); /* analyses a history file */
 void createcfgdir(tcfg *c); /* creates /home/user/.config/qualcard/ */
 char *filenopath(char *filepath); /* get filename with no path */
 int randnorep(int mode, int *n); /* drawn numbers from a list with no repetition */
@@ -365,7 +365,7 @@ int main(int argc, char *argv[])
     if(verb > 2)
     {
         printf("\nDataBase file: %s (%d cards)\n", filenopath(c.dbasef), c.QTDCARD);
-        printf("History  file: %s\n", filenopath(c.configwf));
+        printf("History  file: %s\n", filenopath(c.histf));
     }
 
     readcfg(&c); /* read card stats from chosen dbfile */
@@ -480,7 +480,7 @@ void save2memo(tcfg *c, int i, int card, double scor)
     return;
 }
 
-/* save updated cards in memory to config file */
+/* save updated cards in memory to history file */
 /* file format cf4:
  *          session time (double)
  *          card number (int) card last date (int) card grade average (double)
@@ -491,7 +491,7 @@ void save2file(tcfg c)
     int i;
     FILE *fp;
 
-    if((fp = fopen(c.configwf, "w")) != NULL) /* create from scratch */
+    if((fp = fopen(c.histf, "w")) != NULL) /* create from scratch */
     {
         fprintf(fp, "%lf\n", c.session); /* accumulated time */
         for(i = 0; i < c.cfsize; i++)
@@ -500,7 +500,7 @@ void save2file(tcfg c)
         fclose(fp);
     }
     else  /* /home/carol/.config/qualcard/carol-ls-key-description.cf4 */
-        fprintf(stderr, "save2file(): can't open config file %s for writing.\n", c.configwf);
+        fprintf(stderr, "save2file(): can't open history file %s for writing.\n", c.histf);
     return;
 }
 
@@ -810,7 +810,7 @@ double getactime(FILE *fp)
 }
 
 /* history analises */
-void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, double *pct, double *addscore, int *ncardl)
+void cfanalyses(char *histfile, int today, int qtd, int *view, int *learn, double *pct, double *addscore, int *ncardl)
 {
     int card, date, revd; /* card number, card date last seen, card review date */
     int late; /* days late */
@@ -818,6 +818,7 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, double
     FILE *fp;
     int alla = 1; /* all cards are A */
     double weight; /* accumulator for hybrid Compl.% */
+    double penalty; /* cap penalty */
 
     *view = 0; /* number of cards viewed from the total */
     *learn = 0; /* number of cards with score greater than SCOREA */
@@ -825,12 +826,13 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, double
     *addscore = 0.0; /* just the scores of cards seen */
     *ncardl = 0; /* number of cards late that need review */
 
-    if(!(fp = fopen(sumfile, "r"))) /* temporary configwf in a loop */
+    if(!(fp = fopen(histfile, "r"))) /* temporary histfile in a loop */
         return;
 
     ave = getactime(fp); /* ignore accumulated time if it exists */
 
     weight = 0.0;
+    /* ~/.config/qualcard/histfile.cf4 format:  11 20211211 3.8462 */
     while(3 == fscanf(fp, "%d %d %lf\n", &card, &date, &ave))
     {
         (*view)++;
@@ -844,13 +846,15 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, double
             (*ncardl)++;
         }
 
+        /* penalty = fmax(1.0 - late / 25.0, 0.0); /1* Cap penalty *1/ */
+        penalty = exp(-late / 365.0); /* Exponencial decay, 365-day scale */
         if(ave >= SCOREB)
         {
             (*learn)++;
-            weight += 1.0 * (1.0 - late / 25.0); /* full credit, with time penalty */
+            weight += 1.0 * penalty; /* full credit, with time penalty */
         }
         else
-            weight += (ave / 6.18) * (1.0 - late / 25.0); /* partial credit, with time penalty */
+            weight += (ave / 6.18) * penalty; /* partial credit, with time penalty */
 
         if(ave < SCOREA)
             alla = 0; /* not all cards are A */
@@ -968,7 +972,7 @@ void summary(tcfg c)
     double pct; /* percentage of your achievements, decay with time */
     int clate; /* number of cards late */
     int maxlen = 14, len;
-    char summaryf[PATHSIZE];
+    char histfile[PATHSIZE]; /* history file name */
     char cardfr[STRSIZE], cardbk[STRSIZE]; /* card front and back */
 
     for(i = 0; i < c.dbfsize; i++) /* database file list */
@@ -991,9 +995,9 @@ void summary(tcfg c)
             fprintf(stderr, "Summary filename overflow\n");
             exit(EXIT_FAILURE);
         }
-        snprintf(summaryf, PATHSIZE, "%s/%s-%s%s", c.cfguserpath, c.fileuser, dbc, EXTCF);
+        snprintf(histfile, PATHSIZE, "%s/%s-%s%s", c.cfguserpath, c.fileuser, dbc, EXTCF);
 
-        cfanalyses(summaryf, c.today, qtd, &view, &learn, &pct, &ave, &clate);
+        cfanalyses(histfile, c.today, qtd, &view, &learn, &pct, &ave, &clate);
         pview = ((double)view / (double)qtd) * 100.0;
         plearn = ((double)learn / (double)qtd) * 100.0;
 
@@ -1062,7 +1066,7 @@ char *theme(char *file)
     return theme;
 }
 
-/* Sorteia um cartao novo que esta no arquivo config e nunca foi visto */
+/* Sorteia um cartao novo que esta no arquivo history e nunca foi visto */
 int newcard(tcfg c, int tencards[10][2])
 {
     int l, i;
@@ -1256,7 +1260,7 @@ void qualcard_init(tcfg *cfg)
     return;
 }
 
-/* read database from menu, set dbsize, dbasef and configwf */
+/* read database from menu, set dbsize, dbasef and histf */
 void menudb(tcfg *cfg)
 {
     int i, dbnum;
@@ -1293,7 +1297,7 @@ void menudb(tcfg *cfg)
     cfg->QTDCARD = dbsize(cfg->dbasef);
     if(cfg->QTDCARD < 10)
     {
-        printf("Error in database %s.\nMust have at least 10 questions:answers (lines).\n", cfg->dbasef);
+        printf("Error in database %s.\nMust have at least 10 questions::answers (lines).\n", cfg->dbasef);
         exit(EXIT_FAILURE);
     }
 
@@ -1301,12 +1305,12 @@ void menudb(tcfg *cfg)
     /* ~/.config/qualcard/user-theme-front-verse.cf4 */
     if(strlen(cfg->cfgrealpath) + strlen(cfg->fileuser) + strlen(dbc) + strlen(EXTCF) >= STRSIZE)
     {
-        fprintf(stderr, "Configwf filename overflow\n");
+        fprintf(stderr, "History filename overflow\n");
         exit(EXIT_FAILURE);
     }
-    snprintf(cfg->configwf, STRSIZE, "%s/%s-%s%s", cfg->cfgrealpath, cfg->fileuser, dbc, EXTCF);
+    snprintf(cfg->histf, STRSIZE, "%s/%s-%s%s", cfg->cfgrealpath, cfg->fileuser, dbc, EXTCF);
     if(verb > 2)
-        printf("Configuration file: %s\n", cfg->configwf);
+        printf("History file: %s\n", cfg->histf);
 
     return;
 }
@@ -1426,8 +1430,8 @@ void readcfg(tcfg *c)
 
     c->cfcard = c->cfdate = NULL;
     c->cfave = NULL;
-    c->cfsize = 0; /* number of cards in config file */
-    if((fp = fopen(c->configwf, "r")) != NULL) /* we've got a file! */
+    c->cfsize = 0; /* number of cards in history file */
+    if((fp = fopen(c->histf, "r")) != NULL) /* we've got a file! */
     {
         c->session = getactime(fp);
         for(i = 0; 3 == fscanf(fp, "%d %d %lf\n", &card, &date, &ave); i++)
@@ -1491,7 +1495,7 @@ void readdbfiles(tcfg *c)
     struct dirent *ep;
     char *dot = NULL;
     int len;
-    int dois = 1; /* run twice, one for standard db path and other for config path */
+    int dois = 1; /* run twice, one for standard db path and other for history path */
     char fullname[PATHSIZE];
 
     c->dbfiles = NULL; /* risk of memory leak here: this line isn't needed */
@@ -1697,12 +1701,11 @@ void help(void)
     printf("\t-q,  --quiet\n\t\tReduces verbose level (also cumulative).\n");
     printf("\t-s,  --status\n\t\tShows how many cards in need of a review in each database. Together with -n N, shows only the status of a single chosen database.\n");
     printf("\t-i,  --invert\n\t\tInvert presentation order (show first the back, then the front of the card).\n");
-    printf("\t-u username,  --user username\n\t\tUse the username's profile. If not given, defaults to the -p username or the username from the system.\n");
+    printf("\t-u username,  --user username\n\t\tUse the username's profile. If not given, defaults to the current username.\n");
     printf("\t-p username,  --path username\n\t\tSet the username used for the config path (it is mandatory to use together with -s).\n");
     printf("\t-n N, --number N\n\t\tPick a database number to start right away. With -s, prints the status of only a specific database.\n");
     printf("\t-d file.ex4,  --database file.ex4\n\t\tUse the given database to practice.\n\t\tThe file must have a '.ex4' extension\n\t\tand its name is in the form 'theme-front-verse.ex4', where:\n\t\t\t* theme: the theme of the study.\n\t\t\t* front: the first side of the card, ex. question.\n\t\t\t* verse: the back side of the card, ex. answer.\n");
     /* add more options here */
-    printf("\t-n N, --number N\n\t\tPick a database number to start right away. With -s, prints the status of only a specific database.\n");
     printf("\t-e OPTION=VALUE\n\t\t Set OPTION. Options are: order=[sort|random], score=[before|after]\n\t\t Example: qualcard -e order=sort -e score=after\n\t\t Options are saved into ~/.config/qualcard/qualcard.ini\n");
     printf("\nExit status:\n\t0 if ok.\n\t1 some error occurred.\n");
     printf("\nTodo:\n\tLong options not implemented yet.\n\tsort=random not implemented yet.\n");
