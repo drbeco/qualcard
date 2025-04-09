@@ -835,16 +835,6 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, double
     {
         (*view)++;
         *addscore += ave;
-        if(ave >= SCOREB)
-        {
-            (*learn)++;
-            weight += 1.0;
-        }
-        else
-            weight += ave / 5.14;
-
-        if(ave < SCOREA)
-            alla = 0; /* not all cards are A */
 
         revd = newdate(date, ave2day(ave));
         late = 0;
@@ -853,7 +843,19 @@ void cfanalyses(char *sumfile, int today, int qtd, int *view, int *learn, double
             late = diffdays(today, revd);
             (*ncardl)++;
         }
-        *pct += score(ave, late); /* late is positive or zero */
+
+        if(ave >= SCOREB)
+        {
+            (*learn)++;
+            weight += 1.0 * (1.0 - late / 25.0); /* full credit, with time penalty */
+        }
+        else
+            weight += (ave / 6.18) * (1.0 - late / 25.0); /* partial credit, with time penalty */
+
+        if(ave < SCOREA)
+            alla = 0; /* not all cards are A */
+
+        /* *pct += score(ave, late); /1* late is positive or zero *1/ */
     }
     fclose(fp);
 
