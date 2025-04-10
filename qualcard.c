@@ -83,7 +83,7 @@
 /* ---------------------------------------------------------------------- */
 /* definitions */
 
-/* #define BUILD (20160409.000957) / * * < Build Version Number */
+/* #define BUILD (20160409.000957) / * * < First build Version Number */
 #define EXTDB ".ex4" /**< Database extension: theme-question-answer.ex4 (example: english-word-definition.ex4) */
 #define EXTCF ".cf4" /**< History file, extension: user-qualcard.cf4 */
 #define CFGINI "qualcard.ini" /*<< Configuration file */
@@ -112,7 +112,7 @@
 
 /* VERSION */
 #ifndef VERSION /* gcc -DDEBUG=1 */
-#define VERSION "1.7.20250408.141740" /**< VERSION comes from makefile*/
+#define VERSION "1.9.20250410.111416" /**< VERSION comes from makefile*/
 #endif
 
 /* Debug */
@@ -835,9 +835,9 @@ void cfanalyses(char *histfile, int today, int qtd, int *view, int *learn, doubl
 
     (void) getactime(fp); /* ignore accumulated time if it exists */
 
-    /* weight = 0.0; */
     completed(COMPLSTRT, ave, late, qtd); /* initialize weight 0.0 */
-    /* ~/.config/qualcard/histfile.cf4 format:  11 20211211 3.8462 */
+
+    /* History file formad: ~/.config/qualcard/histfile.cf4 :  11 20211211 3.8462 (first line, accumulated time) */
     while(3 == fscanf(fp, "%d %d %lf\n", &card, &date, &ave))
     {
         (*view)++;
@@ -857,19 +857,11 @@ void cfanalyses(char *histfile, int today, int qtd, int *view, int *learn, doubl
         if(ave < SCOREA)
             alla = 0; /* not all cards are A */
 
-        /* *pct += score(ave, late); /1* late is positive or zero *1/ */
         completed(COMPLCONT, ave, late, qtd); /* keep adding */
     }
     fclose(fp);
 
     *pct = completed(COMPLSTOP, ave, late, qtd); /* return result */
-    /* *pct = weight / qtd * 100.0; */
-    /* old v1.7, reinstated v1.9 */
-    /* *pct /= ((double)qtd); */
-    /* if(*pct > SCOREA && alla) /1* it is not impossible to achieve 100% *1/ */
-        /* *pct = 5.0; */
-    /* *pct *= 20.0; /1* 0%..100% *1/ */
-
 
     if(*view > 0)
         *addscore /= ((double) * view); /* average of scores you've got so far */
@@ -887,7 +879,6 @@ void cfanalyses(char *histfile, int today, int qtd, int *view, int *learn, doubl
  */
 double completed(int start, double ave, int late, int qtd)
 {
-    double penalty;
     static double weight=0.0;
 
     if(start == COMPLSTRT)
@@ -895,27 +886,22 @@ double completed(int start, double ave, int late, int qtd)
     if(start == COMPLSTOP)
         return weight / qtd * 100.0;
 
-    penalty = exp(-late / 80.7); /* Exponencial decay, halves points every 14 days (2 weeks) */
     if(ave >= SCOREB)
-        weight += 1.0 * penalty; /* full credit, with time penalty */
+        weight += score(ave, late) / 5.0; /* full credit, with time penalty */
     else
-        weight += (ave / 6.18) * penalty; /* partial credit, with time penalty */
-    return weight; // / qtd * 100.0;
+        weight += score(ave, late) / 6.18; /* partial credit, with time penalty */
+    return weight; // ignored when start == COMPLCONT
 }
 
 /* return the new score 0..5 when the revision is late */
 double score(double ave, int late)
 {
-    if(late == 0) /* score dont change */
-        return ave;
+    double scr = ave;
+    double penalty;
 
-    if(late == 1 && ave > SCOREA) /* penalty, but don't let one day spoil the fun */
-        return SCOREA + 0.01; /* fix 4.93 */
-
-    ave -= ((double)late / 3.5); /* int late, number of days */
-    if(ave < 0.0)
-        ave = 0.0;
-    return ave;
+    penalty = exp(-late / 80.7); /* Exponencial decay, halves every ~8 weeks */
+    scr = ave * penalty;
+    return scr;
 }
 
 /* calculates duration of this session and accumulated time */
