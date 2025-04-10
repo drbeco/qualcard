@@ -24,11 +24,12 @@ Projeto de Aprendizado de temas diversos via repetição espaçada de cartões (
     - (B) Média <= 4.92   -> reagendar para  9 dias
     - (A) Caso contrário  -> reagendar para 11 dias
 * Iniciando um cartão com a nota máxima 5.0, registrada como 5-23%=3.84, e recebendo sempre a nota máxima 5.0, sua progressão é: 3.84 (C), 4.42 (B), 4.71 (B), 4.85 (B), 4.93 (A).
-* A nota, para efeito da porcentagem final, decai com o tempo:
-    - Decaimento com taxa de 1 ponto a cada meia semana (3.5 dias).
-    - Isso significa que se um cartão estiver com nota máxima 5.0, seu valor será considerado zero para efeito de cálculo de porcentagem após 25 dias vencido.
-    - No mesmo exemplo, a nota máxima 5.0 será avaliada em 4.0 (perda de 1 ponto) em aproximadamente 10.5 dias.
-    - Quando na reapresentação do cartão atrasado, para cálculo de M1, a nota M0 continua tendo o valor 5.0.
+* A nota, para efeito da porcentagem de completude final, para conseguir o certificado, decai com o tempo:
+    - O valor da nota cai pela metade a cada 8 semanas sem revisão.
+    - Um cartão com nota máxima 5.0, vai a zero após 10 meses sem revisão.
+    - No mesmo exemplo, a nota máxima 5.0 cai para 4.0 em cerca de 3 semanas.
+    - Você pode aprender um baralho de 200 cartões estudando apenas 10 cartões por dia!
+    - No momento da revisão de um cartão atrasado, para cálculo de M1, a nota M0 terá seu novo valor como a média do valor original (antes do decaimento) e do valor após o decaimento de tempo.
 * Quando todos os cartões estiverem com média (A) ou (B), i.é, Nota>3.90, e dentro do prazo de revisão, o programa parabeniza o estudante e imprime um certificado com:
     - Nome completo e usuário
     - Data de início
