@@ -132,6 +132,11 @@
 #define PEREXEC 10 /**< How many cards presented per round (execution) */
 #define NEWEXEC 1 /**< Minimum number of new cards presented per round */
 
+/* completed() function for score */
+#define COMPLSTRT 0  /* completed() start */
+#define COMPLCONT 1  /* completed() continue */
+#define COMPLSTOP 2  /* completed() stop */
+
 /* ---------------------------------------------------------------------- */
 /* globals */
 
@@ -144,7 +149,7 @@ typedef struct scfg /* configuration data struct */
     int QTDCARD; /* database size */
     int today; /* yyyymmdd */
     time_t tstart; /* start time (s) of this session */
-    double session; /* duration of all session (s) */
+    double session; /* accumulated time of all session(s) */
     char dbpath[PATHSIZE]; /* path to commom database directory */
     char cfgrealpath[PATHSIZE]; /* path to own config directory with config (ini), history (cf4) and databases (ex4), read and write */
     char cfguserpath[PATHSIZE]; /* path to some other user config directory (just for read) */
@@ -169,7 +174,7 @@ void copyr(void); /* print version and copyright information */
 void qualcard_init(tcfg *cfg); /* global initialization function */
 void summary(tcfg c); /* how many cards to review */
 double randmm(double min, double max); /* drawn a number from [min, max[ */
-int ave2day(double ave); /* given an average, return how many days */
+int ave2day(double ave); /* given an average, return how many days for next review */
 int newdate(int oldd, int days); /* add days to a date */
 char *prettydate(int somedate); /* return date in a pretty format */
 void readcfg(tcfg *c); /* read history file */
@@ -181,7 +186,7 @@ void select10cards(tcfg *c, int tencards[10][2]); /* select 10 cards (old or new
 void sortmemo(tcfg *c); /* prioritary (old) comes first (selection sort) */
 void getcard(char *dbfile, int cardnum, char *cardfr, char *cardbk); /* given a card number, get it from file */
 void cardfaces(char *card, char *fr, char *bk); /* get card faces front/back */
-void save2memo(tcfg *c, int i, int card, double scor); /* save new or update old card */
+void save2memo(tcfg *c, int i, int card, double scor); /* save new or update old card in memory */
 void save2file(tcfg c); /* save updated cards in memory to history file */
 int dbsize(char *dbname); /* database ex4 size */
 void cfanalyses(char *histfile, int today, int qtd, int *view, int *learn, double *pct, double *addscore, int *ncardl); /* analyses a history file */
@@ -191,7 +196,6 @@ int randnorep(int mode, int *n); /* drawn numbers from a list with no repetition
 void changebarnet(char *s); /* change \n and \t to the real thing */
 void changecolon(char *nt); /* change char 254 back to a colon sign */
 int diffdays(int newd, int oldd); /* Difference of two dates in days. Positive if new>old, 0 if equals, negative c.c. */
-double score(double ave, int late); /* return the new score when the revision is late */
 void menudb(tcfg *c); /* read menu */
 char *dbcore(char *s); /* grab the core name of the file */
 void sessiontime(tcfg *c); /* calculates duration of this session and accumulated time */
@@ -200,6 +204,8 @@ void sstrip(char *s); /* remove \n \t and double spaces from string */
 void setoption(int optini[2], char *optarg); /* read option from command line and update vector of options in memory */
 void readini(tcfg *c); /* read INI file options */
 void cmpoption(tcfg *c, int mopt[2]); /* compare command line options with INI file and save if necessary */
+double score(double ave, int late); /* return the new score when the revision is late */
+double completed(int start, double ave, int late, int qtd); /* return a percentage 0..100 till the deck is finished */
 
 /* ---------------------------------------------------------------------- */
 /* @ingroup GroupUnique */
@@ -437,7 +443,7 @@ int main(int argc, char *argv[])
                     sco = (double)opt / ((double)repet[i] + 1.0);
                 else
                     sco = (double)opt;
-                save2memo(&c, tencards[i][TMEM], tencards[i][TFIL], sco);
+                save2memo(&c, tencards[i][TMEM], tencards[i][TFIL], sco); /* update card in memory */
                 if(tencards[i][TMEM] == TVAL)
                     tencards[i][TMEM] = c.cfsize - 1;
                 futd = newdate(c.today, ave2day(c.cfave[tencards[i][TMEM]]));
@@ -783,12 +789,12 @@ int dbsize(char *dbname)
     return --qtdl;
 }
 
-/* read time if exists. points to first card stat */
+/* get accumulated time if exists. points to first card stat */
 double getactime(FILE *fp)
 {
-    int card, date;
-    double ave;
-    double ac = 0.0;
+    int card, date; /* card_number, last_card_revision_date */
+    double ave; /* card_score_average */
+    double ac = 0.0; /* accumulated time session */
     errno = 0;
 
     fseek(fp, 0, 0);
@@ -813,12 +819,10 @@ double getactime(FILE *fp)
 void cfanalyses(char *histfile, int today, int qtd, int *view, int *learn, double *pct, double *addscore, int *ncardl)
 {
     int card, date, revd; /* card number, card date last seen, card review date */
-    int late; /* days late */
     double ave; /* average of a single card written in disk */
-    FILE *fp;
+    FILE *fp; /* file pointer to history file */
     int alla = 1; /* all cards are A */
-    double weight; /* accumulator for hybrid Compl.% */
-    double penalty; /* cap penalty */
+    int late=0; /* days late */
 
     *view = 0; /* number of cards viewed from the total */
     *learn = 0; /* number of cards with score greater than SCOREA */
@@ -829,9 +833,10 @@ void cfanalyses(char *histfile, int today, int qtd, int *view, int *learn, doubl
     if(!(fp = fopen(histfile, "r"))) /* temporary histfile in a loop */
         return;
 
-    ave = getactime(fp); /* ignore accumulated time if it exists */
+    (void) getactime(fp); /* ignore accumulated time if it exists */
 
-    weight = 0.0;
+    /* weight = 0.0; */
+    completed(COMPLSTRT, ave, late, qtd); /* initialize weight 0.0 */
     /* ~/.config/qualcard/histfile.cf4 format:  11 20211211 3.8462 */
     while(3 == fscanf(fp, "%d %d %lf\n", &card, &date, &ave))
     {
@@ -846,30 +851,25 @@ void cfanalyses(char *histfile, int today, int qtd, int *view, int *learn, doubl
             (*ncardl)++;
         }
 
-        /* penalty = fmax(1.0 - late / 25.0, 0.0); /1* Cap penalty *1/ */
-        penalty = exp(-late / 365.0); /* Exponencial decay, 365-day scale */
         if(ave >= SCOREB)
-        {
             (*learn)++;
-            weight += 1.0 * penalty; /* full credit, with time penalty */
-        }
-        else
-            weight += (ave / 6.18) * penalty; /* partial credit, with time penalty */
 
         if(ave < SCOREA)
             alla = 0; /* not all cards are A */
 
         /* *pct += score(ave, late); /1* late is positive or zero *1/ */
+        completed(COMPLCONT, ave, late, qtd); /* keep adding */
     }
     fclose(fp);
 
-    /* old v1.7 */
+    *pct = completed(COMPLSTOP, ave, late, qtd); /* return result */
+    /* *pct = weight / qtd * 100.0; */
+    /* old v1.7, reinstated v1.9 */
     /* *pct /= ((double)qtd); */
     /* if(*pct > SCOREA && alla) /1* it is not impossible to achieve 100% *1/ */
         /* *pct = 5.0; */
     /* *pct *= 20.0; /1* 0%..100% *1/ */
 
-    *pct = qtd ? (weight / qtd * 100.0) : 0.0 ;
 
     if(*view > 0)
         *addscore /= ((double) * view); /* average of scores you've got so far */
@@ -879,12 +879,40 @@ void cfanalyses(char *histfile, int today, int qtd, int *view, int *learn, doubl
     return;
 }
 
-/* return the new score when the revision is late */
+/* return percentage of completed database */
+/* flag start: 0=start the sum, 1=keep adding, 2=return result */
+/* Verification, tau=80.7:
+ * 5.0 -> 0.1 : ~316 days (~10 months)
+ * 5.0 -> 4.0 : ~21 days (~3 weeks)
+ */
+double completed(int start, double ave, int late, int qtd)
+{
+    double penalty;
+    static double weight=0.0;
+
+    if(start == COMPLSTRT)
+        weight = 0.0;
+    if(start == COMPLSTOP)
+        return weight / qtd * 100.0;
+
+    penalty = exp(-late / 80.7); /* Exponencial decay, halves points every 14 days (2 weeks) */
+    if(ave >= SCOREB)
+        weight += 1.0 * penalty; /* full credit, with time penalty */
+    else
+        weight += (ave / 6.18) * penalty; /* partial credit, with time penalty */
+    return weight; // / qtd * 100.0;
+}
+
+/* return the new score 0..5 when the revision is late */
 double score(double ave, int late)
 {
-    if(late == 1 && ave > SCOREA) /* don't let one day spoil the fun */
-        return SCOREA + 0.01;
-    ave -= ((double)late / 3.5);
+    if(late == 0) /* score dont change */
+        return ave;
+
+    if(late == 1 && ave > SCOREA) /* penalty, but don't let one day spoil the fun */
+        return SCOREA + 0.01; /* fix 4.93 */
+
+    ave -= ((double)late / 3.5); /* int late, number of days */
     if(ave < 0.0)
         ave = 0.0;
     return ave;
@@ -1327,7 +1355,7 @@ char *dbcore(char *s)
     return dbc;
 }
 
-/* given an average, return how many days */
+/* given an average, return how many days for next review */
 int ave2day(double ave)
 {
     if(ave <= SCOREF) /* G: review tomorrow */
@@ -1433,7 +1461,7 @@ void readcfg(tcfg *c)
     c->cfsize = 0; /* number of cards in history file */
     if((fp = fopen(c->histf, "r")) != NULL) /* we've got a file! */
     {
-        c->session = getactime(fp);
+        c->session = getactime(fp); /* get accumulated time session */
         for(i = 0; 3 == fscanf(fp, "%d %d %lf\n", &card, &date, &ave); i++)
         {
             c->cfcard = (int *)reallocordie(c->cfcard, sizeof(int) * (i + 1));
